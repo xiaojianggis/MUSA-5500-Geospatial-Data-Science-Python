@@ -15,7 +15,7 @@ function Layout({ children }) {
     <div className="page">
       <header className="header">
         <div className="container header-inner">
-          <h1 className="site-title">MUSA 550: Python for Spatial Data Science</h1>
+          <h1 className="site-title">MUSA 5500: Python for Spatial Data Science</h1>
           <nav className="nav">
             <Link to="/">Home</Link>
             <Link to="/syllabus">Syllabus</Link>
@@ -27,7 +27,7 @@ function Layout({ children }) {
           </nav>
         </div>
       </header>
-
+      
       <main className="main">
         {children}
       </main>

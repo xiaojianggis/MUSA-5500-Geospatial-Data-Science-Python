@@ -19,7 +19,7 @@ export default function Home(){
     return (
         <div className="container">
           <section className="hero">
-            <h2 className="hero-title">Welcome to MUSA Geosptial Data Science in Python</h2>
+            <h2 className="hero-title">Welcome to MUSA5500 Geosptial Data Science in Python</h2>
             <div className='hero-content'>
                 <div className='hero-text'>
                     <h2>
@@ -50,32 +50,33 @@ export default function Home(){
 
                       <div className="meta-block meta-span">
                       <div className="meta-label">TA</div>
-                        <div className="meta-value">
-                          Shengao Yi ·{" "}
-                          <a href="mailto:shengao@design.upenn.edu" className="contact-link">
-                          shengao@design.upenn.edu
-                          </a>
-                          <br />
-                          {" Office hour:"} Wed 11:45am to 13:45pm, <a href="https://www.wejoinin.com/sheets/irjyz">Schedule</a>, <a href="https://upenn.zoom.us/j/5518937381">Zoom Link</a>
-                          
-                        </div>
-                        <br />
 
                         <div className="meta-value">
-                          Frank Chen ·{" "}
-                          <a href="mailto:fchen9@design.upenn.edu" className="contact-link">
-                            fchen9@design.upenn.edu
+                          Mark Deng ·{" "}
+                          <a href="mailto:deng13@design.upenn.edu" className="contact-link">
+                            deng13@design.upenn.edu
                           </a>
                           <br />
-                          {" Office hour:"} Mon, 1:30 to 3:30pm, <a href="https://calendly.com/fchen9-upenn/office-hour">Schedule</a>, <a href="https://upenn.zoom.us/j/2100517683">Zoom Link</a>
+                          {" Office hour:"} Mon, 1:30 to 3:30pm, <a href="https://calendly.com/deng13-upenn/office-hour">Schedule</a>, <a href="https://upenn.zoom.us/j/2100517683">Zoom Link</a>
                         </div>
+
+                        <br />
+                        <div className="meta-value">
+                          Zhanchao Yang·{" "}
+                          <a href="mailto:zhanchao@design.upenn.edu" className="contact-link">
+                            zhanchao@design.upenn.edu
+                          </a>
+                          <br />
+                          {" Office hour:"} Mon, 1:30 to 3:30pm, <a href="https://calendly.com/deng13-upenn/office-hour">Schedule</a>, <a href="https://upenn.zoom.us/j/2100517683">Zoom Link</a>
+                        </div>
+
                       </div>
 
 
                       <div className="meta-block meta-span">
                         <div className="meta-label">Classroom</div>
                         <div className="meta-value">
-                          David Rittenhouse Laboratory, 3N1H
+                          Neural and Behavioral Sciences Building, <a href="https://facilities.upenn.edu/maps/locations/neural-behavioral-sciences-building" target="_blank" rel="noopener noreferrer">NBS 111</a>
                         </div>
                       </div>
                     </div>

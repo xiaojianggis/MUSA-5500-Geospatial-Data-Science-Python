@@ -4,27 +4,27 @@ import "./Syllabus.css"
 
 export default function Syllabus() {
   const schedule = [
-    { w: 1, date: "8/28/25", topic: "Course introduction and programming environment setup", lab: "Configure Anaconda, Jupyter, VS Code; Python basics (modules, read/write txt/csv, file ops, exceptions, functions)" },
-    { w: 2, date: "9/4/25", topic: "Lecture: Data Visualization Fundamentals", lab: "Read file and create visualizations using Pandas, Matplotlib" },
-    { w: 3, date: "9/11/25", topic: "Lecture: More on Data Visualization and Intro to Vector Data & GeoPandas", lab: "Read file and create visualizations using Pandas, Matplotlib" },
-    { w: 4, date: "9/18/25", topic: "Lecture: Geospatial data mapping", lab: "Use GeoPandas and Leaflet to do analysis and create maps" },
-    { w: 5, date: "9/25/25", topic: "Lecture: Raster data operations in Python", lab: "Rasterio, NumPy, Xarray to manipulate raster data" },
-    { w: 6, date: "10/2/25", topic: "Lecture: Advanced geospatial analysis", lab: "NetworkX, OSMnx; Fiona+Shapely+Rasterio; Zonal statistics; road network analysis" },
-    { w: 7, date: "10/9/25", topic: "Fall break — No class", lab: "—" },
-    { w: 8, date: "10/16/25", topic: "Network analysis", lab: "Network analysis using NetworkX and OSMnx" },
-    { w: 8, date: "10/23/25", topic: "Lecture: Web Scraping", lab: "Understand web page, parse HTML, scrape data from web pages" },
-    { w: 10, date: "10/30/25", topic: "Lecture: Web APIs", lab: "Download data from web APIs, download census data" },
-    { w: 11, date: "11/6/25", topic: "Web hosting: GitHub, Quarto, create web pages", lab: "Vibe coding for developing a website" },
-    { w: 12, date: "11/13/25", topic: "Lecture: Machine Learning (I)", lab: "Cluster analysis using k-means, DBSCAN" },
-    { w: 13, date: "11/20/25", topic: "Lecture: Machine Learning (II)", lab: "Predictive modeling using scikit-learn, deep learning" },
-    { w: 14, date: "11/27/25", topic: "Thanksgiving break — No class", lab: "—" },
-    { w: 15, date: "12/4/25", topic: "Final Project Presentations (last day of class)", lab: "—" },
+    { w: 1, date: "8/27/26", topic: "Course introduction and programming environment setup", lab: "Configure the environment of Anaconda, Jupyter Notebook, Visual Studio Code, Python basics (Python modules, read/write txt and csv files, file operations, exception handling, functions)" },
+    { w: 2, date: "9/3/26", topic: "Data Visualization Fundamentals", lab: "Read file and create visualizations using Pandas, Matplotlib" },
+    { w: 3, date: "9/10/26", topic: "More on Data Visualization and Intro to Vector Data", lab: "Read file and create visualizations using Pandas, Matplotlib" },
+    { w: 4, date: "9/17/26", topic: "Geospatial data mapping", lab: "Use GeoPandas and Leaflet to do analysis and create maps" },
+    { w: 5, date: "9/24/26", topic: "Raster data operations in Python", lab: "Using Rasterio and NumPy, XArray to manipulate raster data" },
+    { w: 6, date: "10/1/26", topic: "Fall break — No class" },
+    { w: 7, date: "10/8/26", topic: "Advanced geospatial analysis", lab: "Zonal statistics overlay polygon on rasters, road network analysis (NetworkX, OSMnx)" },
+    { w: 8, date: "10/15/26", topic: "Web Scraping", lab: "Web scrape through API, parse the HTML of web pages, store the data in database" },
+    { w: 9, date: "10/22/26", topic: "Web Scraping (II)", lab: "Web scrape and analyze the real data, GSV…" },
+    { w: 10, date: "10/29/26", topic: "Analyzing and Visualizing Large Datasets", lab: "Visualize large raster data and the vector data, LiDAR data processing" },
+    { w: 11, date: "11/5/26", topic: "Web hosting", lab: "Python + web application, Vibe coding for web application" },
+    { w: 12, date: "11/12/26", topic: "Machine learning (I)", lab: "Predictive Modeling with Scikit-Learn" },
+    { w: 13, date: "11/19/26", topic: "Machine learning (II)", lab: "Predictive Modeling with Scikit-Learn" },
+    { w: 14, date: "11/26/26", topic: "Thanksgiving break — No class" },
+    { w: 15, date: "12/3/26", topic: "Final Project Presentations (last day of class)" },
   ];
 
   return (
     <div className="syllabus">
       <header className="page-hero syllabus-hero">
-        <div className="badge">Fall 2025 · MUSA 5500 / CPLN 6720</div>
+        <div className="badge">Fall 2026 · MUSA 5500 / CPLN 6720</div>
         <h1>Geospatial Data Science in Python</h1>
 
         <div className="hero-grid">
@@ -32,7 +32,7 @@ export default function Syllabus() {
             <h3>Logistics</h3>
             <ul>
               <li><strong>Meets:</strong> Thursday, 1:45–4:44 PM</li>
-              <li><strong>Location:</strong> David Rittenhouse Laboratory, 3N1H</li>
+              <li><strong>Location:</strong> Neural and Behavioral Sciences Building, NBS 111</li>
             </ul>
           </div>
           <div className="hero-card">
@@ -132,6 +132,8 @@ export default function Syllabus() {
           <li>Use free resources to fine-tune Python skills.</li>
           <li>If you’re still struggling, reach out so we can make a plan.</li>
         </ol>
+
+        <p><strong>Note:</strong> And if you are still struggling, reach out and let me know and we’ll figure out a strategy to make things work! NOTE: AI for coding (vibe coding) make lot of things very easy now. However, this class is the basic level of Python, I still recommend you <strong>MINIMIZE</strong>  the usage of AI for your work. AI can also help you to learn Python, like when you are confused on some script, you can ask AI to help you understand it. Try to not ask AI to help you do all the work now in this class. </p>
       </section>
 
       <section className="section">
@@ -188,9 +190,8 @@ export default function Syllabus() {
             <thead>
               <tr>
                 <th>Week</th>
-                <th>Date</th>
+                <th>Day</th>
                 <th>Topic</th>
-                <th>Lab</th>
               </tr>
             </thead>
             <tbody>
@@ -199,10 +200,11 @@ export default function Syllabus() {
                   <td>{r.w}</td>
                   <td>{r.date}</td>
                   <td>
-                    {r.topic}
-                    {r.topic.toLowerCase().includes("break") && <span className="pill pill-muted">no class</span>}
+                    {r.w === 1 || r.topic.toLowerCase().includes("break") || r.w === 15
+                      ? r.topic
+                      : <><strong>Lecture:</strong> {r.topic}</>}
+                    {r.lab && <><br /><strong>Lab:</strong> {r.lab}</>}
                   </td>
-                  <td>{r.lab}</td>
                 </tr>
               ))}
             </tbody>

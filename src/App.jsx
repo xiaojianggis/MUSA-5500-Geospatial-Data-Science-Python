@@ -20,7 +20,7 @@ function Layout({ children }) {
             <Link to="/">Home</Link>
             <Link to="/syllabus">Syllabus</Link>
             <Link to="/schedule">Schedule</Link>
-            <Link to="/assignments">Assignments</Link>
+            {/* Assignments will be published when the class begins. */}
             <Link to="/project">Final Project</Link>
             {/* <Link to="/Github">Github</Link> */}
             <a href="https://github.com/xiaojianggis/MUSA-5500-Geospatial-Data-Science-Python" target="_blank" rel="noopener noreferrer">GitHub</a>

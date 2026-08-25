@@ -36,9 +36,21 @@ const examples = [
   },
 
     {
+    title: "Transportation Noise and its Impact on Health Outcomes in the Northeas",
+    blurb:
+      "By integrating National Transportation Noise Map data with CDC PLACES health data and US Census socioeconomic indicators, we aim to uncover statistical links between our acoustic environment and our well-being.",  
+      href: "https://jasonfan28.github.io/MUSA550-Final-Noise_on_health/",
+  },
+    {
+    title: "Passyunk Square Neighborhood Accessibility Character Map",
+    blurb:
+      "This site documents the full analytical workflow used to build a multi-dimensional accessibility index for Philadelphia neighborhoods, with a focus on Passyunk Square as a case study.",  
+      href: "https://astauf03.github.io/musa5500-python-final/",
+  },
+    {
     title: "Mapping the Amazon River",
     blurb:
-      "n this project, the depth of 12 lakes along the Amazon River was estimated using flooding frequency, with areas that flood more being expected to be deeper. Depth data is valuable for ecological and hydrological research, such as determining biodiversity distribution and modeling water stratification.",  
+      "In this project, the depth of 12 lakes along the Amazon River was estimated using flooding frequency, with areas that flood more being expected to be deeper. Depth data is valuable for ecological and hydrological research, such as determining biodiversity distribution and modeling water stratification.",  
       href: "https://weijingg.github.io/mapping_amazon/",
   },
 
@@ -77,12 +89,12 @@ export default function FinalProject() {
         <div className="dates-grid">
           <div className="date-card">
             <div className="date-label">Proposal</div>
-            <div className="date-value">Thusday, Nov 6 (or earlier)</div>
+            <div className="date-value">Thusday, Nov 5 (or earlier)</div>
             <p className="muted">Proposals must be approved in writing before you proceed.</p>
           </div>
           <div className="date-card">
             <div className="date-label">Final Project Report</div>
-            <div className="date-value">Friday, Dec 12 @ 11:59 PM</div>
+            <div className="date-value">Monday, Dec 8 @ 11:59 PM</div>
             <p className="muted">A report (~3 pages) summarizing your work, sturctured as introduction, 
               methodology, results, and conclusion.
             </p>
@@ -96,14 +108,14 @@ export default function FinalProject() {
         <ol className="list-tight">
           <li>
             <strong>A website</strong> hosted on GitHub Pages.
-            Use text, images, and interactive visualizations to explain your process and results.
+            Use text, images, and interactive visualizations to explain your process and results. <strong>Vibe coding</strong> is recommended to develop the website and data/map visualizations. 
           </li>
           <li>
             <strong>All project materials</strong> (code, notebooks, spreadsheets, datasets) in your own GitHub repo submited to Canvas.
             Include a <code>README</code> with the URL of your website.
           </li>
           <li>
-            <strong>Final project presentation</strong>, all groups/people will present their work on <strong>Dec 4th</strong>, 2025. 
+            <strong>Final project presentation</strong>, all groups/people will present their work on <strong>Dec 4th</strong>, 2026. 
             Prepare a ~10 minutes presentation summarizing your project. Eeach group/person will have about 1~2 minutes for Q&A 
             after the presentation.
           </li>

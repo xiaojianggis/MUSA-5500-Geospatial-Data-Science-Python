@@ -5,7 +5,8 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // public/ and README_files/ contain generated Quarto pages and vendored JS.
+  globalIgnores(['dist', 'public', 'README_files']),
   {
     files: ['**/*.{js,jsx}'],
     extends: [

@@ -110,12 +110,7 @@ export default function Home(){
               />
 
 
-              <Card 
-                title="Assignments" 
-                description="Practice Python spatial workflows and submit interactive notebooks." 
-                link="/assignments" 
-                linkText="Assignments"
-              />
+              {/* Assignments will be published when the class begins. */}
               <Card 
                 title="Final Project" 
                 description="Tackle a real-world geospatial problem using Python and present your results." 

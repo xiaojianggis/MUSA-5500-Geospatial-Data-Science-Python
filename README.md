@@ -1,67 +1,194 @@
-## MUSA-5500-Geospatial Data Science in Python
+# MUSA 5500 — Geospatial Data Science in Python
 
-This course will provide students with the knowledge and tools to turn data into meaningful insights, with a focus on real-world case studies in the urban planning and public policy realms and transform results into understandable and compelling narratives.
+Course website for MUSA 5500 at the University of Pennsylvania. It is a static
+React application built with Vite. Course notebooks, assignments, and other
+downloads are stored in `public/`.
 
+## Requirements
 
-### Outline
-- #### Week 1. Introduction to Python and Programming Basics
-  - Week 1A. Environment setup and Python basics ([Link](public/labs/week-1-intro-python/wweek-1A-python-basics.ipynb))
-  - Week 1B. More about Python ([Link](public/labs/week-1-intro-python/week-1B-more-about-python.ipynb))
+- [Node.js](https://nodejs.org/) 20 or newer
+- npm (included with Node.js)
+- Git
+- An AWS account for AWS deployment
 
+The command-line AWS option also requires
+[AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html).
 
-- #### Week 2. Data Visualization Fundamentals
-    - 2.1 Exploratory data science ([Link](public/labs/week-2-data-viz-fundamentals/week-2A-exploratory-data-science-Python.ipynb))
-    - 2.2 Data visualization fundamentals-A ([Link](public/labs/week-2-data-viz-fundamentals/week-2A-exploratory-data-science-Python.ipynb))
-    - 2.3 data visualization fundamentals-B ([Link](public/labs/week-2-data-viz-fundamentals/week-2B2-data-visualization-fundamentals-B.ipynb))
+## Start the website locally
 
-- #### Week 3. Data Manipulation with Pandas
-  - 3.1 More about data visualization ([Link](public/labs/week-3-more-data-viz-geodata/week-3-more-data-viz.ipynb))
-  - 3.2 Intro to GeoPandas and vector data ([Link](public/labs/week-3-more-data-viz-geodata/week3-geospatial-data-concepts.ipynb))
+```bash
+git clone https://github.com/xiaojianggis/MUSA-5500-Geospatial-Data-Science-Python.git
+cd MUSA-5500-Geospatial-Data-Science-Python
+npm ci
+npm run dev
+```
 
-- #### Week 4. Geospatial data mapping
-  - 4.1 More about geospatial data mapping ([Link](public/labs/week-4-spatial-data-mapping/week-4A-spatial-data-viz.ipynb))
-  - 4.2 Interactive spatial data visualization ([Link](public/labs/week-4-spatial-data-mapping/week-4B-interactive-spatial-data-viz.ipynb))
+Vite prints the local URL, normally
+`http://localhost:5173/MUSA-5500-Geospatial-Data-Science-Python/`. Changes in
+`src/` appear automatically. Files in `public/` are copied without modification.
 
+To test from another device on the same network, use `npm run dev -- --host`.
+Do not expose the development server directly to the public internet.
 
-- #### Week 5. Raster data operations in Python
-  - 5.1 Raster data operations ([link](public/labs/week-5-raster-data-operations/week-5A-raster-data.ipynb))
-  - 5.2 Raster data analysis ([lin](public/labs/week-5-raster-analysis/week-5B-raster-analysis.ipynb))
+## Check and build
 
-- #### Week 6. Advanced geospatial analysis
-  - 6.1 Spatial joins and overlays ([Link](public/labs/week-6-advanced-geospatial-analysis/week-6A-advanced-raster-analysis.ipynb))
-  - 6.2. Spatial data analysis using `fiona` and `shapely` ([Link](public/labs/week-6-advanced-geospatial-analysis/week-6B-spatial_fiona_shapely.ipynb))
+```bash
+npm run lint
+```
 
-- #### Week 7. Fall break — No class
+Build for the existing GitHub Pages project path:
 
+```bash
+npm run build
+```
 
-- #### Week 8. Network Analysis
-  - 8.1 Network analysis using OSMnx ([link](public/labs/week-8-network-analysis/week-8A-street-network.ipynb))
-  - 8.2 Web scraping ([link](public/labs/week-8-network-analysis/week-8B-street-network.ipynb))
+Build for an AWS domain served from its root path:
 
-- #### Week 9. Web Scraping
-  - 9.1 Web scraping basics ([link](public/labs/week-9-web-scraping/lecture-9A.ipynb))
-  - 9.2 Web scraping through APIs ([link](public/labs/week-9-web-scraping/lecture-9B.ipynb))
+```bash
+npm run build:aws
+```
 
-- #### Week 10. Downloading data through APIs
-    - 10.1 APIs basics ([link](public/labs/week-10-web-api/lecture-10A.ipynb))
-    - 10.2 More about APIs ([link](public/labs/week-10-web-api/lecture-10B.ipynb))
+Both commands create `dist/`. The AWS command changes the asset base path from
+the GitHub repository subpath to `/`. Test that build locally with:
 
-- #### Week 11. Web hosting: GitHub, Quarto, create web pages (Vibe coding using ChatGPT)
+```bash
+npm run build:aws
+npm run preview
+```
 
+Open the printed URL, normally `http://localhost:4173/`.
 
-- #### Week 12. Machine Learning (I)
-  - Custer analysis using Kmeans([link](public/labs/week-12-cluster-analysis/lecture-12A.ipynb))
-  - Spatially cluster anlaysis using DBSCAN ([link](public/labs/week-12-cluster-analysis/lecture-12B.ipynb))
-  - Predictive Modeling (I) ([link](public/labs/week-13-machine-learning-scikit/lecture-13A.ipynb))
-  
+## Deploy to AWS
 
-- #### Week 13. Machine Learning (II)
-  - Predictive Modeling (II) ([link](public/labs/week-13-machine-learning-scikit/lecture-13B.ipynb))
-  - Predictive Modeling (III) ([link](public/labs/week-14-predictive-modeling/lecture-14A.ipynb))
-  - Deep neural networks ([link](public/labs/week-14-predictive-modeling/deep-learning.ipynb))
+### Option 1: AWS Amplify Hosting (recommended)
 
-- #### Week 14. Thanksgiving break — No class
+Amplify is the simplest setup and can redeploy automatically when `main`
+changes.
 
+1. In the AWS Console, open **AWS Amplify**.
+2. Choose **Create new app** > **GitHub**, authorize this repository, and select
+   `main`.
+3. Use these build settings:
 
-- #### Week 15. Final project presentations
+   ```yaml
+   version: 1
+   frontend:
+     phases:
+       preBuild:
+         commands:
+           - npm ci
+       build:
+         commands:
+           - npm run build:aws
+     artifacts:
+       baseDirectory: dist
+       files:
+         - '**/*'
+     cache:
+       paths:
+         - node_modules/**/*
+   ```
 
+4. Choose **Save and deploy**, then open the generated Amplify URL.
+5. Optional: attach a custom domain under **Hosting > Custom domains**. Amplify
+   provisions HTTPS.
+6. If refreshing an internal React route returns 404, add this rule under
+   **Hosting > Rewrites and redirects**:
+
+   ```text
+   Source: </^[^.]+$|\.(?!(css|gif|ico|jpg|jpeg|js|png|svg|txt|webp|woff|woff2)$)([^.]+$)/>
+   Target: /index.html
+   Type:   200 (Rewrite)
+   ```
+
+Amplify keeps its GitHub authorization in AWS. Never paste its token into the
+repository.
+
+### Option 2: private S3 bucket behind CloudFront
+
+Use this option for direct control of AWS resources. Keep the S3 bucket private
+and use CloudFront Origin Access Control (OAC); do not enable S3 public access.
+
+#### One-time setup
+
+1. Create an S3 bucket with a unique name and leave **Block all public access**
+   enabled.
+2. Create a CloudFront distribution with the bucket as its origin.
+3. Create and attach an OAC. Apply the bucket policy generated by CloudFront so
+   only that distribution can read the objects.
+4. Set the default root object to `index.html`.
+5. For React routes, configure CloudFront custom error responses for HTTP 403
+   and 404 to return `/index.html` with response code 200.
+6. Optional: request an ACM certificate in `us-east-1`, attach it to CloudFront,
+   and point the custom DNS name to the distribution. Route 53 supports an alias
+   record.
+7. Give the deployer only the required S3 upload/delete/list and CloudFront
+   invalidation permissions.
+
+#### Deploy from a trusted computer
+
+Configure credentials outside the repository:
+
+```bash
+aws configure --profile musa5500-deploy
+```
+
+Use placeholders for the actual resource identifiers, then build and upload:
+
+```bash
+export MUSA_AWS_PROFILE="musa5500-deploy"
+export MUSA_S3_BUCKET="replace-with-your-bucket-name"
+export MUSA_CLOUDFRONT_DISTRIBUTION="replace-with-your-distribution-id"
+
+npm ci
+npm run lint
+npm run build:aws
+
+aws s3 sync dist/ "s3://${MUSA_S3_BUCKET}/" \
+  --delete \
+  --profile "${MUSA_AWS_PROFILE}"
+
+aws cloudfront create-invalidation \
+  --distribution-id "${MUSA_CLOUDFRONT_DISTRIBUTION}" \
+  --paths '/*' \
+  --profile "${MUSA_AWS_PROFILE}"
+```
+
+`aws s3 sync --delete` removes remote files no longer in `dist/`. Verify that
+`MUSA_S3_BUCKET` is the intended website bucket before running it. CloudFront
+may take a few minutes to serve the new version.
+
+## Public repository and security
+
+This repository and website are public. Anything committed here—including
+deleted content retained in Git history—is visible to everyone. It is not
+possible to hide part of this README from other GitHub users, so this guide uses
+placeholders instead of private deployment values.
+
+Never commit:
+
+- AWS access-key IDs, secret keys, session tokens, or `.env` files
+- private keys, passwords, GitHub tokens, or student records
+- private AWS account details or internal-only URLs
+
+Use AWS IAM Identity Center or a local AWS profile for manual deployment. For
+GitHub Actions, use GitHub's AWS OpenID Connect integration with a narrowly
+scoped IAM role instead of long-lived access keys. Put deployment values in
+**Repository Settings > Secrets and variables > Actions**, not in source files.
+
+If a secret is committed accidentally, deleting the file is not enough. Revoke
+or rotate the credential immediately, then remove it from Git history.
+
+## Existing GitHub Pages deployment
+
+`.github/workflows/deploy.yml` publishes the site to GitHub Pages after a push
+to `main`. It uses `npm run build`, preserving the repository-specific base path
+in `vite.config.js`. AWS deployments must use `npm run build:aws`.
+
+## Course outline
+
+The course covers Python fundamentals, exploratory analysis and visualization,
+Pandas and GeoPandas, spatial mapping, raster operations, spatial analysis,
+network analysis, web scraping and APIs, web publishing, clustering, machine
+learning, and final project presentations. Labs and assignments are available
+through the website and under `public/`.

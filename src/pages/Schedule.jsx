@@ -2,22 +2,22 @@ import React from "react";
 import "./Schedule.css";
 
 // If you deploy under a base path (e.g., GitHub Pages), BASE_URL helps build correct links
-// const base = import.meta.env.BASE_URL || "/";
+const base = import.meta.env.BASE_URL || "/";
 
 const schedule = [
   { w: 1, date: "8/27/26", topic: "Course introduction and programming environment setup",
     // multiple labs → different HTMLs
     lab: [
-      { label: "1.1 Environment setup and Python basics" /* href: `${base}labs/week-1-intro-python/week-1A-python-basics.html` */ },
-      { label: "1.2 More about Python" /* href: `${base}labs/week-1-intro-python/week-1B-more-about-python.html` */ },
+      { label: "1.1 Environment setup and Python basics",  href: `${base}labs/week-1-intro-python/week-1A-python-basics.html` },
+      { label: "1.2 More about Python", href: `${base}labs/week-1-intro-python/week-1B-more-about-python.html` },
     ],
   },
   { w: 2, date: "9/3/26", topic: "Data Visualization Fundamentals",
     // if you just give strings, we’ll auto-map to lab{ww}-{index}.html
     lab: [ 
-      { label: "2.1 Exploratory data science" /* href: `${base}labs/week-2-data-viz-fundamentals/week-2A-exploratory-data-science-Python.html` */ },
-      { label: "2.2 data visualization fundamentals-A" /* href: `${base}labs/week-2-data-viz-fundamentals/week-2B1-data-visualization-fundamentals-A.html` */ },
-      { label: "2.3 data visualization fundamentals-B" /* href: `${base}labs/week-2-data-viz-fundamentals/week-2B2-data-visualization-fundamentals-B.html` */ }
+      { label: "2.1 Exploratory data science", href: `${base}labs/week-2-data-viz-fundamentals/week-2A-exploratory-data-science-Python.html`  },
+      { label: "2.2 data visualization fundamentals-A", href: `${base}labs/week-2-data-viz-fundamentals/week-2B1-data-visualization-fundamentals-A.html` },
+      // { label: "2.3 data visualization fundamentals-B", href: `${base}labs/week-2-data-viz-fundamentals/week-2B2-data-visualization-fundamentals-B.html` }
     ],
   },
   { w: 3, date: "9/10/26", topic: "More on Data Visualization and Intro to Vector Data & GeoPandas",
@@ -103,13 +103,12 @@ function LabCell({ item }) {
 
   if (val === "—" || val == null) return <span>—</span>;
 
-  // Lab links are temporarily disabled; render labels as plain text.
   if (Array.isArray(val) && val.every(v => v && typeof v === "object")) {
     return (
       <ul className="lab-list">
         {val.map((lab, i) => (
           <li key={`${item.w}-labobj-${i}`}>
-            <span>{lab.label}</span>
+            {lab.href ? <a href={lab.href}>{lab.label}</a> : <span>{lab.label}</span>}
           </li>
         ))}
       </ul>
@@ -142,7 +141,7 @@ export default function Schedule() {
   return (
     <div className="container schedule-page">
       <h2>Schedule</h2>
-      <p>Below is the tentative weekly schedule for MUSA 550.</p>
+      <p>Below is the tentative weekly schedule for MUSA 5500.</p>
 
       <div className="table-wrap">
         <table className="schedule-table">

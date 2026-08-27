@@ -51,14 +51,7 @@ export default function Home(){
                       <div className="meta-block meta-span">
                       <div className="meta-label">TA</div>
 
-                        <div className="meta-value">
-                          Mark Deng ·{" "}
-                          <a href="mailto:deng13@design.upenn.edu" className="contact-link">
-                            deng13@design.upenn.edu
-                          </a>
-                          <br />
-                          {" Office hour:"} Mon, 1:30 to 3:30pm, <a href="https://calendly.com/deng13-upenn/office-hour">Schedule</a>, <a href="https://upenn.zoom.us/j/2100517683">Zoom Link</a>
-                        </div>
+
 
                         <br />
                         <div className="meta-value">

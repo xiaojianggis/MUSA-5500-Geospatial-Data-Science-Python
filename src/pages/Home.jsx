@@ -103,7 +103,13 @@ export default function Home(){
               />
 
 
-              {/* Assignments will be published when the class begins. */}
+              <Card
+                title="Assignments"
+                description="Review assignment guidelines and access homework materials."
+                link="/assignments"
+                linkText="View Assignments"
+              />
+
               <Card 
                 title="Final Project" 
                 description="Tackle a real-world geospatial problem using Python and present your results." 

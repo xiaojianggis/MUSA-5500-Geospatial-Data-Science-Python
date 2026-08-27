@@ -294,7 +294,7 @@ export default function Assignments() {
               </li>
           </ol>
 
-      <h2>Assigments</h2>
+      <h2>Assignments</h2>
 
       <div className="table-wrap">
         <table className="assignments-table">

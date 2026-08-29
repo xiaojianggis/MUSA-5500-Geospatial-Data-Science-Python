@@ -26,6 +26,58 @@ Vite prints the local URL, normally
 To test from another device on the same network, use `npm run dev -- --host`.
 Do not expose the development server directly to the public internet.
 
+## Render a notebook as HTML
+
+The lecture notebooks and their rendered HTML files live together under
+`public/labs/`. They are rendered with [Quarto](https://quarto.org/). Check that
+Quarto is installed with:
+
+```bash
+quarto --version
+```
+
+From the repository root, render a notebook with:
+
+```bash
+quarto render public/labs/week-9-web-scraping/lecture-9A.ipynb --to html
+```
+
+### Preview while editing
+
+Open the notebook in JupyterLab (or VS Code), then in a second terminal run:
+
+```bash
+quarto preview public/labs/week-9-web-scraping/lecture-9A.ipynb --to html
+```
+
+Quarto opens a local preview URL and refreshes it after you save the notebook.
+Use the saved cell outputs for a fast preview. If you also need Quarto to run
+every cell before rendering, add `--execute`:
+
+```bash
+quarto preview public/labs/week-9-web-scraping/lecture-9A.ipynb --to html --execute
+```
+
+Replace the example path with the notebook you want to update. Quarto writes
+the HTML beside the notebook, so the example creates or replaces:
+
+```text
+public/labs/week-9-web-scraping/lecture-9A.html
+```
+
+The command uses the notebook's saved cell outputs. To execute every cell
+before rendering, use:
+
+```bash
+quarto render public/labs/week-9-web-scraping/lecture-9A.ipynb --to html --execute
+```
+
+Use `--execute` only when the notebook's Python environment and required data
+are available. After rendering, make sure the corresponding entry in
+`src/pages/Schedule.jsx` has an `href` pointing to the HTML file. Then run
+`npm run dev` to check the lecture link locally. Commit the notebook, generated
+HTML, any generated `<notebook-name>_files/` directory, and the schedule change.
+
 ## Check and build
 
 ```bash

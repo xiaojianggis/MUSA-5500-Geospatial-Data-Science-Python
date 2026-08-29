@@ -7,10 +7,10 @@ const assignments = [
 {
     id: "a1",
     title: "HW #1 — Python Basics & Setup",
-    assigned: "Thu, Sep 4",
+    assigned: "Thu, Aug 27",
     due: "Sun, Sep 13 @ 11:59 PM",
     detailsMd: `
-**Assigned on:** Thu, September 4  
+**Assigned on:** Thu, Aug 27
 **Due:** Sun, September 13 at 11:59 PM  
 
 ---
@@ -43,11 +43,11 @@ const assignments = [
 {
     id: "a2",
     title: "HW #2 — Exploratory Data Visualization",
-    assigned: "Thu, Sep 11",
-    due: "Sun, Sep 21 @ 11:59 PM",
+    assigned: "Thu, Sep 10",
+    due: "Sun, Sep 20 @ 11:59 PM",
     detailsMd: `
-**Assigned on:** Thu, September 11 
-**Due:** Sun, September 21 at 11:59 PM  
+**Assigned on:** Thu, September 10 
+**Due:** Sun, September 20 at 11:59 PM  
 
 ---
 ### Part 1: Part 1: Select a dataset
@@ -99,11 +99,11 @@ Note: You may include geospatial charts to satisfy the above requirements, but y
 {
   id: "a3",
   title: "HW #3 — Explore spatial patterns",
-  assigned: "Thu, Sep 25",
-  due: "Tue, Oct 12 @ 11:59 PM",
+  assigned: "Thu, Sep 24",
+  due: "Mon, Oct 12 @ 11:59 PM",
   detailsMd: `
-**Assigned on:** Thu, September 25 
-**Due:** Tue, Oct 12 at 11:59 PM  
+**Assigned on:** Thu, September 24 
+**Due:** Mon, Oct 12 at 11:59 PM  
 ### Description
 ---
 This assignment will include two parts:

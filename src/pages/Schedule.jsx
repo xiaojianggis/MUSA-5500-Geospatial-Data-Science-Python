@@ -17,7 +17,7 @@ const schedule = [
     lab: [ 
       { label: "2.1 Exploratory data science", href: `${base}labs/week-2-data-viz-fundamentals/week-2A-exploratory-data-science-Python.html`  },
       { label: "2.2 data visualization fundamentals-A", href: `${base}labs/week-2-data-viz-fundamentals/week-2B1-data-visualization-fundamentals-A.html` },
-      // { label: "2.3 data visualization fundamentals-B", href: `${base}labs/week-2-data-viz-fundamentals/week-2B2-data-visualization-fundamentals-B.html` }
+      { label: "2.3 data visualization fundamentals-B", href: `${base}labs/week-2-data-viz-fundamentals/week-2B2-data-visualization-fundamentals-B.html` }
     ],
   },
   { w: 3, date: "9/10/26", topic: "More on Data Visualization and Intro to Vector Data & GeoPandas",

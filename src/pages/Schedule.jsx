@@ -45,8 +45,8 @@ const schedule = [
   },
   { w: 7, date: "10/8/26", topic: "Advanced geospatial analysis", 
     lab: [
-      {label: "6.1 Advanced geospatial analysis" /* href: `${base}labs/week-6-advanced-geospatial-analysis/week-6A-advanced-raster-analysis.html` */},
-      {label: "6.2 Zonal statistics" /* href: `${base}labs/week-6-advanced-geospatial-analysis/week-6B-spatial_fiona_shapely.html` */}
+      // {label: "6.1 Advanced geospatial analysis" /* href: `${base}labs/week-6-advanced-geospatial-analysis/week-6A-advanced-raster-analysis.html` */},
+      {label: "6.1 Network analysis" /* href: `${base}labs/week-6-advanced-geospatial-analysis/week-6B-spatial_fiona_shapely.html` */}
     ]
   },
   // { w: 8, date: "10/15/26", topic: "Network analysis", 

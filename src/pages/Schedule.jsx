@@ -71,8 +71,8 @@ const schedule = [
   },
     { w: 10, date: "10/29/26", topic: "Analyzing and Visualizing Large Datasets", 
     lab: [
-      {label: "10.1 Visualizing large datasets" /* href: `${base}labs/week-10-web-api/lecture-10A.html` */},
-      {label: "10.2 LiDAR data processing" /* href: `${base}labs/week-10-web-api/lecture-10B.html` */}
+      {label: "10.1 Visualizing large datasets", href: `${base}labs/week11-large-data-viz-lidar/lecture-11A.html`},
+      {label: "10.2 LiDAR data processing", href: `${base}labs/week11-large-data-viz-lidar/lecture-11B.html`}
     ]
   },
   { w: 11, date: "11/5/26", topic: "Web hosting: GitHub, Vibe coding, create web pages", 

@@ -1,0 +1,19 @@
+name: musa-largeviz
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - numpy=1.26.4
+  - numba=0.59.1
+  - pandas=2.2.2
+  - dask=2024.5.0
+  - datashader=0.16.2
+  - pyarrow=14.0.2
+  - colorcet
+  - matplotlib
+  - pillow
+  - bokeh=3.4.1
+  - requests
+  - fsspec
+  - jupyterlab
+  - ipykernel

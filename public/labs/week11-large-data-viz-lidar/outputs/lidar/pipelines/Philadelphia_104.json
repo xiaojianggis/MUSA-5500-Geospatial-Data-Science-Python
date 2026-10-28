@@ -1,0 +1,31 @@
+{
+  "pipeline": [
+    {
+      "type": "readers.las",
+      "filename": "/tmp/musa550-week11/raw/Philadelphia_104.las"
+    },
+    {
+      "type": "filters.expression",
+      "expression": "ReturnNumber == 1 && Classification != 7 && Classification != 18 && Withheld == 0"
+    },
+    {
+      "type": "filters.assign",
+      "value": "Z = Z * 0.304800609601219"
+    },
+    {
+      "type": "writers.gdal",
+      "filename": "/Users/xiaojiang/Dropbox/xiaojiang/Teaching/Penn/python-class/python-spatial-data-science/public/labs/week11-large-data-viz-lidar/outputs/lidar/raw_dsm/Philadelphia_104_dsm.tif",
+      "resolution": 3.280833333333333,
+      "origin_x": 2651192.204166666,
+      "origin_y": 193749.61249999996,
+      "width": 247,
+      "height": 686,
+      "binmode": true,
+      "output_type": "max,count",
+      "data_type": "float32",
+      "nodata": -9999.0,
+      "override_srs": "PROJCRS[\"NAD83(2011) / Pennsylvania South (ftUS)\",BASEGEOGCRS[\"NAD83(2011)\",DATUM[\"NAD83 (National Spatial Reference System 2011)\",ELLIPSOID[\"GRS 1980\",6378137,298.257222101,LENGTHUNIT[\"metre\",1]]],PRIMEM[\"Greenwich\",0,ANGLEUNIT[\"Degree\",0.0174532925199433]]],CONVERSION[\"unnamed\",METHOD[\"Lambert Conic Conformal (2SP)\",ID[\"EPSG\",9802]],PARAMETER[\"Easting at false origin\",1968500,LENGTHUNIT[\"US Survey Foot\",0.304800609601219],ID[\"EPSG\",8826]],PARAMETER[\"Northing at false origin\",0,LENGTHUNIT[\"US Survey Foot\",0.304800609601219],ID[\"EPSG\",8827]],PARAMETER[\"Longitude of false origin\",-77.75,ANGLEUNIT[\"Degree\",0.0174532925199433],ID[\"EPSG\",8822]],PARAMETER[\"Latitude of 1st standard parallel\",40.966666666667,ANGLEUNIT[\"Degree\",0.0174532925199433],ID[\"EPSG\",8823]],PARAMETER[\"Latitude of 2nd standard parallel\",39.933333333333,ANGLEUNIT[\"Degree\",0.0174532925199433],ID[\"EPSG\",8824]],PARAMETER[\"Latitude of false origin\",39.333333333333,ANGLEUNIT[\"Degree\",0.0174532925199433],ID[\"EPSG\",8821]]],CS[Cartesian,2],AXIS[\"easting\",east,ORDER[1],LENGTHUNIT[\"US Survey Foot\",0.304800609601219]],AXIS[\"northing\",north,ORDER[2],LENGTHUNIT[\"US Survey Foot\",0.304800609601219]],ID[\"EPSG\",6565]]",
+      "gdalopts": "COMPRESS=DEFLATE,TILED=YES"
+    }
+  ]
+}

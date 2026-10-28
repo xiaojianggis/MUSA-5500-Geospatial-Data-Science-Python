@@ -1,0 +1,47 @@
+{
+  "validation_date": "2026-10-25",
+  "notebooks_executed": [
+    "lecture-11A.ipynb",
+    "lecture-11B.ipynb"
+  ],
+  "sample_rows": {
+    "osm": 1000050,
+    "census": 1533372,
+    "taxi": 150000,
+    "parking": 10000
+  },
+  "las_files": [
+    "Philadelphia_104.las",
+    "Philadelphia_105.las",
+    "Philadelphia_114.las"
+  ],
+  "input_points": 3986474,
+  "retained_points": 3949569,
+  "raw_dsm_tiles": 3,
+  "filled_dsm_tiles": 3,
+  "qa_tiles": 3,
+  "xyz_png_tiles": 56,
+  "xyz_zooms": [
+    15,
+    16,
+    17
+  ],
+  "analytical_cell_size_m": 1.0,
+  "analytical_vertical_units": "meters",
+  "analytical_vertical_datum": "NAVD88",
+  "checks": [
+    "all code cells execute",
+    "no notebook error outputs",
+    "point count conservation",
+    "observed elevations preserved by gap filling",
+    "large/exterior holes remain NoData",
+    "XYZ RGBA tile sizes",
+    "24 GIF frames",
+    "local HTML resource links",
+    "Vite production build"
+  ],
+  "limitations": [
+    "Browser interaction not tested: no browser surface available.",
+    "Classroom samples are not full datasets; live Datashader reaggregation is not available in static HTML."
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "created": "2026-10-25",
+  "sampling": "Seed 5500: random-phase systematic thinning throughout every original Parquet part. OSM: retain approximately one in 1,000 records; Census: one in 200. More spatially dispersed than a first-batch extract, but record order can still induce bias. These remain teaching samples, not validated inferential survey samples.",
+  "osm_source": "https://s3.amazonaws.com/datashader-data/osm-1billion.snappy.parq.zip",
+  "census_source": "https://s3.amazonaws.com/datashader-data/census2010.parq.zip",
+  "taxi_source": "https://s3.amazonaws.com/datashader-data/nyc_taxi_wide.parq",
+  "taxi_sampling": "First 150,000 rows from a historical January 2015 Parquet row group; coordinate and timestamp columns only; hours derived from timestamps to avoid obsolete Parquet integer encoding.",
+  "parking_source": "https://musa550.s3.amazonaws.com/parking_violations.csv",
+  "parking_sampling": "First 10,000 CSV records; only original latitude and longitude retained. Not a uniform/time-representative sample.",
+  "district_source": "https://www2.census.gov/geo/tiger/GENZ2015/shp/cb_2015_us_cd114_20m.zip",
+  "row_counts": {
+    "osm": 1000050,
+    "census": 1533372,
+    "taxi": 150000,
+    "parking": 10000
+  }
+}

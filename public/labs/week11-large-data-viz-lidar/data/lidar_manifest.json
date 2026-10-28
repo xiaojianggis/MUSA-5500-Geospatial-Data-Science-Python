@@ -1,0 +1,44 @@
+{
+  "provider": "City of Philadelphia / PASDA",
+  "directory_vintage": "2022 distribution; do not infer flight date from folder name",
+  "tile_index_crs": "EPSG:6565",
+  "source": "https://www.pasda.psu.edu/download/phillyLiDAR/2022/LAS/Classified_LAS/",
+  "tiles": [
+    {
+      "name": "Philadelphia_104.las",
+      "url": "https://www.pasda.psu.edu/download/phillyLiDAR/2022/LAS/Classified_LAS/Philadelphia_104.las",
+      "bytes": 4038779,
+      "expected_points": 133328,
+      "nominal_bounds_native": [
+        2649000.0,
+        193000.0,
+        2652000.0,
+        196000.0
+      ]
+    },
+    {
+      "name": "Philadelphia_105.las",
+      "url": "https://www.pasda.psu.edu/download/phillyLiDAR/2022/LAS/Classified_LAS/Philadelphia_105.las",
+      "bytes": 33835207,
+      "expected_points": 1123800,
+      "nominal_bounds_native": [
+        2649000.0,
+        196000.0,
+        2652000.0,
+        199000.0
+      ]
+    },
+    {
+      "name": "Philadelphia_114.las",
+      "url": "https://www.pasda.psu.edu/download/phillyLiDAR/2022/LAS/Classified_LAS/Philadelphia_114.las",
+      "bytes": 82123439,
+      "expected_points": 2729346,
+      "nominal_bounds_native": [
+        2652000.0,
+        196000.0,
+        2655000.0,
+        199000.0
+      ]
+    }
+  ]
+}

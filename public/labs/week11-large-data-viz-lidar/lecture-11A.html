@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Week 11A: Visualizing large spatial datasets</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="lecture-11A_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lecture-11A_files/libs/quarto-html/quarto.js"></script>
+<script src="lecture-11A_files/libs/quarto-html/popper.min.js"></script>
+<script src="lecture-11A_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="lecture-11A_files/libs/quarto-html/anchor.min.js"></script>
+<link href="lecture-11A_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lecture-11A_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="lecture-11A_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="lecture-11A_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="lecture-11A_files/libs/bootstrap/bootstrap-973236bd072d72a04ee9cd82dcc9cb29.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="lecture-presentation.css">
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Lecture outline</h2>
+   
+  <ul>
+  <li><a href="#part-1-a-manageable-classroom-workflow" id="toc-part-1-a-manageable-classroom-workflow" class="nav-link active" data-scroll-target="#part-1-a-manageable-classroom-workflow">Part 1: A manageable classroom workflow</a>
+  <ul class="collapse">
+  <li><a href="#environment-setup" id="toc-environment-setup" class="nav-link" data-scroll-target="#environment-setup">Environment setup</a></li>
+  <li><a href="#what-changes-when-data-no-longer-fits-in-memory" id="toc-what-changes-when-data-no-longer-fits-in-memory" class="nav-link" data-scroll-target="#what-changes-when-data-no-longer-fits-in-memory">What changes when data no longer fits in memory?</a></li>
+  </ul></li>
+  <li><a href="#part-2-osm-gps-points-from-points-to-pixels" id="toc-part-2-osm-gps-points-from-points-to-pixels" class="nav-link" data-scroll-target="#part-2-osm-gps-points-from-points-to-pixels">Part 2: OSM GPS points — from points to pixels</a>
+  <ul class="collapse">
+  <li><a href="#lazy-reductions" id="toc-lazy-reductions" class="nav-link" data-scroll-target="#lazy-reductions">Lazy reductions</a></li>
+  <li><a href="#coordinate-ranges-and-the-rendering-pipeline" id="toc-coordinate-ranges-and-the-rendering-pipeline" class="nav-link" data-scroll-target="#coordinate-ranges-and-the-rendering-pipeline">Coordinate ranges and the rendering pipeline</a></li>
+  <li><a href="#interpret-color-mapping-carefully" id="toc-interpret-color-mapping-carefully" class="nav-link" data-scroll-target="#interpret-color-mapping-carefully">Interpret color mapping carefully</a></li>
+  </ul></li>
+  <li><a href="#part-3-census-dots-categories-and-geographic-questions" id="toc-part-3-census-dots-categories-and-geographic-questions" class="nav-link" data-scroll-target="#part-3-census-dots-categories-and-geographic-questions">Part 3: Census dots — categories and geographic questions</a>
+  <ul class="collapse">
+  <li><a href="#slice-the-aggregate-rather-than-reread-the-original-points" id="toc-slice-the-aggregate-rather-than-reread-the-original-points" class="nav-link" data-scroll-target="#slice-the-aggregate-rather-than-reread-the-original-points">Slice the aggregate rather than reread the original points</a></li>
+  <li><a href="#overlay-a-vector-boundary-in-the-same-coordinate-system" id="toc-overlay-a-vector-boundary-in-the-same-coordinate-system" class="nav-link" data-scroll-target="#overlay-a-vector-boundary-in-the-same-coordinate-system">Overlay a vector boundary in the same coordinate system</a></li>
+  </ul></li>
+  <li><a href="#part-4-nyc-taxis-comparing-origins-destinations-and-time" id="toc-part-4-nyc-taxis-comparing-origins-destinations-and-time" class="nav-link" data-scroll-target="#part-4-nyc-taxis-comparing-origins-destinations-and-time">Part 4: NYC taxis — comparing origins, destinations, and time</a>
+  <ul class="collapse">
+  <li><a href="#a-calendar-view-from-timestamps" id="toc-a-calendar-view-from-timestamps" class="nav-link" data-scroll-target="#a-calendar-view-from-timestamps">A calendar view from timestamps</a></li>
+  <li><a href="#export-a-24-hour-animation" id="toc-export-a-24-hour-animation" class="nav-link" data-scroll-target="#export-a-24-hour-animation">Export a 24-hour animation</a></li>
+  <li><a href="#a-slider-that-works-in-the-published-html" id="toc-a-slider-that-works-in-the-published-html" class="nav-link" data-scroll-target="#a-slider-that-works-in-the-published-html">A slider that works in the published HTML</a></li>
+  </ul></li>
+  <li><a href="#part-5-guided-exercise-philadelphia-parking-records" id="toc-part-5-guided-exercise-philadelphia-parking-records" class="nav-link" data-scroll-target="#part-5-guided-exercise-philadelphia-parking-records">Part 5: Guided exercise — Philadelphia parking records</a></li>
+  <li><a href="#part-6-scale-from-the-extract-to-the-full-dataset" id="toc-part-6-scale-from-the-extract-to-the-full-dataset" class="nav-link" data-scroll-target="#part-6-scale-from-the-extract-to-the-full-dataset">Part 6: Scale from the extract to the full dataset</a></li>
+  <li><a href="#wrap-up" id="toc-wrap-up" class="nav-link" data-scroll-target="#wrap-up">Wrap-up</a></li>
+  </ul>
+</nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Week 11A: Visualizing large spatial datasets</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>Lecture guide:</strong> Memory and lazy computation → OSM density → Census categories → Taxi activity over time → Parking exercise → Scaling up</p>
+<p>This combines and revises <strong>Visualizing Large Data-Lec1.ipynb</strong> and <strong>Visualizing Large Data-Lec2.ipynb</strong>. We retain their main examples while removing duplicate code, absolute paths, whole-dataset conversions to pandas, and inconsistent CRS transformations.</p>
+<p><a href="lecture-11A.ipynb">Download this notebook</a> · <a href="data/samples/provenance.json">Data provenance</a> · <a href="lecture-11B.html">Companion LiDAR lesson</a></p>
+<p><strong>Learning goals:</strong> read partitioned data lazily, aggregate millions of records into a fixed-size image, compare color scales, aggregate categories, interpret spatial/time patterns, and export portable visualizations.</p>
+<section id="part-1-a-manageable-classroom-workflow" class="level2">
+<h2 class="anchored" data-anchor-id="part-1-a-manageable-classroom-workflow">Part 1: A manageable classroom workflow</h2>
+<p>The original sources contain about one billion OSM GPS points, 300 million historical Census dots, and 12 million taxi trips. Loading all three is unnecessary for learning the method.</p>
+<p>This folder includes <strong>real teaching extracts</strong>: 1,000,050 OSM points, 1,533,372 Census dots, 150,000 taxi trips, and 10,000 parking records. They are systematically thinned teaching extracts, <strong>not full datasets or validated representative samples</strong>. Counts and patterns in these extracts must not be described as population totals or representative city statistics. Census dots are historical synthetic locations, not exact residents’ addresses.</p>
+<p>Use the bundled extracts by default. The last section explains how to switch to complete local datasets. Download the whole lab folder when working locally; the notebook needs <code>data/samples/</code>.</p>
+<section id="environment-setup" class="level3">
+<h3 class="anchored" data-anchor-id="environment-setup">Environment setup</h3>
+<p>Use <a href="environment-viz.yml">environment-viz.yml</a> to create a separate environment from a terminal, then select that kernel:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> env create <span class="at">-f</span> environment-viz.yml</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate musa-largeviz</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> ipykernel install <span class="at">--user</span> <span class="at">--name</span> musa-largeviz <span class="at">--display-name</span> <span class="st">"Python (large spatial data)"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The environment file uses a tested compatible NumPy/Numba/Datashader stack. Do not force upgrades inside the running notebook. LiDAR has a separate environment because its native libraries have different dependencies.</p>
+<div id="cdc5736b" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-26T03:19:42.831351Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-26T03:19:42.831145Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-26T03:19:44.363132Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-26T03:19:44.362838Z&quot;}" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> base64</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> io</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> dask</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> dask.dataframe <span class="im">as</span> dd</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datashader <span class="im">as</span> ds</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datashader.transfer_functions <span class="im">as</span> tf</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datashader.utils <span class="im">import</span> lnglat_to_meters</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> colorcet <span class="im">import</span> fire</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> display, HTML, IFrame</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Works from this lab folder or from the repository root.</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>LAB <span class="op">=</span> Path.cwd()</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> (LAB <span class="op">/</span> <span class="st">"data/samples"</span>).is_dir():</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    LAB <span class="op">=</span> LAB <span class="op">/</span> <span class="st">"public/labs/week11-large-data-viz-lidar"</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>DATA <span class="op">=</span> LAB <span class="op">/</span> <span class="st">"data/samples"</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>OUT <span class="op">=</span> LAB <span class="op">/</span> <span class="st">"outputs/viz"</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>OUT.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> (DATA <span class="op">/</span> <span class="st">"osm_sample.parquet"</span>).is_file():</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(<span class="st">"Download the whole lab folder, including data/samples, first."</span>)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Datashader"</span>, ds.__version__, <span class="st">"| Dask"</span>, dask.__version__)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Datashader 0.16.2 | Dask 2024.5.0</code></pre>
+</div>
+</div>
+</section>
+<section id="what-changes-when-data-no-longer-fits-in-memory" class="level3">
+<h3 class="anchored" data-anchor-id="what-changes-when-data-no-longer-fits-in-memory">What changes when data no longer fits in memory?</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Object</th>
+<th>What it contains</th>
+<th>When work happens</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>pandas DataFrame</td>
+<td>One in-memory table</td>
+<td>Immediately</td>
+</tr>
+<tr class="even">
+<td>Dask DataFrame</td>
+<td>A graph of partitioned table operations</td>
+<td>Usually at <code>.compute()</code> or aggregation</td>
+</tr>
+<tr class="odd">
+<td>Datashader aggregate</td>
+<td>A fixed-size grid of pixel statistics</td>
+<td>After scanning the input partitions</td>
+</tr>
+</tbody>
+</table>
+<p>Dask can process data larger than RAM, but not every operation is automatically memory-safe. Avoid converting the entire table to pandas or calling <code>.persist()</code> unless it fits in memory. A small scalar result such as a count is safe to compute; a billion-row table is not.</p>
+<p>Datashader does <strong>not</strong> require EPSG:3857; it aggregates numeric coordinates. We use Web Mercator for these map examples because the source coordinates and common web basemaps use it.</p>
+</section>
+</section>
+<section id="part-2-osm-gps-points-from-points-to-pixels" class="level2">
+<h2 class="anchored" data-anchor-id="part-2-osm-gps-points-from-points-to-pixels">Part 2: OSM GPS points — from points to pixels</h2>
+<p>The source is the historical <a href="https://blog.openstreetmap.org/2012/04/01/bulk-gps-point-data/">OpenStreetMap bulk GPS release</a>, distributed as a Datashader example dataset. This measures uploaded GPS-trace activity, not all roads, all people, or an unbiased sample of travel.</p>
+<p>Read only the two coordinate columns. Parquet row groups allow Dask to build useful partitions even when the extract is one file.</p>
+<div id="b878243f" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-26T03:19:44.364417Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-26T03:19:44.364270Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-26T03:19:44.497623Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-26T03:19:44.497334Z&quot;}" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>osm <span class="op">=</span> dd.read_parquet(DATA <span class="op">/</span> <span class="st">"osm_sample.parquet"</span>, columns<span class="op">=</span>[<span class="st">"x"</span>, <span class="st">"y"</span>],</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                      engine<span class="op">=</span><span class="st">"pyarrow"</span>, split_row_groups<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Partitions:"</span>, osm.npartitions)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>osm.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Partitions: 21</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">x</th>
+<th data-quarto-table-cell-role="th">y</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>-7000458.5</td>
+<td>-9536415.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>-7141858.0</td>
+<td>-9664043.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>-7379035.0</td>
+<td>-9890349.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>-7721307.5</td>
+<td>-10498321.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>-7514765.5</td>
+<td>-7346013.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<section id="lazy-reductions" class="level3">
+<h3 class="anchored" data-anchor-id="lazy-reductions">Lazy reductions</h3>
+<p>The expressions below are tasks until we compute them. A joint <code>dask.compute()</code> call lets related tasks share work. Counting all rows still requires scanning their partitions.</p>
+<div id="8e407bba" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-26T03:19:44.498850Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-26T03:19:44.498758Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-26T03:19:44.532639Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-26T03:19:44.532385Z&quot;}" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>row_count, mean_x, mean_y <span class="op">=</span> dask.compute(osm.shape[<span class="dv">0</span>], osm.x.mean(), osm.y.mean())</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Extract rows: </span><span class="sc">{</span>row_count<span class="sc">:,}</span><span class="ss">; mean x=</span><span class="sc">{</span>mean_x<span class="sc">:,.0f}</span><span class="ss">, y=</span><span class="sc">{</span>mean_y<span class="sc">:,.0f}</span><span class="ss"> meters"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Extract rows: 1,000,050; mean x=2,731,821, y=5,801,809 meters</code></pre>
+</div>
+</div>
+</section>
+<section id="coordinate-ranges-and-the-rendering-pipeline" class="level3">
+<h3 class="anchored" data-anchor-id="coordinate-ranges-and-the-rendering-pipeline">Coordinate ranges and the rendering pipeline</h3>
+<p>Do not divide meter coordinates by an arbitrary factor to pretend they are longitude/latitude. Convert a geographic bounding box with a real projection. For map overlays, all layers must use the same CRS.</p>
+<p><strong>Project/choose extent → aggregate → transform/color → display.</strong> <a href="https://datashader.org/getting_started/Pipeline.html">Datashader pipeline documentation</a>.</p>
+<p>A scatter plot creates one marker per record, which can overplot badly. Matplotlib can handle many points; the issue is the cost and interpretability of drawing millions of individual markers. Datashader instead computes a pixel statistic.</p>
+<div id="b3184e24" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-26T03:19:44.533936Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-26T03:19:44.533858Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-26T03:19:44.886514Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-26T03:19:44.886226Z&quot;}" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mercator_extent(lon_bounds, lat_bounds):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    x, y <span class="op">=</span> lnglat_to_meters(lon_bounds, lat_bounds)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">tuple</span>(x), <span class="bu">tuple</span>(y)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>world_x, world_y <span class="op">=</span> mercator_extent((<span class="op">-</span><span class="dv">180</span>, <span class="dv">180</span>), (<span class="op">-</span><span class="dv">70</span>, <span class="dv">80</span>))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>canvas <span class="op">=</span> ds.Canvas(plot_width<span class="op">=</span><span class="dv">900</span>, plot_height<span class="op">=</span><span class="dv">450</span>, x_range<span class="op">=</span>world_x, y_range<span class="op">=</span>world_y)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>osm_count <span class="op">=</span> canvas.points(osm, <span class="st">"x"</span>, <span class="st">"y"</span>, agg<span class="op">=</span>ds.count())</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Aggregate dimensions:"</span>, <span class="bu">dict</span>(osm_count.sizes))</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Points inside this extent:"</span>, <span class="bu">int</span>(osm_count.<span class="bu">sum</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Aggregate dimensions: {'y': 450, 'x': 900}
+Points inside this extent: 1000049</code></pre>
+</div>
+</div>
+<div id="e1ca3d97" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-26T03:19:44.888064Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-26T03:19:44.887952Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-26T03:19:46.100636Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-26T03:19:46.099844Z&quot;}" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">4</span>))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, how <span class="kw">in</span> <span class="bu">zip</span>(axes, [<span class="st">"linear"</span>, <span class="st">"log"</span>, <span class="st">"eq_hist"</span>]):</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    image <span class="op">=</span> tf.set_background(tf.shade(osm_count, cmap<span class="op">=</span>fire[<span class="dv">40</span>:], how<span class="op">=</span>how), <span class="st">"black"</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    ax.imshow(image.to_pil())</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f"OSM extract: </span><span class="sc">{</span>how<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    ax.set_axis_off()</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lecture-11A_files/figure-html/cell-6-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="interpret-color-mapping-carefully" class="level3">
+<h3 class="anchored" data-anchor-id="interpret-color-mapping-carefully">Interpret color mapping carefully</h3>
+<ul>
+<li><strong>Linear:</strong> preserves direct visual differences but can hide sparse areas.</li>
+<li><strong>Log:</strong> expands the lower end of a skewed distribution.</li>
+<li><strong>Equalized histogram:</strong> improves contrast, but color differences are not proportional count differences.</li>
+</ul>
+<p>Changing the color transform does not change the aggregate. Masking low-count pixels does change what is shown. Compare counts before deciding that a bright place is more active than another map drawn with a different scale.</p>
+<div id="23143472" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-26T03:19:46.105414Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-26T03:19:46.104992Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-26T03:19:46.191242Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-26T03:19:46.189952Z&quot;}" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>masked_osm <span class="op">=</span> osm_count.where(osm_count <span class="op">&gt;</span> <span class="dv">2</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>osm_image <span class="op">=</span> tf.set_background(tf.shade(masked_osm, cmap<span class="op">=</span>fire[<span class="dv">40</span>:], how<span class="op">=</span><span class="st">"eq_hist"</span>), <span class="st">"black"</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>osm_image.to_pil().save(OUT <span class="op">/</span> <span class="st">"osm_density.png"</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>display(osm_image.to_pil())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lecture-11A_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="part-3-census-dots-categories-and-geographic-questions" class="level2">
+<h2 class="anchored" data-anchor-id="part-3-census-dots-categories-and-geographic-questions">Part 3: Census dots — categories and geographic questions</h2>
+<p>These historical 2010 dots use <code>easting</code>/<code>northing</code> in EPSG:3857 and five encoded race/ethnicity categories. Set a <strong>known categorical dtype</strong> before a distributed category aggregation. This avoids scanning all records just to discover the category labels.</p>
+<p>These categories reproduce the source dataset’s encoding and are limited representations of demographic identity. Selected synthetic dots cannot establish neighborhood population totals, diversity, segregation, or gerrymandering.</p>
+<div id="3b7b0ccf" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-26T03:19:46.192824Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-26T03:19:46.192728Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-26T03:19:46.203910Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-26T03:19:46.203659Z&quot;}" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>race_labels <span class="op">=</span> {<span class="st">"w"</span>: <span class="st">"White"</span>, <span class="st">"b"</span>: <span class="st">"Black"</span>, <span class="st">"a"</span>: <span class="st">"Asian"</span>, <span class="st">"h"</span>: <span class="st">"Hispanic"</span>, <span class="st">"o"</span>: <span class="st">"Other"</span>}</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>color_key <span class="op">=</span> {<span class="st">"w"</span>: <span class="st">"#4cc9f0"</span>, <span class="st">"b"</span>: <span class="st">"#ffb703"</span>, <span class="st">"a"</span>: <span class="st">"#90be6d"</span>, <span class="st">"h"</span>: <span class="st">"#f28482"</span>, <span class="st">"o"</span>: <span class="st">"#cdb4db"</span>}</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>census <span class="op">=</span> dd.read_parquet(DATA <span class="op">/</span> <span class="st">"census_sample.parquet"</span>, split_row_groups<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>census[<span class="st">"race"</span>] <span class="op">=</span> census[<span class="st">"race"</span>].astype(pd.CategoricalDtype(<span class="bu">list</span>(race_labels)))</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>census.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">easting</th>
+<th data-quarto-table-cell-role="th">northing</th>
+<th data-quarto-table-cell-role="th">race</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>-12352377.0</td>
+<td>3676244.50</td>
+<td>h</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>-12352691.0</td>
+<td>3679306.75</td>
+<td>h</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>-12352058.0</td>
+<td>3677210.50</td>
+<td>h</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>-12352007.0</td>
+<td>3680322.75</td>
+<td>h</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>-12351758.0</td>
+<td>3677555.75</td>
+<td>h</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="f3c23779" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-26T03:19:46.205048Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-26T03:19:46.204960Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-26T03:19:46.629261Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-26T03:19:46.628962Z&quot;}" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>usa_x, usa_y <span class="op">=</span> mercator_extent((<span class="op">-</span><span class="dv">125</span>, <span class="op">-</span><span class="dv">66</span>), (<span class="dv">24</span>, <span class="dv">50</span>))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>census_canvas <span class="op">=</span> ds.Canvas(plot_width<span class="op">=</span><span class="dv">900</span>, plot_height<span class="op">=</span><span class="dv">500</span>, x_range<span class="op">=</span>usa_x, y_range<span class="op">=</span>usa_y)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>category_count <span class="op">=</span> census_canvas.points(census, <span class="st">"easting"</span>, <span class="st">"northing"</span>, agg<span class="op">=</span>ds.count_cat(<span class="st">"race"</span>))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>census_image <span class="op">=</span> tf.set_background(tf.shade(category_count, color_key<span class="op">=</span>color_key, how<span class="op">=</span><span class="st">"eq_hist"</span>), <span class="st">"black"</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>display(census_image.to_pil())</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>pd.Series(race_labels, name<span class="op">=</span><span class="st">"Source category labels"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lecture-11A_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>w       White
+b       Black
+a       Asian
+h    Hispanic
+o       Other
+Name: Source category labels, dtype: object</code></pre>
+</div>
+</div>
+<section id="slice-the-aggregate-rather-than-reread-the-original-points" class="level3">
+<h3 class="anchored" data-anchor-id="slice-the-aggregate-rather-than-reread-the-original-points">Slice the aggregate rather than reread the original points</h3>
+<p>The category dimension is an xarray coordinate. Ask where the extract has more Black than White dots, or where all four selected categories are present. These are <strong>pixel-scale descriptive questions</strong>; changing pixel size changes the answer. They are not validated demographic indices.</p>
+<div id="ecbcbada" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-26T03:19:46.631469Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-26T03:19:46.631356Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-26T03:19:46.808839Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-26T03:19:46.808534Z&quot;}" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>black_pixels <span class="op">=</span> category_count.sel(race<span class="op">=</span><span class="st">"b"</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>all_present <span class="op">=</span> (category_count.sel(race<span class="op">=</span>[<span class="st">"w"</span>, <span class="st">"b"</span>, <span class="st">"a"</span>, <span class="st">"h"</span>]) <span class="op">&gt;</span> <span class="dv">0</span>).<span class="bu">all</span>(dim<span class="op">=</span><span class="st">"race"</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>black_exceeds_white <span class="op">=</span> category_count.sel(race<span class="op">=</span><span class="st">"b"</span>) <span class="op">&gt;</span> category_count.sel(race<span class="op">=</span><span class="st">"w"</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">4</span>))</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, array, title <span class="kw">in</span> <span class="bu">zip</span>(axes, [black_pixels, all_present.astype(<span class="st">"uint32"</span>),</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                                  black_exceeds_white.astype(<span class="st">"uint32"</span>)],</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                             [<span class="st">"Black dots per pixel"</span>, <span class="st">"All four groups present"</span>, <span class="st">"Black &gt; White dots"</span>]):</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    ax.imshow(tf.set_background(tf.shade(array.where(array <span class="op">&gt;</span> <span class="dv">0</span>), cmap<span class="op">=</span>fire[<span class="dv">40</span>:]), <span class="st">"black"</span>).to_pil())</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    ax.set_title(title)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    ax.set_axis_off()</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lecture-11A_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="overlay-a-vector-boundary-in-the-same-coordinate-system" class="level3">
+<h3 class="anchored" data-anchor-id="overlay-a-vector-boundary-in-the-same-coordinate-system">Overlay a vector boundary in the same coordinate system</h3>
+<p>The bundled 2015 congressional boundaries preserve the historical overlay exercise from the source lectures. They are <strong>not current districts</strong>, and their date differs from the 2010 dots. The overlay teaches CRS alignment; it cannot by itself demonstrate discriminatory districting.</p>
+<p>The GeoJSON coordinates are longitude/latitude. Project each ring before plotting it over the EPSG:3857 image.</p>
+<div id="1f616989" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-26T03:19:46.810120Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-26T03:19:46.810009Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-26T03:19:47.066122Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-26T03:19:47.065843Z&quot;}" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>districts <span class="op">=</span> json.loads((DATA <span class="op">/</span> <span class="st">"districts_2015.geojson"</span>).read_text())</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="dv">6</span>))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>ax.imshow(census_image.to_pil(), extent<span class="op">=</span>[<span class="op">*</span>usa_x, <span class="op">*</span>usa_y], origin<span class="op">=</span><span class="st">"upper"</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> feature <span class="kw">in</span> districts[<span class="st">"features"</span>]:</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    geometry <span class="op">=</span> feature[<span class="st">"geometry"</span>]</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    polygons <span class="op">=</span> [geometry[<span class="st">"coordinates"</span>]] <span class="cf">if</span> geometry[<span class="st">"type"</span>] <span class="op">==</span> <span class="st">"Polygon"</span> <span class="cf">else</span> geometry[<span class="st">"coordinates"</span>]</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> polygon <span class="kw">in</span> polygons:</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>        ring <span class="op">=</span> np.asarray(polygon[<span class="dv">0</span>])</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>        x, y <span class="op">=</span> lnglat_to_meters(ring[:, <span class="dv">0</span>], ring[:, <span class="dv">1</span>])</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>        ax.plot(x, y, color<span class="op">=</span><span class="st">"white"</span>, linewidth<span class="op">=</span><span class="fl">0.25</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlim<span class="op">=</span>usa_x, ylim<span class="op">=</span>usa_y, title<span class="op">=</span><span class="st">"Teaching extract + historical 2015 congressional boundaries"</span>)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lecture-11A_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="part-4-nyc-taxis-comparing-origins-destinations-and-time" class="level2">
+<h2 class="anchored" data-anchor-id="part-4-nyc-taxis-comparing-origins-destinations-and-time">Part 4: NYC taxis — comparing origins, destinations, and time</h2>
+<p>The extract contains 150,000 real historical January 2015 trips. The source is the Datashader example Parquet file; timestamps were retained and hour fields reconstructed during preparation to avoid a legacy integer encoding problem.</p>
+<p>Count <strong>trips</strong>, not passengers: <code>ds.count()</code> counts rows, while <code>ds.sum("passenger_count")</code> would sum passengers if that column were available. We do not infer whole-city demand from this bounded extract.</p>
+<p>The pickup-minus-dropoff comparison uses a symmetric logarithmic color scale so small differences remain visible while retaining their sign.</p>
+<div id="bab5a2bb" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-26T03:19:47.068716Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-26T03:19:47.068624Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-26T03:19:47.375813Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-26T03:19:47.375564Z&quot;}" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>taxi <span class="op">=</span> dd.read_parquet(DATA <span class="op">/</span> <span class="st">"taxi_sample.parquet"</span>, split_row_groups<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>NYC_X, NYC_Y <span class="op">=</span> mercator_extent((<span class="op">-</span><span class="fl">74.10</span>, <span class="op">-</span><span class="fl">73.70</span>), (<span class="fl">40.60</span>, <span class="fl">40.90</span>))</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>taxi_canvas <span class="op">=</span> ds.Canvas(plot_width<span class="op">=</span><span class="dv">750</span>, plot_height<span class="op">=</span><span class="dv">550</span>, x_range<span class="op">=</span>NYC_X, y_range<span class="op">=</span>NYC_Y)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>pickups <span class="op">=</span> taxi_canvas.points(taxi, <span class="st">"pickup_x"</span>, <span class="st">"pickup_y"</span>, agg<span class="op">=</span>ds.count()).rename({<span class="st">"pickup_x"</span>: <span class="st">"x"</span>, <span class="st">"pickup_y"</span>: <span class="st">"y"</span>})</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>dropoffs <span class="op">=</span> taxi_canvas.points(taxi, <span class="st">"dropoff_x"</span>, <span class="st">"dropoff_y"</span>, agg<span class="op">=</span>ds.count()).rename({<span class="st">"dropoff_x"</span>: <span class="st">"x"</span>, <span class="st">"dropoff_y"</span>: <span class="st">"y"</span>})</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"In-view pickups:"</span>, <span class="bu">int</span>(pickups.<span class="bu">sum</span>()), <span class="st">"| in-view dropoffs:"</span>, <span class="bu">int</span>(dropoffs.<span class="bu">sum</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>In-view pickups: 149998 | in-view dropoffs: 149994</code></pre>
+</div>
+</div>
+<div id="4c5d10ce" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-26T03:19:47.377103Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-26T03:19:47.377031Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-26T03:19:47.588354Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-26T03:19:47.588058Z&quot;}" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Subtract signed values: unsigned subtraction would wrap below zero.</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>balance <span class="op">=</span> pickups.astype(<span class="st">"int64"</span>) <span class="op">-</span> dropoffs.astype(<span class="st">"int64"</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.colors <span class="im">import</span> SymLogNorm</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>limit <span class="op">=</span> <span class="bu">max</span>(<span class="dv">1</span>, <span class="bu">int</span>(np.<span class="bu">abs</span>(balance).<span class="bu">max</span>()))</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>plot <span class="op">=</span> ax.imshow(balance, origin<span class="op">=</span><span class="st">"lower"</span>, cmap<span class="op">=</span><span class="st">"RdBu_r"</span>, norm<span class="op">=</span>SymLogNorm(linthresh<span class="op">=</span><span class="dv">1</span>, vmin<span class="op">=-</span>limit, vmax<span class="op">=</span>limit),</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>                 extent<span class="op">=</span>[<span class="op">*</span>NYC_X, <span class="op">*</span>NYC_Y])</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>fig.colorbar(plot, ax<span class="op">=</span>ax, label<span class="op">=</span><span class="st">"Extract trips: pickups minus dropoffs (symmetric log scale)"</span>)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"NYC taxi extract: red = more pickups; blue = more dropoffs"</span>)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lecture-11A_files/figure-html/cell-13-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="a-calendar-view-from-timestamps" class="level3">
+<h3 class="anchored" data-anchor-id="a-calendar-view-from-timestamps">A calendar view from timestamps</h3>
+<p>Here we <strong>do</strong> compute a small grouped result, not the whole trip table. Weekday/hour counts describe only the extract’s January 2015 coverage. The full-year 2016 holiday and blizzard claims in the original lecture cannot be transferred to this different sample.</p>
+<div id="3481c71b" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-26T03:19:47.589745Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-26T03:19:47.589638Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-26T03:19:47.681202Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-26T03:19:47.680931Z&quot;}" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>taxi[<span class="st">"weekday"</span>] <span class="op">=</span> taxi.tpep_pickup_datetime.dt.dayofweek</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>hourly_table <span class="op">=</span> taxi.groupby([<span class="st">"weekday"</span>, <span class="st">"pickup_hour"</span>]).size().compute().unstack(fill_value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>hourly_table <span class="op">=</span> hourly_table.reindex(index<span class="op">=</span><span class="bu">range</span>(<span class="dv">7</span>), columns<span class="op">=</span><span class="bu">range</span>(<span class="dv">24</span>), fill_value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="dv">3</span>))</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>plot <span class="op">=</span> ax.imshow(hourly_table, aspect<span class="op">=</span><span class="st">"auto"</span>, cmap<span class="op">=</span><span class="st">"viridis"</span>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(yticks<span class="op">=</span><span class="bu">range</span>(<span class="dv">7</span>), yticklabels<span class="op">=</span>[<span class="st">"Mon"</span>, <span class="st">"Tue"</span>, <span class="st">"Wed"</span>, <span class="st">"Thu"</span>, <span class="st">"Fri"</span>, <span class="st">"Sat"</span>, <span class="st">"Sun"</span>],</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>       xticks<span class="op">=</span><span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">24</span>, <span class="dv">3</span>), xlabel<span class="op">=</span><span class="st">"Pickup hour"</span>, title<span class="op">=</span><span class="st">"January 2015 extract: trips by weekday/hour"</span>)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>fig.colorbar(plot, ax<span class="op">=</span>ax, label<span class="op">=</span><span class="st">"Extract trips"</span>)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lecture-11A_files/figure-html/cell-14-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="export-a-24-hour-animation" class="level3">
+<h3 class="anchored" data-anchor-id="export-a-24-hour-animation">Export a 24-hour animation</h3>
+<p>Precompute the hourly pixel counts once using a known categorical hour field. Use a <strong>shared log count scale</strong> for all frames so brightness remains comparable. A frame-by-frame equalized histogram would change the meaning of color each hour.</p>
+<div id="d2655a24" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-26T03:19:47.682608Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-26T03:19:47.682530Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-26T03:19:48.658283Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-26T03:19:48.658038Z&quot;}" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>taxi[<span class="st">"dropoff_hour"</span>] <span class="op">=</span> taxi[<span class="st">"dropoff_hour"</span>].astype(pd.CategoricalDtype(<span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">24</span>))))</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>by_hour <span class="op">=</span> taxi_canvas.points(taxi, <span class="st">"dropoff_x"</span>, <span class="st">"dropoff_y"</span>, agg<span class="op">=</span>ds.count_cat(<span class="st">"dropoff_hour"</span>))</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>max_count <span class="op">=</span> <span class="bu">max</span>(<span class="dv">2</span>, <span class="bu">int</span>(by_hour.<span class="bu">max</span>()))</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>frames <span class="op">=</span> []</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> ImageDraw</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> hour <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">24</span>):</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    image <span class="op">=</span> tf.set_background(tf.shade(by_hour.sel(dropoff_hour<span class="op">=</span>hour), cmap<span class="op">=</span>fire[<span class="dv">40</span>:],</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>                                       how<span class="op">=</span><span class="st">"log"</span>, span<span class="op">=</span>(<span class="dv">1</span>, max_count)), <span class="st">"black"</span>).to_pil().convert(<span class="st">"RGB"</span>)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    ImageDraw.Draw(image).text((<span class="dv">16</span>, <span class="dv">16</span>), <span class="ss">f"</span><span class="sc">{</span>hour<span class="sc">:02d}</span><span class="ss">:00 | historical taxi extract"</span>, fill<span class="op">=</span><span class="st">"white"</span>)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    frames.append(image)</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>frames[<span class="dv">0</span>].save(OUT <span class="op">/</span> <span class="st">"taxi_dropoffs_24h.gif"</span>, save_all<span class="op">=</span><span class="va">True</span>, append_images<span class="op">=</span>frames[<span class="dv">1</span>:],</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>               duration<span class="op">=</span><span class="dv">250</span>, loop<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>display(HTML(<span class="st">'&lt;img src="outputs/viz/taxi_dropoffs_24h.gif" alt="24-hour taxi drop-off animation"&gt;'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<img src="outputs/viz/taxi_dropoffs_24h.gif" alt="24-hour taxi drop-off animation">
+</div>
+</div>
+</section>
+<section id="a-slider-that-works-in-the-published-html" class="level3">
+<h3 class="anchored" data-anchor-id="a-slider-that-works-in-the-published-html">A slider that works in the published HTML</h3>
+<p>A live hvPlot/Datashader view can reaggregate points as you pan and zoom, but that requires an active Python kernel or Panel server. Saving a dynamic Python callback in a static page does not make it work without Python.</p>
+<p>For this course’s static website, embed the <strong>24 precomputed frames</strong> in a Bokeh document. The JavaScript slider works without a Python server. Zooming enlarges the precomputed image; it does not rescan the original points. Bokeh’s JavaScript is embedded too, so this slider does not depend on a CDN.</p>
+<div id="0db4b717" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-26T03:19:48.659492Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-26T03:19:48.659419Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-26T03:19:49.172651Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-26T03:19:49.172409Z&quot;}" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bokeh.embed <span class="im">import</span> file_html</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bokeh.resources <span class="im">import</span> INLINE</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bokeh.layouts <span class="im">import</span> column</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bokeh.models <span class="im">import</span> ColumnDataSource, CustomJS, Slider</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bokeh.plotting <span class="im">import</span> figure</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>frame_urls <span class="op">=</span> []</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> frame <span class="kw">in</span> frames:</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">buffer</span> <span class="op">=</span> io.BytesIO()</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    frame.save(<span class="bu">buffer</span>, <span class="bu">format</span><span class="op">=</span><span class="st">"PNG"</span>)</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    frame_urls.append(<span class="st">"data:image/png;base64,"</span> <span class="op">+</span> base64.b64encode(<span class="bu">buffer</span>.getvalue()).decode())</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>source <span class="op">=</span> ColumnDataSource(<span class="bu">dict</span>(url<span class="op">=</span>[frame_urls[<span class="dv">0</span>]]))</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>plot <span class="op">=</span> figure(width<span class="op">=</span><span class="dv">800</span>, height<span class="op">=</span><span class="dv">580</span>, x_range<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">1</span>), y_range<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>              title<span class="op">=</span><span class="st">"Taxi dropoffs by hour — precomputed extract"</span>, tools<span class="op">=</span><span class="st">"pan,wheel_zoom,reset,save"</span>)</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>plot.image_url(url<span class="op">=</span><span class="st">"url"</span>, source<span class="op">=</span>source, x<span class="op">=</span><span class="dv">0</span>, y<span class="op">=</span><span class="dv">1</span>, w<span class="op">=</span><span class="dv">1</span>, h<span class="op">=</span><span class="dv">1</span>, anchor<span class="op">=</span><span class="st">"top_left"</span>)</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>plot.axis.visible <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>slider <span class="op">=</span> Slider(start<span class="op">=</span><span class="dv">0</span>, end<span class="op">=</span><span class="dv">23</span>, value<span class="op">=</span><span class="dv">0</span>, step<span class="op">=</span><span class="dv">1</span>, title<span class="op">=</span><span class="st">"Hour of day"</span>)</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>slider.js_on_change(<span class="st">"value"</span>, CustomJS(args<span class="op">=</span><span class="bu">dict</span>(source<span class="op">=</span>source, frames<span class="op">=</span>frame_urls),</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>    code<span class="op">=</span><span class="st">"source.data.url = [frames[cb_obj.value]]; source.change.emit();"</span>))</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>(OUT <span class="op">/</span> <span class="st">"taxi_hour_slider.html"</span>).write_text(file_html(column(slider, plot), INLINE, <span class="st">"Taxi hour explorer"</span>))</span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>display(IFrame(<span class="st">"outputs/viz/taxi_hour_slider.html"</span>, width<span class="op">=</span><span class="dv">850</span>, height<span class="op">=</span><span class="dv">680</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+        <iframe width="850" height="680" src="outputs/viz/taxi_hour_slider.html" frameborder="0" allowfullscreen=""></iframe>
+        
+</div>
+</div>
+</section>
+</section>
+<section id="part-5-guided-exercise-philadelphia-parking-records" class="level2">
+<h2 class="anchored" data-anchor-id="part-5-guided-exercise-philadelphia-parking-records">Part 5: Guided exercise — Philadelphia parking records</h2>
+<p>The source lecture used <a href="https://musa550.s3.amazonaws.com/parking_violations.csv">this public parking-violations CSV</a>. Our small extract retains its <code>lat</code>/<code>lon</code> columns. It contains missing locations, so drop missing values <strong>only in the coordinate columns</strong>, then reject impossible coordinates.</p>
+<p><strong>Try first:</strong> read lazily, clean locations, convert to EPSG:3857 partition by partition, and render counts on a Philadelphia canvas. Compare <code>dropna()</code> on every field with coordinate-only filtering.</p>
+<div id="72684667" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-26T03:19:49.173968Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-26T03:19:49.173872Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-26T03:19:49.348299Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-26T03:19:49.348043Z&quot;}" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>parking <span class="op">=</span> dd.read_csv(DATA <span class="op">/</span> <span class="st">"parking_sample.csv"</span>, dtype<span class="op">=</span>{<span class="st">"lat"</span>: <span class="st">"float64"</span>, <span class="st">"lon"</span>: <span class="st">"float64"</span>})</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>parking <span class="op">=</span> parking.dropna(subset<span class="op">=</span>[<span class="st">"lat"</span>, <span class="st">"lon"</span>])</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>parking <span class="op">=</span> parking[parking.lat.between(<span class="op">-</span><span class="dv">85</span>, <span class="dv">85</span>) <span class="op">&amp;</span> parking.lon.between(<span class="op">-</span><span class="dv">180</span>, <span class="dv">180</span>)]</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> project_parking(partition):</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> partition.copy()</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    result[<span class="st">"x"</span>], result[<span class="st">"y"</span>] <span class="op">=</span> lnglat_to_meters(result.lon.to_numpy(), result.lat.to_numpy())</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> parking._meta.assign(x<span class="op">=</span>pd.Series(dtype<span class="op">=</span><span class="st">"float64"</span>), y<span class="op">=</span>pd.Series(dtype<span class="op">=</span><span class="st">"float64"</span>))</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>parking_xy <span class="op">=</span> parking.map_partitions(project_parking, meta<span class="op">=</span>meta)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>philly_x, philly_y <span class="op">=</span> mercator_extent((<span class="op">-</span><span class="fl">75.28</span>, <span class="op">-</span><span class="fl">74.96</span>), (<span class="fl">39.86</span>, <span class="fl">40.14</span>))</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>parking_canvas <span class="op">=</span> ds.Canvas(plot_width<span class="op">=</span><span class="dv">650</span>, plot_height<span class="op">=</span><span class="dv">650</span>, x_range<span class="op">=</span>philly_x, y_range<span class="op">=</span>philly_y)</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>parking_counts <span class="op">=</span> parking_canvas.points(parking_xy, <span class="st">"x"</span>, <span class="st">"y"</span>, agg<span class="op">=</span>ds.count())</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>parking_image <span class="op">=</span> tf.set_background(tf.shade(parking_counts, cmap<span class="op">=</span>fire[<span class="dv">40</span>:], how<span class="op">=</span><span class="st">"eq_hist"</span>), <span class="st">"black"</span>)</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>display(parking_image.to_pil())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lecture-11A_files/figure-html/cell-17-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="part-6-scale-from-the-extract-to-the-full-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="part-6-scale-from-the-extract-to-the-full-dataset">Part 6: Scale from the extract to the full dataset</h2>
+<p>Use a local Parquet path or directory, select only needed columns, and let Dask scan partitions. Do not read every Parquet file into pandas and concatenate it before creating Dask: that defeats out-of-core processing.</p>
+<p>Original download sources:</p>
+<ul>
+<li><a href="https://s3.amazonaws.com/datashader-data/osm-1billion.snappy.parq.zip">OSM GPS archive</a></li>
+<li><a href="https://s3.amazonaws.com/datashader-data/census2010.parq.zip">2010 Census dots</a></li>
+<li><a href="https://s3.amazonaws.com/datashader-data/nyc_taxi_wide.parq">Historical taxi trips</a></li>
+</ul>
+<p>These are optional, large downloads. The sample workflow does not download them automatically. The old taxi Parquet has legacy integer encodings; use the prepared modern extract unless you have separately converted the archive. Reproject using CRS-aware formulas, never arbitrary multiplication/division.</p>
+<div id="8eaacb32" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-26T03:19:49.349594Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-26T03:19:49.349517Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-26T03:19:49.351462Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-26T03:19:49.351233Z&quot;}" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Optional: set OSM_PARQUET to your complete local dataset before starting Jupyter.</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>full_osm_path <span class="op">=</span> os.environ.get(<span class="st">"OSM_PARQUET"</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> full_osm_path:</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    full_osm <span class="op">=</span> dd.read_parquet(full_osm_path, columns<span class="op">=</span>[<span class="st">"x"</span>, <span class="st">"y"</span>], split_row_groups<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Full dataset partitions:"</span>, full_osm.npartitions)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This next operation scans the complete dataset. Uncomment deliberately:</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># full_count = canvas.points(full_osm, "x", "y", agg=ds.count())</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Using bundled extracts. Full archives are optional."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Using bundled extracts. Full archives are optional.</code></pre>
+</div>
+</div>
+</section>
+<section id="wrap-up" class="level2">
+<h2 class="anchored" data-anchor-id="wrap-up">Wrap-up</h2>
+<ul>
+<li>Input records may be huge; the aggregate size depends on pixels and categories.</li>
+<li>Sampling, filtering, CRS, binning resolution, and color transforms all affect interpretation.</li>
+<li>Use lazy reads, bounded computations, and explicit units.</li>
+<li>A static HTML visualization can offer JavaScript interactions; live reaggregation needs Python.</li>
+</ul>
+<p><strong>Exercises:</strong> double the canvas resolution; compare shared versus independent color scales; add a morning-versus-evening taxi comparison; and explain why a selected GPS extract cannot measure population density.</p>
+<p><strong>Source material:</strong> <code>Visualizing Large Data-Lec1.ipynb</code> and <code>Visualizing Large Data-Lec2.ipynb</code>, consolidated and corrected for this lab. The original notebooks are retained locally; their large embedded outputs are not required for this lesson.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

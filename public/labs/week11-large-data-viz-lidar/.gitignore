@@ -1,0 +1,9 @@
+__pycache__/
+.ipynb_checkpoints/
+*.part
+
+# Original reference notebooks contain large embedded outputs; keep locally.
+Visualizing Large Data-Lec1.ipynb
+Visualizing Large Data-Lec2.ipynb
+
+/.quarto/

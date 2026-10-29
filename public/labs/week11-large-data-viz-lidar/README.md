@@ -1,52 +1,88 @@
-# Large spatial data visualization and LiDAR
+# Week 11: Large-data visualization and LiDAR
 
-Two executable lessons, rendered with the same Quarto configuration and presentation CSS as Weeks 9–10:
+- **Lecture 11A:** Dask tables → Datashader density maps → Census categories → taxi animation → parking exercise.
+- **Lecture 11B:** two Philadelphia LAS tiles → raw maximum and IDW rasters → median-smoothed DSMs → before/after plots.
 
-- `lecture-11A.ipynb` → `lecture-11A.html`: merged and corrected large-data visualization lectures.
-- `lecture-11B.ipynb` → `lecture-11B.html`: three real Philadelphia LAS files to analytical DSMs and XYZ web tiles.
+Both tutorials use **Python (largeviz)**. Run cells from top to bottom from this folder or the repository root.
 
-The original lecture notebooks are retained locally and excluded from version control because of their large embedded outputs (one is about 285 MiB). The three supplied scripts are retained as small reference files. Run the new notebooks rather than the original scripts, which contain machine-specific paths and project assumptions.
-
-## Environments and execution
-
-Create the appropriate environment from `environment-viz.yml` or `environment-lidar.yml`, then select that environment's notebook kernel. Run each notebook from this folder or the repository root. Both lessons explain their dependencies and workflow.
-
-Visualization runs from the bundled real-data extracts in `data/samples/`; see `provenance.json` for sampling limitations and original sources. The samples are for teaching, not representative estimates of population, demand, or travel behavior. Original billion-point archives are optional and are not downloaded by Run All.
-
-The LiDAR notebook downloads `Philadelphia_104.las`, `Philadelphia_105.las`, and `Philadelphia_114.las` from PASDA, about 120 MB in total. `data/lidar_manifest.json` records URLs, sizes, point counts, and provider footprints. Raw LAS data is cached outside the public website at `~/.cache/musa550-week11/raw/`, or under the directory specified by `MUSA550_CACHE`.
-
-Source horizontal and vertical units are US survey feet. Analytical outputs retain the native horizontal CRS but convert elevation values to meters; the one-meter pixel size is converted to native horizontal units. The vertical datum remains NAVD88. This is a unit conversion, not a vertical-datum transformation.
-
-## Generated artifacts
-
-`outputs/viz/` contains a density PNG, a 24-frame taxi GIF, and a standalone Bokeh hourly slider. The slider embeds JavaScript and precomputed frames; it works without a live Python server. Zooming does not reaggregate the source data.
-
-`outputs/lidar/` contains:
-
-- `raw_dsm/`: three aligned Float32 GeoTIFFs, band 1 maximum elevation (m), band 2 retained point count.
-- `filled_dsm/`: three elevation-only rasters with only small enclosed holes interpolated.
-- `qa/`: three flags rasters, 0 observed / 1 interpolated / 255 NoData.
-- `pipelines/`: the executed PDAL stage specifications.
-- `philadelphia_dsm_mosaic.tif`: the analytical elevation mosaic.
-- `tiles/dsm/{z}/{x}/{y}.png`: RGBA display tiles at zooms 15–17 and shared-scale `tilejson.json` metadata.
-- `dsm_viewer.html`: Leaflet viewer using the local XYZ tiles. Leaflet assets require internet access; no map API key is needed.
-
-LAS files are sparse edge examples with substantial water/NoData coverage. Do not interpret the maximum surface as terrain or canopy height, or interpolate across broad gaps. The original LAS files and raw rasters are never deleted by the notebooks.
-
-## Validate and render
-
-After running both notebooks, run in the LiDAR environment:
-
-```bash
-python validate_outputs.py
-```
+## Create or update the environment
 
 From the repository root:
 
 ```bash
-quarto render public/labs/week11-large-data-viz-lidar/lecture-11A.ipynb --to html
-quarto render public/labs/week11-large-data-viz-lidar/lecture-11B.ipynb --to html
-npm run build
+cd public/labs/week11-large-data-viz-lidar
+# First installation:
+conda env create -f environment-viz.yml
+# For an existing largeviz environment, use this instead:
+# conda env update -n largeviz -f environment-viz.yml
+conda activate largeviz
+python -m ipykernel install --user --name largeviz --display-name "Python (largeviz)"
+jupyter lab
 ```
 
-Quarto uses saved outputs; no new downloads occur while rendering. The course schedule links to both HTML files. Use `npm run dev` or another HTTP server for the local tile viewer, rather than opening it through `file://`.
+If downloading the lab separately, keep `environment-viz.yml` beside the notebooks and run these commands from that folder, omitting `cd`. Create the environment once. Close running kernels before updating it. `environment-lidar.yml` defines the same shared environment for compatibility.
+
+In VS Code, choose **Select Kernel → Python (largeviz)**. If missing, use **Select Another Kernel → Python Environments**, or reload the VS Code window. In Jupyter, choose **Kernel → Change Kernel → Python (largeviz)**.
+
+To launch with the environment explicitly:
+
+```bash
+conda run -n largeviz jupyter lab
+# Or:
+conda run -n largeviz jupyter notebook
+```
+
+Check both package stacks:
+
+```bash
+conda run -n largeviz python -c "import numpy, numba, scipy.special, dask.dataframe, datashader, pdal, rasterio, pyproj; print('Both lab stacks import OK')"
+```
+
+## Data and outputs
+
+Lecture 11A uses the bundled extracts in `data/samples/`. See `data/samples/provenance.json` for sources and sampling. These are teaching extracts, not representative estimates. Outputs are `outputs/viz/osm_density.png` and `outputs/viz/taxi_dropoffs_24h.gif`.
+
+Lecture 11B downloads `Philadelphia_394.las` (University City) and `Philadelphia_456.las` (Center City) from PASDA, about **2.09 GB** total. Complete downloads are reused. The default cache is `~/.cache/musa550-week11/raw/`; set `MUSA550_CACHE` before launching Jupyter to use another cache root.
+
+The selected footprints are about 914 × 914 m each. Horizontal coordinates remain in the native projected CRS; elevations and pixel size are converted to meters using the LAS CRS metadata. The vertical datum stays unchanged. DSM elevations include trees/buildings/ground and are not building heights above terrain.
+
+Lecture 11B writes to `outputs/lidar/case_studies/`:
+
+- `*_max.tif`: unsmoothed maximum return per pixel, retained for comparison.
+- `*_idw.tif`: first-return IDW interpolation using a 1.5-pixel radius.
+- `*_dsm.tif`: 3 × 3 median of the IDW surface, retaining its NoData mask.
+- Pipeline JSON files, `dsm_before_after.png`, and `center_city_university_city_dsm.png`.
+
+IDW and median filtering reduce isolated spikes but can lower small roof features, canopy peaks, and narrow structures. Use raw maximum rasters when examining measured peaks. Remaining NoData is retained; no broad water/gap filling is performed. Earlier outputs from other versions of the lesson may still exist; the current notebooks do not use them.
+
+## Reference scripts
+
+The scripts now use the same small-radius IDW + median approach via `dsm_tools.py`, read the source CRS rather than assigning EPSG:4326, and preserve raw rasters. They create DSMs only; they do not classify ground or produce a DTM.
+
+For a local LAS/LAZ file:
+
+```bash
+python pdal-las2desm.py input.las outputs/dsm.tif --resolution 1
+```
+
+If the input has no vertical CRS, supply `--z-scale`: `1` for meters, `0.3048` for international feet, or `0.3048006096012192` for US survey feet. Do not infer Z units from a horizontal EPSG code. Optionally pass `--crs EPSG:2272` to reproject horizontal coordinates.
+
+For a USGS EPT patch:
+
+```bash
+python usgs_pdal_dsm.py PATCH outputs/dsm.tif \
+  --bounds LEFT BOTTOM RIGHT TOP --crs EPSG:2272 --z-scale 1
+```
+
+Replace placeholders with the patch name and a small EPSG:3857 bounding box. Confirm the source Z units before choosing the scale. The callable `usgs_pdal_dsm()` now requires explicit `bounds` and `z_scale` keyword arguments. It no longer depends on a machine-specific city shapefile. `fill_desm()` writes separate smoothed outputs and never deletes raw DSMs.
+
+## Render the lessons
+
+After running and saving the notebooks, from the repository root:
+
+```bash
+quarto render public/labs/week11-large-data-viz-lidar/lecture-11A.ipynb --to html
+quarto render public/labs/week11-large-data-viz-lidar/lecture-11B.ipynb --to html
+```
+
+Quarto renders saved outputs; it does not rerun downloads or processing.

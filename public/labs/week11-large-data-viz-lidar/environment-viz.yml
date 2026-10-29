@@ -1,6 +1,7 @@
-name: musa-largeviz
+name: largeviz
 channels:
   - conda-forge
+  - nodefaults
 dependencies:
   - python=3.12
   - numpy=1.26.4
@@ -17,3 +18,12 @@ dependencies:
   - fsspec
   - jupyterlab
   - ipykernel
+  - notebook
+  - nbconvert
+  - nbclient
+  - python-pdal=3.5.3
+  - rasterio=1.5.0
+  - pyproj=3.7.2
+  - scipy=1.17.1
+  - laspy
+  - mercantile

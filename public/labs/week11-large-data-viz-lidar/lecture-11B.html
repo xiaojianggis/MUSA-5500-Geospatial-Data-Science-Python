@@ -84,11 +84,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#before-you-start" id="toc-before-you-start" class="nav-link active" data-scroll-target="#before-you-start">Before you start</a></li>
-  <li><a href="#import-packages-and-set-folders" id="toc-import-packages-and-set-folders" class="nav-link" data-scroll-target="#import-packages-and-set-folders">1. Import packages and set folders</a></li>
-  <li><a href="#choose-and-download-two-las-tiles" id="toc-choose-and-download-two-las-tiles" class="nav-link" data-scroll-target="#choose-and-download-two-las-tiles">2. Choose and download two LAS tiles</a>
-  <ul class="collapse">
-  <li><a href="#download-the-files" id="toc-download-the-files" class="nav-link" data-scroll-target="#download-the-files">Download the files</a></li>
-  </ul></li>
+  <li><a href="#download-and-save-the-lidar-files" id="toc-download-and-save-the-lidar-files" class="nav-link" data-scroll-target="#download-and-save-the-lidar-files">Download and save the LiDAR files</a></li>
+  <li><a href="#import-packages-and-set-the-output-folder" id="toc-import-packages-and-set-the-output-folder" class="nav-link" data-scroll-target="#import-packages-and-set-the-output-folder">1. Import packages and set the output folder</a></li>
+  <li><a href="#open-your-downloaded-files" id="toc-open-your-downloaded-files" class="nav-link" data-scroll-target="#open-your-downloaded-files">2. Open your downloaded files</a></li>
   <li><a href="#check-the-coordinate-system-and-units" id="toc-check-the-coordinate-system-and-units" class="nav-link" data-scroll-target="#check-the-coordinate-system-and-units">3. Check the coordinate system and units</a></li>
   <li><a href="#create-raw-dsm-rasters" id="toc-create-raw-dsm-rasters" class="nav-link" data-scroll-target="#create-raw-dsm-rasters">4. Create raw DSM rasters</a></li>
   <li><a href="#remove-isolated-pixels-with-a-median-filter" id="toc-remove-isolated-pixels-with-a-median-filter" class="nav-link" data-scroll-target="#remove-isolated-pixels-with-a-median-filter">5. Remove isolated pixels with a median filter</a></li>
@@ -123,12 +121,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>We will download two Philadelphia LAS files, create a digital surface model with PDAL, and smooth isolated bright pixels.</p>
+<p>We will use two Philadelphia LAS files, create a digital surface model with PDAL, and smooth isolated bright pixels.</p>
 <p>A <strong>DSM</strong> includes roofs, trees, and ground. Elevations are relative to a vertical datum; they are not building heights above ground.</p>
-<p><a href="lecture-11B.ipynb">Download notebook</a> · <a href="lecture-11A.html">Previous lesson: large-data visualization</a></p>
+<p><a href="lecture-11B.ipynb" download="">Download notebook</a> · <a href="lecture-11A.html">Previous lesson: large-data visualization</a></p>
 <section id="before-you-start" class="level2">
 <h2 class="anchored" data-anchor-id="before-you-start">Before you start</h2>
-<p>Use <strong>Python (largeviz)</strong> for both lessons. Download <a href="environment-viz.yml">environment-viz.yml</a> beside the notebooks. In a terminal opened in this lab folder:</p>
+<p>Use <strong>Python (largeviz)</strong> for both lessons. Download <a href="environment-viz.yml" download="">environment-viz.yml</a> beside the notebooks. In a terminal opened in this lab folder:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># First time only:</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> env create <span class="at">-f</span> environment-viz.yml</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># If largeviz already exists, update it instead:</span></span>
@@ -138,59 +136,80 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">jupyter</span> lab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>In VS Code, open the notebook and select <strong>Python (largeviz)</strong>. Run the cells from top to bottom. See the <a href="README.md">README</a> for setup troubleshooting.</p>
 </section>
-<section id="import-packages-and-set-folders" class="level2">
-<h2 class="anchored" data-anchor-id="import-packages-and-set-folders">1. Import packages and set folders</h2>
-<p>The two LAS files total about <strong>2.09 GB</strong>. Downloads are cached and reused. Set <code>MUSA550_CACHE</code> before starting Jupyter to choose another cache folder.</p>
-<div id="e5de3368" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pdal</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rasterio</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rasterio.plot <span class="im">import</span> show</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyproj <span class="im">import</span> CRS, Transformer</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.colors <span class="im">import</span> Normalize</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.patches <span class="im">import</span> Rectangle</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>LAB <span class="op">=</span> Path.cwd()</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> (LAB <span class="op">/</span> <span class="st">"lecture-11B.ipynb"</span>).exists():</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    LAB <span class="op">=</span> LAB <span class="op">/</span> <span class="st">"public/labs/week11-large-data-viz-lidar"</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> (LAB <span class="op">/</span> <span class="st">"lecture-11B.ipynb"</span>).exists(), <span class="st">"Run from the lab directory or repository root."</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>CACHE <span class="op">=</span> Path(os.environ.get(<span class="st">"MUSA550_CACHE"</span>, Path.home() <span class="op">/</span> <span class="st">".cache/musa550-week11"</span>))</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>RAW <span class="op">=</span> CACHE <span class="op">/</span> <span class="st">"raw"</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>OUT <span class="op">=</span> LAB <span class="op">/</span> <span class="st">"outputs/lidar/case_studies"</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>RAW.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>OUT.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Python:"</span>, sys.executable)</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"PDAL:"</span>, pdal.__version__)</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Raw LAS cache:"</span>, RAW)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="download-and-save-the-lidar-files" class="level2">
+<h2 class="anchored" data-anchor-id="download-and-save-the-lidar-files">Download and save the LiDAR files</h2>
+<ol type="1">
+<li>Create a folder named <code>week11</code> on your computer (or use the folder from Lecture 11A). Save <a href="lecture-11B.ipynb" download="">lecture-11B.ipynb</a> and <a href="environment-viz.yml" download="">environment-viz.yml</a> in it.</li>
+<li>Inside <code>week11</code>, create a <code>data</code> folder, then a <code>lidar</code> folder inside it.</li>
+<li>Download <strong>both</strong> LAS files using the direct links below. Save them in <code>data/lidar/</code> and keep their original filenames. If clicking a link does not download it, right-click and choose <strong>Save Link As…</strong>.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Case study</th>
+<th>Direct download</th>
+<th>Size</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>University City</td>
+<td><a href="https://www.pasda.psu.edu/download/phillyLiDAR/2022/LAS/Classified_LAS/Philadelphia_394.las">Download Philadelphia_394.las</a></td>
+<td>about 1.09 GB</td>
+</tr>
+<tr class="even">
+<td>Center City</td>
+<td><a href="https://www.pasda.psu.edu/download/phillyLiDAR/2022/LAS/Classified_LAS/Philadelphia_456.las">Download Philadelphia_456.las</a></td>
+<td>about 997 MB</td>
+</tr>
+</tbody>
+</table>
+<p>Wait for both downloads to finish before running the notebook. These are <code>.las</code> files; <strong>no extraction is needed</strong>. Allow at least 3 GB of free space for the data and results.</p>
+<pre class="text"><code>week11/
+├── lecture-11B.ipynb
+├── environment-viz.yml
+└── data/
+    └── lidar/
+        ├── Philadelphia_394.las
+        └── Philadelphia_456.las</code></pre>
+<p>Open the notebook from this folder and select <strong>Python (largeviz)</strong>. All paths below are relative to the notebook’s folder. If you saved the LAS files somewhere else, edit the two paths in Step 2.</p>
+</section>
+<section id="import-packages-and-set-the-output-folder" class="level2">
+<h2 class="anchored" data-anchor-id="import-packages-and-set-the-output-folder">1. Import packages and set the output folder</h2>
+<div id="e5de3368" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:52.840905Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:52.840789Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:53.753733Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:53.753217Z&quot;}" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pdal</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rasterio</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rasterio.plot <span class="im">import</span> show</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyproj <span class="im">import</span> CRS</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.colors <span class="im">import</span> Normalize</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>OUT <span class="op">=</span> Path(<span class="st">"outputs/lidar/case_studies"</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>OUT.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"PDAL:"</span>, pdal.__version__)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Python: /opt/anaconda3/envs/largeviz/bin/python
-PDAL: 3.5.3
-Raw LAS cache: /Users/xiaojiang/.cache/musa550-week11/raw</code></pre>
+<pre><code>PDAL: 3.5.3</code></pre>
 </div>
 </div>
 </section>
-<section id="choose-and-download-two-las-tiles" class="level2">
-<h2 class="anchored" data-anchor-id="choose-and-download-two-las-tiles">2. Choose and download two LAS tiles</h2>
-<p>Use University City and Center City examples from <a href="https://www.pasda.psu.edu/download/phillyLiDAR/2022/LAS/Classified_LAS/">PASDA’s Philadelphia classified LAS directory</a>. Each selected footprint is about 914 × 914 m. These are case studies, not complete neighborhood coverage.</p>
-<div id="f3ec999e" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>BASE_URL <span class="op">=</span> <span class="st">"https://www.pasda.psu.edu/download/phillyLiDAR/2022/LAS/Classified_LAS/"</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>cases <span class="op">=</span> [</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"zone"</span>: <span class="st">"University City"</span>, <span class="st">"name"</span>: <span class="st">"Philadelphia_394.las"</span>, <span class="st">"bytes"</span>: <span class="dv">1_090_289_145</span>,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>     <span class="st">"bounds"</span>: [<span class="dv">2685000</span>, <span class="dv">235000</span>, <span class="dv">2688000</span>, <span class="dv">238000</span>]},</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"zone"</span>: <span class="st">"Center City"</span>, <span class="st">"name"</span>: <span class="st">"Philadelphia_456.las"</span>, <span class="st">"bytes"</span>: <span class="dv">997_092_345</span>,</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>     <span class="st">"bounds"</span>: [<span class="dv">2691000</span>, <span class="dv">235000</span>, <span class="dv">2694000</span>, <span class="dv">238000</span>]},</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(cases)[[<span class="st">"zone"</span>, <span class="st">"name"</span>, <span class="st">"bytes"</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="12">
+<section id="open-your-downloaded-files" class="level2">
+<h2 class="anchored" data-anchor-id="open-your-downloaded-files">2. Open your downloaded files</h2>
+<p>These PASDA tiles cover approximately 914 × 914 m each. They are case studies, not complete neighborhood coverage. The bounds below select the corresponding footprints in the source coordinate system.</p>
+<div id="f3ec999e" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:53.755005Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:53.754870Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:53.760376Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:53.759928Z&quot;}" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>cases <span class="op">=</span> [</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"zone"</span>: <span class="st">"University City"</span>, <span class="st">"name"</span>: <span class="st">"Philadelphia_394.las"</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>     <span class="st">"bounds"</span>: [<span class="dv">2685000</span>, <span class="dv">235000</span>, <span class="dv">2688000</span>, <span class="dv">238000</span>]},</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"zone"</span>: <span class="st">"Center City"</span>, <span class="st">"name"</span>: <span class="st">"Philadelphia_456.las"</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>     <span class="st">"bounds"</span>: [<span class="dv">2691000</span>, <span class="dv">235000</span>, <span class="dv">2694000</span>, <span class="dv">238000</span>]},</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(cases)[[<span class="st">"zone"</span>, <span class="st">"name"</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
 <div>
 
 
@@ -200,7 +219,6 @@ Raw LAS cache: /Users/xiaojiang/.cache/musa550-week11/raw</code></pre>
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th">zone</th>
 <th data-quarto-table-cell-role="th">name</th>
-<th data-quarto-table-cell-role="th">bytes</th>
 </tr>
 </thead>
 <tbody>
@@ -208,13 +226,11 @@ Raw LAS cache: /Users/xiaojiang/.cache/musa550-week11/raw</code></pre>
 <td data-quarto-table-cell-role="th">0</td>
 <td>University City</td>
 <td>Philadelphia_394.las</td>
-<td>1090289145</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>Center City</td>
 <td>Philadelphia_456.las</td>
-<td>997092345</td>
 </tr>
 </tbody>
 </table>
@@ -222,40 +238,18 @@ Raw LAS cache: /Users/xiaojiang/.cache/musa550-week11/raw</code></pre>
 </div>
 </div>
 </div>
-<section id="download-the-files" class="level3">
-<h3 class="anchored" data-anchor-id="download-the-files">Download the files</h3>
-<p>Stream each file to disk, check its size, and reuse it on later runs. The first download may take several minutes.</p>
-<div id="441b78c4" class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> download_las(case):</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    destination <span class="op">=</span> RAW <span class="op">/</span> case[<span class="st">"name"</span>]</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> destination.exists() <span class="kw">and</span> destination.stat().st_size <span class="op">==</span> case[<span class="st">"bytes"</span>]:</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Using cached:"</span>, destination.name)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> destination</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    temporary <span class="op">=</span> destination.with_suffix(<span class="st">".las.part"</span>)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Downloading:"</span>, case[<span class="st">"name"</span>])</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> requests.get(BASE_URL <span class="op">+</span> case[<span class="st">"name"</span>], stream<span class="op">=</span><span class="va">True</span>, timeout<span class="op">=</span>(<span class="dv">30</span>, <span class="dv">180</span>)) <span class="im">as</span> response:</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        response.raise_for_status()</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> temporary.<span class="bu">open</span>(<span class="st">"wb"</span>) <span class="im">as</span> stream:</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> chunk <span class="kw">in</span> response.iter_content(chunk_size<span class="op">=</span><span class="dv">8</span> <span class="op">*</span> <span class="dv">1024</span> <span class="op">*</span> <span class="dv">1024</span>):</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> chunk:</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>                    stream.write(chunk)</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> temporary.stat().st_size <span class="op">!=</span> case[<span class="st">"bytes"</span>]:</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f"Unexpected download size: </span><span class="sc">{</span>temporary<span class="sc">}</span><span class="ss">. Check the provider and retry."</span>)</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    temporary.replace(destination)</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> destination</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>las_paths <span class="op">=</span> [download_las(case) <span class="cf">for</span> case <span class="kw">in</span> cases]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Using cached: Philadelphia_394.las
-Using cached: Philadelphia_456.las</code></pre>
+<p>Set the paths to the files you downloaded. If you see <code>FileNotFoundError</code> in the next step, check that the files are in <code>data/lidar/</code> beside this notebook and that their names match exactly.</p>
+<div id="441b78c4" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:53.761420Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:53.761332Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:53.763052Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:53.762705Z&quot;}" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>las_paths <span class="op">=</span> [</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    Path(<span class="st">"data/lidar/Philadelphia_394.las"</span>),</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    Path(<span class="st">"data/lidar/Philadelphia_456.las"</span>),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
-</section>
 </section>
 <section id="check-the-coordinate-system-and-units" class="level2">
 <h2 class="anchored" data-anchor-id="check-the-coordinate-system-and-units">3. Check the coordinate system and units</h2>
 <p>Read the LAS header with <code>quickinfo</code>. Keep the native horizontal CRS and convert Z to meters using its vertical CRS. Convert the <strong>1 m</strong> pixel size to the horizontal coordinate units too. This changes units, not the vertical datum.</p>
-<div id="156e3450" class="cell" data-execution_count="14">
+<div id="156e3450" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:53.764109Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:53.764038Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:53.853924Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:53.853330Z&quot;}" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>infos <span class="op">=</span> []</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> path <span class="kw">in</span> las_paths:</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    reader <span class="op">=</span> pdal.Pipeline(json.dumps([{<span class="st">"type"</span>: <span class="st">"readers.las"</span>, <span class="st">"filename"</span>: <span class="bu">str</span>(path)}]))</span>
@@ -279,7 +273,7 @@ Using cached: Philadelphia_456.las</code></pre>
 <span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>               <span class="st">"vertical_crs"</span>: info[<span class="st">"vertical"</span>].name,</span>
 <span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>               <span class="st">"z_units"</span>: info[<span class="st">"vertical"</span>].axis_info[<span class="dv">0</span>].unit_name}</span>
 <span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>              <span class="cf">for</span> case, info <span class="kw">in</span> <span class="bu">zip</span>(cases, infos)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="14">
+<div class="cell-output cell-output-display" data-execution_count="4">
 <div>
 
 
@@ -329,7 +323,7 @@ Using cached: Philadelphia_456.las</code></pre>
 <li><strong>IDW:</strong> a distance-weighted average within <strong>1.5 m</strong> of each cell center; a smoother estimated surface.</li>
 </ul>
 <p>A small radius limits mixing across roofs and streets. No extra gap filling is applied. See <a href="https://pdal.io/en/stable/stages/writers.gdal.html">PDAL’s GDAL writer</a>.</p>
-<div id="dff74305" class="cell" data-execution_count="15">
+<div id="dff74305" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:53.855166Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:53.855080Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:53.858282Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:53.857778Z&quot;}" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>CELL_SIZE_M <span class="op">=</span> <span class="fl">1.0</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>NODATA <span class="op">=</span> <span class="op">-</span><span class="fl">9999.0</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -356,7 +350,7 @@ Using cached: Philadelphia_456.las</code></pre>
 <span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    ]}</span>
 <span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="f0978ea3" class="cell" data-execution_count="16">
+<div id="f0978ea3" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:53.859474Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:53.859392Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:56:44.610182Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:56:44.609759Z&quot;}" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>raw_paths <span class="op">=</span> []</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>max_paths <span class="op">=</span> []</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> path, case, info <span class="kw">in</span> <span class="bu">zip</span>(las_paths, cases, infos):</span>
@@ -383,7 +377,7 @@ Center City idw → Philadelphia_456_idw.tif</code></pre>
 <h2 class="anchored" data-anchor-id="remove-isolated-pixels-with-a-median-filter">5. Remove isolated pixels with a median filter</h2>
 <p>A <strong>3 × 3 median</strong> replaces each pixel with its neighborhood median. It reduces speckle while retaining broad roof edges better than a blur. It can remove small roof features and canopy peaks, so keep both raw rasters for analysis.</p>
 <p>Temporarily use nearest valid values so NoData cannot contaminate the filter, then restore the exact IDW NoData mask. We leave remaining gaps and water unfilled.</p>
-<div id="b9bfb210" class="cell" data-execution_count="17">
+<div id="b9bfb210" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:56:44.611672Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:56:44.611574Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:56:45.023224Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:56:45.022718Z&quot;}" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.ndimage <span class="im">import</span> distance_transform_edt, median_filter</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>dsm_paths <span class="op">=</span> []</span>
@@ -416,7 +410,7 @@ Philadelphia_456_dsm.tif</code></pre>
 <section id="compare-before-and-after" class="level2">
 <h2 class="anchored" data-anchor-id="compare-before-and-after">6. Compare before and after</h2>
 <p>The same central 250 × 250 pixel window and color scale show maximum, IDW, and smoothed IDW for each tile. The GeoTIFFs keep elevation values in meters; color limits affect only the plots.</p>
-<div id="217d42e3" class="cell" data-execution_count="18">
+<div id="217d42e3" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:56:45.025646Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:56:45.025323Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:56:45.608702Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:56:45.608089Z&quot;}" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">9</span>), constrained_layout<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> row, (case, paths) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(cases, <span class="bu">zip</span>(max_paths, raw_paths, dsm_paths))):</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    windows <span class="op">=</span> []</span>
@@ -442,7 +436,7 @@ Philadelphia_456_dsm.tif</code></pre>
 <section id="check-and-plot-the-final-dsms" class="level3">
 <h3 class="anchored" data-anchor-id="check-and-plot-the-final-dsms">Check and plot the final DSMs</h3>
 <p>Check CRS, pixel size, coverage, and elevation range. Both maps below use one elevation scale.</p>
-<div id="2ba03f6e" class="cell" data-execution_count="19">
+<div id="2ba03f6e" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:56:45.610838Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:56:45.610667Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:56:45.644910Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:56:45.644340Z&quot;}" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>summary <span class="op">=</span> []</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>rasters <span class="op">=</span> []</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> path, case, info <span class="kw">in</span> <span class="bu">zip</span>(dsm_paths, cases, infos):</span>
@@ -457,7 +451,7 @@ Philadelphia_456_dsm.tif</code></pre>
 <span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"valid_percent"</span>: <span class="dv">100</span> <span class="op">*</span> data.count() <span class="op">/</span> data.size,</span>
 <span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"min_m"</span>: <span class="bu">float</span>(data.<span class="bu">min</span>()), <span class="st">"max_m"</span>: <span class="bu">float</span>(data.<span class="bu">max</span>())})</span>
 <span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="19">
+<div class="cell-output cell-output-display" data-execution_count="9">
 <div>
 
 
@@ -498,7 +492,7 @@ Philadelphia_456_dsm.tif</code></pre>
 </div>
 </div>
 </div>
-<div id="df570664" class="cell" data-execution_count="20">
+<div id="df570664" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:56:45.646479Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:56:45.646330Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:56:46.576496Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:56:46.575930Z&quot;}" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>values <span class="op">=</span> np.concatenate([data.compressed() <span class="cf">for</span> data, transform <span class="kw">in</span> rasters])</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>vmin, vmax <span class="op">=</span> np.percentile(values, [<span class="dv">2</span>, <span class="dv">98</span>])</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>norm <span class="op">=</span> Normalize(vmin<span class="op">=</span>vmin, vmax<span class="op">=</span><span class="bu">max</span>(vmax, vmin <span class="op">+</span> <span class="dv">1</span>))</span>

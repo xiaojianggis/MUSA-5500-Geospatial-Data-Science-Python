@@ -3,14 +3,13 @@
 - **Lecture 11A:** Dask tables → Datashader density maps → Census categories → taxi animation → parking exercise.
 - **Lecture 11B:** two Philadelphia LAS tiles → raw maximum and IDW rasters → median-smoothed DSMs → before/after plots.
 
-Both tutorials use **Python (largeviz)**. Run cells from top to bottom from this folder or the repository root.
+Both tutorials use **Python (largeviz)**. Save the notebooks and downloaded data in one local folder, then open the notebooks there and run cells from top to bottom.
 
 ## Create or update the environment
 
-From the repository root:
+Download [environment-viz.yml](environment-viz.yml) and the notebooks to a local folder named `week11`. Open a terminal in that folder:
 
 ```bash
-cd public/labs/week11-large-data-viz-lidar
 # First installation:
 conda env create -f environment-viz.yml
 # For an existing largeviz environment, use this instead:
@@ -20,7 +19,7 @@ python -m ipykernel install --user --name largeviz --display-name "Python (large
 jupyter lab
 ```
 
-If downloading the lab separately, keep `environment-viz.yml` beside the notebooks and run these commands from that folder, omitting `cd`. Create the environment once. Close running kernels before updating it. `environment-lidar.yml` defines the same shared environment for compatibility.
+Keep `environment-viz.yml` beside the notebooks and run these commands from that folder. Create the environment once. Close running kernels before updating it. `environment-lidar.yml` defines the same shared environment for compatibility.
 
 In VS Code, choose **Select Kernel → Python (largeviz)**. If missing, use **Select Another Kernel → Python Environments**, or reload the VS Code window. In Jupyter, choose **Kernel → Change Kernel → Python (largeviz)**.
 
@@ -40,9 +39,45 @@ conda run -n largeviz python -c "import numpy, numba, scipy.special, dask.datafr
 
 ## Data and outputs
 
-Lecture 11A uses the bundled extracts in `data/samples/`. See `data/samples/provenance.json` for sources and sampling. These are teaching extracts, not representative estimates. Outputs are `outputs/viz/osm_density.png` and `outputs/viz/taxi_dropoffs_24h.gif`.
+Download [Lecture 11A](lecture-11A.ipynb) and [Lecture 11B](lecture-11B.ipynb). The HTML tutorials include the same direct data links and folder instructions below. If a link opens in the browser, right-click it and choose **Save Link As…**. Keep the original filenames.
 
-Lecture 11B downloads `Philadelphia_394.las` (University City) and `Philadelphia_456.las` (Center City) from PASDA, about **2.09 GB** total. Complete downloads are reused. The default cache is `~/.cache/musa550-week11/raw/`; set `MUSA550_CACHE` before launching Jupyter to use another cache root.
+For Lecture 11A, save these files in `data/samples/` beside the notebooks:
+
+| Data | Download |
+| --- | --- |
+| OSM GPS points | [osm_sample.parquet](data/samples/osm_sample.parquet) |
+| Census dots | [census_sample.parquet](data/samples/census_sample.parquet) |
+| Taxi trips | [taxi_sample.parquet](data/samples/taxi_sample.parquet) |
+| Parking records | [parking_sample.csv](data/samples/parking_sample.csv) |
+
+See [data provenance](data/samples/provenance.json) for sources and sampling. These are teaching extracts, not representative estimates. Outputs are `outputs/viz/osm_density.png` and `outputs/viz/taxi_dropoffs_24h.gif`.
+
+For Lecture 11B, download both files and save them in `data/lidar/` beside the notebooks:
+
+| Case study | Download | Size |
+| --- | --- | --- |
+| University City | [Philadelphia_394.las](https://www.pasda.psu.edu/download/phillyLiDAR/2022/LAS/Classified_LAS/Philadelphia_394.las) | about 1.09 GB |
+| Center City | [Philadelphia_456.las](https://www.pasda.psu.edu/download/phillyLiDAR/2022/LAS/Classified_LAS/Philadelphia_456.las) | about 997 MB |
+
+Wait for both downloads to finish; no extraction is needed. Allow at least 3 GB of free space. The notebook reads these local files; it does not download or cache data automatically.
+
+```text
+week11/
+├── lecture-11A.ipynb
+├── lecture-11B.ipynb
+├── environment-viz.yml
+└── data/
+    ├── samples/
+    │   ├── osm_sample.parquet
+    │   ├── census_sample.parquet
+    │   ├── taxi_sample.parquet
+    │   └── parking_sample.csv
+    └── lidar/
+        ├── Philadelphia_394.las
+        └── Philadelphia_456.las
+```
+
+Open the notebooks from `week11`. Paths such as `data/lidar/Philadelphia_394.las` are relative to that folder. If you keep your LAS files elsewhere, change the two paths in Lecture 11B, Step 2.
 
 The selected footprints are about 914 × 914 m each. Horizontal coordinates remain in the native projected CRS; elevations and pixel size are converted to meters using the LAS CRS metadata. The vertical datum stays unchanged. DSM elevations include trees/buildings/ground and are not building heights above terrain.
 

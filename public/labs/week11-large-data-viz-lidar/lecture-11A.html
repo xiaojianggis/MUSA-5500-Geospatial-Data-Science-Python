@@ -84,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#before-you-start" id="toc-before-you-start" class="nav-link active" data-scroll-target="#before-you-start">Before you start</a></li>
-  <li><a href="#download-the-example-data" id="toc-download-the-example-data" class="nav-link" data-scroll-target="#download-the-example-data">Download the example data</a></li>
+  <li><a href="#download-and-save-the-data" id="toc-download-and-save-the-data" class="nav-link" data-scroll-target="#download-and-save-the-data">Download and save the data</a></li>
   <li><a href="#import-the-packages" id="toc-import-the-packages" class="nav-link" data-scroll-target="#import-the-packages">1. Import the packages</a></li>
   <li><a href="#read-gps-points-with-dask" id="toc-read-gps-points-with-dask" class="nav-link" data-scroll-target="#read-gps-points-with-dask">2. Read GPS points with Dask</a>
   <ul class="collapse">
@@ -134,10 +134,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Explore taxi trips over space and time.</li>
 <li>Practice with Philadelphia parking records.</li>
 </ol>
-<p><a href="lecture-11A.ipynb">Download notebook</a> · <a href="lecture-11B.html">Next lesson: LiDAR</a></p>
+<p><a href="lecture-11A.ipynb" download="">Download notebook</a> · <a href="lecture-11B.html">Next lesson: LiDAR</a></p>
 <section id="before-you-start" class="level2">
 <h2 class="anchored" data-anchor-id="before-you-start">Before you start</h2>
-<p>Use <strong>Python (largeviz)</strong> for both lessons. Download <a href="environment-viz.yml">environment-viz.yml</a> beside the notebooks. In a terminal opened in this lab folder:</p>
+<p>Use <strong>Python (largeviz)</strong> for both lessons. Download <a href="environment-viz.yml" download="">environment-viz.yml</a> beside the notebooks. In a terminal opened in this lab folder:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># First time only:</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> env create <span class="at">-f</span> environment-viz.yml</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># If largeviz already exists, update it instead:</span></span>
@@ -147,44 +147,79 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">jupyter</span> lab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>In VS Code, open the notebook and select <strong>Python (largeviz)</strong>. Run the cells from top to bottom. See the <a href="README.md">README</a> for setup troubleshooting.</p>
 </section>
-<section id="download-the-example-data" class="level2">
-<h2 class="anchored" data-anchor-id="download-the-example-data">Download the example data</h2>
-<p>Download the whole lab folder, or save these files in <code>data/samples/</code> beside this notebook:</p>
-<ul>
-<li><a href="data/samples/osm_sample.parquet">OSM GPS points</a></li>
-<li><a href="data/samples/census_sample.parquet">Census dots</a></li>
-<li><a href="data/samples/taxi_sample.parquet">Taxi trips</a></li>
-<li><a href="data/samples/parking_sample.csv">Parking records</a></li>
-</ul>
-<p>These small teaching extracts let us practice the same workflow used for larger datasets. They are not representative population or travel estimates. Census dots are synthetic locations. See <a href="data/samples/provenance.json">data sources and sampling</a>.</p>
+<section id="download-and-save-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="download-and-save-the-data">Download and save the data</h2>
+<ol type="1">
+<li>Create a folder named <code>week11</code> on your computer. Save <a href="lecture-11A.ipynb" download="">lecture-11A.ipynb</a> and <a href="environment-viz.yml" download="">environment-viz.yml</a> in it.</li>
+<li>Inside <code>week11</code>, create a folder named <code>data</code>, then a folder named <code>samples</code> inside <code>data</code>.</li>
+<li>Click each link below and save the file in <code>data/samples/</code>. Keep the filenames exactly as shown. If a file opens in your browser, right-click its link and choose <strong>Save Link As…</strong>.</li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Download</th>
+<th>Save as</th>
+<th>Size</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="data/samples/osm_sample.parquet">OSM GPS points</a></td>
+<td><code>osm_sample.parquet</code></td>
+<td>about 11 MB</td>
+</tr>
+<tr class="even">
+<td><a href="data/samples/census_sample.parquet">Census dots</a></td>
+<td><code>census_sample.parquet</code></td>
+<td>about 17 MB</td>
+</tr>
+<tr class="odd">
+<td><a href="data/samples/taxi_sample.parquet">Taxi trips</a></td>
+<td><code>taxi_sample.parquet</code></td>
+<td>about 4 MB</td>
+</tr>
+<tr class="even">
+<td><a href="data/samples/parking_sample.csv">Parking records</a></td>
+<td><code>parking_sample.csv</code></td>
+<td>about 0.3 MB</td>
+</tr>
+</tbody>
+</table>
+<p>Your folder should look like this:</p>
+<pre class="text"><code>week11/
+├── lecture-11A.ipynb
+├── environment-viz.yml
+└── data/
+    └── samples/
+        ├── osm_sample.parquet
+        ├── census_sample.parquet
+        ├── taxi_sample.parquet
+        └── parking_sample.csv</code></pre>
+<p>Open the notebook from this folder and select <strong>Python (largeviz)</strong>. All paths below are relative to the notebook’s folder. The code reads your downloaded files and creates an <code>outputs</code> folder for results.</p>
+<p>These are teaching extracts, not representative population or travel estimates. Census dots are synthetic locations. See <a href="data/samples/provenance.json">data sources and sampling</a>.</p>
 </section>
 <section id="import-the-packages" class="level2">
 <h2 class="anchored" data-anchor-id="import-the-packages">1. Import the packages</h2>
-<div id="4d870f1c" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:35:36.110024Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:35:36.109916Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:35:38.005034Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:35:38.004390Z&quot;}" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> dask</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> dask.dataframe <span class="im">as</span> dd</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datashader <span class="im">as</span> ds</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datashader.transfer_functions <span class="im">as</span> tf</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datashader.utils <span class="im">import</span> lnglat_to_meters</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> colorcet <span class="im">import</span> fire</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> display, HTML</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Works from this lab folder or from the repository root.</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>LAB <span class="op">=</span> Path.cwd()</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> (LAB <span class="op">/</span> <span class="st">"data/samples"</span>).is_dir():</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    LAB <span class="op">=</span> LAB <span class="op">/</span> <span class="st">"public/labs/week11-large-data-viz-lidar"</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>DATA <span class="op">=</span> LAB <span class="op">/</span> <span class="st">"data/samples"</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>OUT <span class="op">=</span> LAB <span class="op">/</span> <span class="st">"outputs/viz"</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>OUT.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> (DATA <span class="op">/</span> <span class="st">"osm_sample.parquet"</span>).is_file():</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">FileNotFoundError</span>(<span class="st">"Download the whole lab folder, including data/samples, first."</span>)</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Datashader"</span>, ds.__version__, <span class="st">"| Dask"</span>, dask.__version__)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="4d870f1c" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:45.727555Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:45.727365Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:47.527181Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:47.526627Z&quot;}" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> dask</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> dask.dataframe <span class="im">as</span> dd</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datashader <span class="im">as</span> ds</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datashader.transfer_functions <span class="im">as</span> tf</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datashader.utils <span class="im">import</span> lnglat_to_meters</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> colorcet <span class="im">import</span> fire</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> display, HTML</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Files saved beside this notebook, following the folder layout above.</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>DATA <span class="op">=</span> Path(<span class="st">"data/samples"</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>OUT <span class="op">=</span> Path(<span class="st">"outputs/viz"</span>)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>OUT.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Datashader"</span>, ds.__version__, <span class="st">"| Dask"</span>, dask.__version__)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>/opt/anaconda3/envs/largeviz/lib/python3.12/site-packages/datashader/__init__.py:6: FutureWarning: param.version.Version has been deprecated and will be removed in a future version.
   __version__ = str(param.version.Version(fpath=__file__, archive_commit="$Format:%h$",
@@ -199,11 +234,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="read-gps-points-with-dask" class="level2">
 <h2 class="anchored" data-anchor-id="read-gps-points-with-dask">2. Read GPS points with Dask</h2>
 <p><code>read_parquet()</code> creates a lazy table. <code>head()</code> reads a few rows so we can inspect the columns.</p>
-<div id="b878243f" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:35:38.007009Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:35:38.006729Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:35:38.159572Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:35:38.158672Z&quot;}" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>osm <span class="op">=</span> dd.read_parquet(DATA <span class="op">/</span> <span class="st">"osm_sample.parquet"</span>, columns<span class="op">=</span>[<span class="st">"x"</span>, <span class="st">"y"</span>],</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                      engine<span class="op">=</span><span class="st">"pyarrow"</span>, split_row_groups<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Partitions:"</span>, osm.npartitions)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>osm.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="b878243f" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:47.528600Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:47.528407Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:47.663614Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:47.663230Z&quot;}" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>osm <span class="op">=</span> dd.read_parquet(DATA <span class="op">/</span> <span class="st">"osm_sample.parquet"</span>, columns<span class="op">=</span>[<span class="st">"x"</span>, <span class="st">"y"</span>],</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                      engine<span class="op">=</span><span class="st">"pyarrow"</span>, split_row_groups<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Partitions:"</span>, osm.npartitions)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>osm.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Partitions: 21</code></pre>
 </div>
@@ -254,9 +289,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="count-the-points" class="level3">
 <h3 class="anchored" data-anchor-id="count-the-points">Count the points</h3>
 <p>Use <code>dask.compute()</code> to calculate several summaries in one pass. The full table stays partitioned.</p>
-<div id="8e407bba" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:35:38.161407Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:35:38.161265Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:35:38.244637Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:35:38.244054Z&quot;}" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>row_count, mean_x, mean_y <span class="op">=</span> dask.compute(osm.shape[<span class="dv">0</span>], osm.x.mean(), osm.y.mean())</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Extract rows: </span><span class="sc">{</span>row_count<span class="sc">:,}</span><span class="ss">; mean x=</span><span class="sc">{</span>mean_x<span class="sc">:,.0f}</span><span class="ss">, y=</span><span class="sc">{</span>mean_y<span class="sc">:,.0f}</span><span class="ss"> meters"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="8e407bba" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:47.664838Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:47.664754Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:47.698144Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:47.697771Z&quot;}" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>row_count, mean_x, mean_y <span class="op">=</span> dask.compute(osm.shape[<span class="dv">0</span>], osm.x.mean(), osm.y.mean())</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Extract rows: </span><span class="sc">{</span>row_count<span class="sc">:,}</span><span class="ss">; mean x=</span><span class="sc">{</span>mean_x<span class="sc">:,.0f}</span><span class="ss">, y=</span><span class="sc">{</span>mean_y<span class="sc">:,.0f}</span><span class="ss"> meters"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Extract rows: 1,000,050; mean x=2,731,821, y=5,801,809 meters</code></pre>
 </div>
@@ -265,16 +300,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="aggregate-points-into-pixels" class="level3">
 <h3 class="anchored" data-anchor-id="aggregate-points-into-pixels">Aggregate points into pixels</h3>
 <p>Create a canvas, then count how many points fall in each pixel. The coordinates are Web Mercator meters; convert the map extent from longitude/latitude.</p>
-<div id="b3184e24" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:35:38.246220Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:35:38.246082Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:35:38.903902Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:35:38.903259Z&quot;}" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mercator_extent(lon_bounds, lat_bounds):</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    x, y <span class="op">=</span> lnglat_to_meters(lon_bounds, lat_bounds)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">tuple</span>(x), <span class="bu">tuple</span>(y)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>world_x, world_y <span class="op">=</span> mercator_extent((<span class="op">-</span><span class="dv">180</span>, <span class="dv">180</span>), (<span class="op">-</span><span class="dv">70</span>, <span class="dv">80</span>))</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>canvas <span class="op">=</span> ds.Canvas(plot_width<span class="op">=</span><span class="dv">900</span>, plot_height<span class="op">=</span><span class="dv">450</span>, x_range<span class="op">=</span>world_x, y_range<span class="op">=</span>world_y)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>osm_count <span class="op">=</span> canvas.points(osm, <span class="st">"x"</span>, <span class="st">"y"</span>, agg<span class="op">=</span>ds.count())</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Aggregate dimensions:"</span>, <span class="bu">dict</span>(osm_count.sizes))</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Points inside this extent:"</span>, <span class="bu">int</span>(osm_count.<span class="bu">sum</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="b3184e24" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:47.699434Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:47.699345Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:48.202014Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:48.201523Z&quot;}" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mercator_extent(lon_bounds, lat_bounds):</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    x, y <span class="op">=</span> lnglat_to_meters(lon_bounds, lat_bounds)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">tuple</span>(x), <span class="bu">tuple</span>(y)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>world_x, world_y <span class="op">=</span> mercator_extent((<span class="op">-</span><span class="dv">180</span>, <span class="dv">180</span>), (<span class="op">-</span><span class="dv">70</span>, <span class="dv">80</span>))</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>canvas <span class="op">=</span> ds.Canvas(plot_width<span class="op">=</span><span class="dv">900</span>, plot_height<span class="op">=</span><span class="dv">450</span>, x_range<span class="op">=</span>world_x, y_range<span class="op">=</span>world_y)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>osm_count <span class="op">=</span> canvas.points(osm, <span class="st">"x"</span>, <span class="st">"y"</span>, agg<span class="op">=</span>ds.count())</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Aggregate dimensions:"</span>, <span class="bu">dict</span>(osm_count.sizes))</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Points inside this extent:"</span>, <span class="bu">int</span>(osm_count.<span class="bu">sum</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Aggregate dimensions: {'y': 450, 'x': 900}
 Points inside this extent: 1000049</code></pre>
@@ -284,15 +319,15 @@ Points inside this extent: 1000049</code></pre>
 <section id="compare-color-scales" class="level3">
 <h3 class="anchored" data-anchor-id="compare-color-scales">Compare color scales</h3>
 <p>Shade the same counts three ways. Log and equalized scales reveal sparse areas; they change how counts map to color.</p>
-<div id="e1ca3d97" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:35:38.905500Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:35:38.905386Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:35:40.238372Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:35:40.237858Z&quot;}" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">4</span>))</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, how <span class="kw">in</span> <span class="bu">zip</span>(axes, [<span class="st">"linear"</span>, <span class="st">"log"</span>, <span class="st">"eq_hist"</span>]):</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    image <span class="op">=</span> tf.set_background(tf.shade(osm_count, cmap<span class="op">=</span>fire[<span class="dv">40</span>:], how<span class="op">=</span>how), <span class="st">"black"</span>)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    ax.imshow(image.to_pil())</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f"OSM extract: </span><span class="sc">{</span>how<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    ax.set_axis_off()</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="e1ca3d97" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:48.203386Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:48.203290Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:49.251314Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:49.250894Z&quot;}" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">4</span>))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, how <span class="kw">in</span> <span class="bu">zip</span>(axes, [<span class="st">"linear"</span>, <span class="st">"log"</span>, <span class="st">"eq_hist"</span>]):</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    image <span class="op">=</span> tf.set_background(tf.shade(osm_count, cmap<span class="op">=</span>fire[<span class="dv">40</span>:], how<span class="op">=</span>how), <span class="st">"black"</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    ax.imshow(image.to_pil())</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="ss">f"OSM extract: </span><span class="sc">{</span>how<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    ax.set_axis_off()</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -305,11 +340,11 @@ Points inside this extent: 1000049</code></pre>
 <section id="save-a-density-map" class="level3">
 <h3 class="anchored" data-anchor-id="save-a-density-map">Save a density map</h3>
 <p>Hide pixels with two or fewer points and save the image. Try a different threshold.</p>
-<div id="23143472" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:35:40.239722Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:35:40.239614Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:35:40.282706Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:35:40.282175Z&quot;}" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>masked_osm <span class="op">=</span> osm_count.where(osm_count <span class="op">&gt;</span> <span class="dv">2</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>osm_image <span class="op">=</span> tf.set_background(tf.shade(masked_osm, cmap<span class="op">=</span>fire[<span class="dv">40</span>:], how<span class="op">=</span><span class="st">"eq_hist"</span>), <span class="st">"black"</span>)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>osm_image.to_pil().save(OUT <span class="op">/</span> <span class="st">"osm_density.png"</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>display(osm_image.to_pil())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="23143472" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:49.252840Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:49.252742Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:49.291958Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:49.291381Z&quot;}" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>masked_osm <span class="op">=</span> osm_count.where(osm_count <span class="op">&gt;</span> <span class="dv">2</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>osm_image <span class="op">=</span> tf.set_background(tf.shade(masked_osm, cmap<span class="op">=</span>fire[<span class="dv">40</span>:], how<span class="op">=</span><span class="st">"eq_hist"</span>), <span class="st">"black"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>osm_image.to_pil().save(OUT <span class="op">/</span> <span class="st">"osm_density.png"</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>display(osm_image.to_pil())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -323,12 +358,12 @@ Points inside this extent: 1000049</code></pre>
 <section id="map-census-categories" class="level2">
 <h2 class="anchored" data-anchor-id="map-census-categories">3. Map Census categories</h2>
 <p>Read the Census extract and tell Datashader which categories to expect. <code>count_cat()</code> counts each category separately in every pixel. The labels come from the historical source data.</p>
-<div id="3b7b0ccf" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:35:40.284129Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:35:40.284003Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:35:40.297741Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:35:40.297184Z&quot;}" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>race_labels <span class="op">=</span> {<span class="st">"w"</span>: <span class="st">"White"</span>, <span class="st">"b"</span>: <span class="st">"Black"</span>, <span class="st">"a"</span>: <span class="st">"Asian"</span>, <span class="st">"h"</span>: <span class="st">"Hispanic"</span>, <span class="st">"o"</span>: <span class="st">"Other"</span>}</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>color_key <span class="op">=</span> {<span class="st">"w"</span>: <span class="st">"#4cc9f0"</span>, <span class="st">"b"</span>: <span class="st">"#ffb703"</span>, <span class="st">"a"</span>: <span class="st">"#90be6d"</span>, <span class="st">"h"</span>: <span class="st">"#f28482"</span>, <span class="st">"o"</span>: <span class="st">"#cdb4db"</span>}</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>census <span class="op">=</span> dd.read_parquet(DATA <span class="op">/</span> <span class="st">"census_sample.parquet"</span>, split_row_groups<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>census[<span class="st">"race"</span>] <span class="op">=</span> census[<span class="st">"race"</span>].astype(pd.CategoricalDtype(<span class="bu">list</span>(race_labels)))</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>census.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="3b7b0ccf" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:49.293319Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:49.293218Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:49.321654Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:49.320698Z&quot;}" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>race_labels <span class="op">=</span> {<span class="st">"w"</span>: <span class="st">"White"</span>, <span class="st">"b"</span>: <span class="st">"Black"</span>, <span class="st">"a"</span>: <span class="st">"Asian"</span>, <span class="st">"h"</span>: <span class="st">"Hispanic"</span>, <span class="st">"o"</span>: <span class="st">"Other"</span>}</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>color_key <span class="op">=</span> {<span class="st">"w"</span>: <span class="st">"#4cc9f0"</span>, <span class="st">"b"</span>: <span class="st">"#ffb703"</span>, <span class="st">"a"</span>: <span class="st">"#90be6d"</span>, <span class="st">"h"</span>: <span class="st">"#f28482"</span>, <span class="st">"o"</span>: <span class="st">"#cdb4db"</span>}</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>census <span class="op">=</span> dd.read_parquet(DATA <span class="op">/</span> <span class="st">"census_sample.parquet"</span>, split_row_groups<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>census[<span class="st">"race"</span>] <span class="op">=</span> census[<span class="st">"race"</span>].astype(pd.CategoricalDtype(<span class="bu">list</span>(race_labels)))</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>census.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div>
 
@@ -379,13 +414,13 @@ Points inside this extent: 1000049</code></pre>
 </div>
 </div>
 </div>
-<div id="f3c23779" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:35:40.298934Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:35:40.298851Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:35:40.886720Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:35:40.885796Z&quot;}" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>usa_x, usa_y <span class="op">=</span> mercator_extent((<span class="op">-</span><span class="dv">125</span>, <span class="op">-</span><span class="dv">66</span>), (<span class="dv">24</span>, <span class="dv">50</span>))</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>census_canvas <span class="op">=</span> ds.Canvas(plot_width<span class="op">=</span><span class="dv">900</span>, plot_height<span class="op">=</span><span class="dv">500</span>, x_range<span class="op">=</span>usa_x, y_range<span class="op">=</span>usa_y)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>category_count <span class="op">=</span> census_canvas.points(census, <span class="st">"easting"</span>, <span class="st">"northing"</span>, agg<span class="op">=</span>ds.count_cat(<span class="st">"race"</span>))</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>census_image <span class="op">=</span> tf.set_background(tf.shade(category_count, color_key<span class="op">=</span>color_key, how<span class="op">=</span><span class="st">"eq_hist"</span>), <span class="st">"black"</span>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>display(census_image.to_pil())</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>pd.Series(race_labels, name<span class="op">=</span><span class="st">"Source category labels"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="f3c23779" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:49.323751Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:49.323532Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:49.782660Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:49.782125Z&quot;}" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>usa_x, usa_y <span class="op">=</span> mercator_extent((<span class="op">-</span><span class="dv">125</span>, <span class="op">-</span><span class="dv">66</span>), (<span class="dv">24</span>, <span class="dv">50</span>))</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>census_canvas <span class="op">=</span> ds.Canvas(plot_width<span class="op">=</span><span class="dv">900</span>, plot_height<span class="op">=</span><span class="dv">500</span>, x_range<span class="op">=</span>usa_x, y_range<span class="op">=</span>usa_y)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>category_count <span class="op">=</span> census_canvas.points(census, <span class="st">"easting"</span>, <span class="st">"northing"</span>, agg<span class="op">=</span>ds.count_cat(<span class="st">"race"</span>))</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>census_image <span class="op">=</span> tf.set_background(tf.shade(category_count, color_key<span class="op">=</span>color_key, how<span class="op">=</span><span class="st">"eq_hist"</span>), <span class="st">"black"</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>display(census_image.to_pil())</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>pd.Series(race_labels, name<span class="op">=</span><span class="st">"Source category labels"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -406,29 +441,29 @@ Name: Source category labels, dtype: object</code></pre>
 <section id="compare-taxi-pickups-and-dropoffs" class="level2">
 <h2 class="anchored" data-anchor-id="compare-taxi-pickups-and-dropoffs">4. Compare taxi pickups and dropoffs</h2>
 <p>Read the taxi extract and aggregate both locations on the same canvas. Subtract signed counts to show where pickups exceed dropoffs.</p>
-<div id="bab5a2bb" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:35:40.889081Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:35:40.888970Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:35:41.240338Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:35:41.239744Z&quot;}" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>taxi <span class="op">=</span> dd.read_parquet(DATA <span class="op">/</span> <span class="st">"taxi_sample.parquet"</span>, split_row_groups<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>NYC_X, NYC_Y <span class="op">=</span> mercator_extent((<span class="op">-</span><span class="fl">74.10</span>, <span class="op">-</span><span class="fl">73.70</span>), (<span class="fl">40.60</span>, <span class="fl">40.90</span>))</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>taxi_canvas <span class="op">=</span> ds.Canvas(plot_width<span class="op">=</span><span class="dv">750</span>, plot_height<span class="op">=</span><span class="dv">550</span>, x_range<span class="op">=</span>NYC_X, y_range<span class="op">=</span>NYC_Y)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>pickups <span class="op">=</span> taxi_canvas.points(taxi, <span class="st">"pickup_x"</span>, <span class="st">"pickup_y"</span>, agg<span class="op">=</span>ds.count()).rename({<span class="st">"pickup_x"</span>: <span class="st">"x"</span>, <span class="st">"pickup_y"</span>: <span class="st">"y"</span>})</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>dropoffs <span class="op">=</span> taxi_canvas.points(taxi, <span class="st">"dropoff_x"</span>, <span class="st">"dropoff_y"</span>, agg<span class="op">=</span>ds.count()).rename({<span class="st">"dropoff_x"</span>: <span class="st">"x"</span>, <span class="st">"dropoff_y"</span>: <span class="st">"y"</span>})</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"In-view pickups:"</span>, <span class="bu">int</span>(pickups.<span class="bu">sum</span>()), <span class="st">"| in-view dropoffs:"</span>, <span class="bu">int</span>(dropoffs.<span class="bu">sum</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="bab5a2bb" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:49.785164Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:49.785068Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:50.108262Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:50.107703Z&quot;}" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>taxi <span class="op">=</span> dd.read_parquet(DATA <span class="op">/</span> <span class="st">"taxi_sample.parquet"</span>, split_row_groups<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>NYC_X, NYC_Y <span class="op">=</span> mercator_extent((<span class="op">-</span><span class="fl">74.10</span>, <span class="op">-</span><span class="fl">73.70</span>), (<span class="fl">40.60</span>, <span class="fl">40.90</span>))</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>taxi_canvas <span class="op">=</span> ds.Canvas(plot_width<span class="op">=</span><span class="dv">750</span>, plot_height<span class="op">=</span><span class="dv">550</span>, x_range<span class="op">=</span>NYC_X, y_range<span class="op">=</span>NYC_Y)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>pickups <span class="op">=</span> taxi_canvas.points(taxi, <span class="st">"pickup_x"</span>, <span class="st">"pickup_y"</span>, agg<span class="op">=</span>ds.count()).rename({<span class="st">"pickup_x"</span>: <span class="st">"x"</span>, <span class="st">"pickup_y"</span>: <span class="st">"y"</span>})</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>dropoffs <span class="op">=</span> taxi_canvas.points(taxi, <span class="st">"dropoff_x"</span>, <span class="st">"dropoff_y"</span>, agg<span class="op">=</span>ds.count()).rename({<span class="st">"dropoff_x"</span>: <span class="st">"x"</span>, <span class="st">"dropoff_y"</span>: <span class="st">"y"</span>})</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"In-view pickups:"</span>, <span class="bu">int</span>(pickups.<span class="bu">sum</span>()), <span class="st">"| in-view dropoffs:"</span>, <span class="bu">int</span>(dropoffs.<span class="bu">sum</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>In-view pickups: 149998 | in-view dropoffs: 149994</code></pre>
 </div>
 </div>
-<div id="4c5d10ce" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:35:41.241647Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:35:41.241549Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:35:41.551904Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:35:41.551324Z&quot;}" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Subtract signed values: unsigned subtraction would wrap below zero.</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>balance <span class="op">=</span> pickups.astype(<span class="st">"int64"</span>) <span class="op">-</span> dropoffs.astype(<span class="st">"int64"</span>)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.colors <span class="im">import</span> SymLogNorm</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>limit <span class="op">=</span> <span class="bu">max</span>(<span class="dv">1</span>, <span class="bu">int</span>(np.<span class="bu">abs</span>(balance).<span class="bu">max</span>()))</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>plot <span class="op">=</span> ax.imshow(balance, origin<span class="op">=</span><span class="st">"lower"</span>, cmap<span class="op">=</span><span class="st">"RdBu_r"</span>, norm<span class="op">=</span>SymLogNorm(linthresh<span class="op">=</span><span class="dv">1</span>, vmin<span class="op">=-</span>limit, vmax<span class="op">=</span>limit),</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>                 extent<span class="op">=</span>[<span class="op">*</span>NYC_X, <span class="op">*</span>NYC_Y])</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>fig.colorbar(plot, ax<span class="op">=</span>ax, label<span class="op">=</span><span class="st">"Extract trips: pickups minus dropoffs (symmetric log scale)"</span>)</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"NYC taxi extract: red = more pickups; blue = more dropoffs"</span>)</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="4c5d10ce" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:50.109595Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:50.109486Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:50.388270Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:50.387826Z&quot;}" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Subtract signed values: unsigned subtraction would wrap below zero.</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>balance <span class="op">=</span> pickups.astype(<span class="st">"int64"</span>) <span class="op">-</span> dropoffs.astype(<span class="st">"int64"</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.colors <span class="im">import</span> SymLogNorm</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>limit <span class="op">=</span> <span class="bu">max</span>(<span class="dv">1</span>, <span class="bu">int</span>(np.<span class="bu">abs</span>(balance).<span class="bu">max</span>()))</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">6</span>))</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>plot <span class="op">=</span> ax.imshow(balance, origin<span class="op">=</span><span class="st">"lower"</span>, cmap<span class="op">=</span><span class="st">"RdBu_r"</span>, norm<span class="op">=</span>SymLogNorm(linthresh<span class="op">=</span><span class="dv">1</span>, vmin<span class="op">=-</span>limit, vmax<span class="op">=</span>limit),</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>                 extent<span class="op">=</span>[<span class="op">*</span>NYC_X, <span class="op">*</span>NYC_Y])</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>fig.colorbar(plot, ax<span class="op">=</span>ax, label<span class="op">=</span><span class="st">"Extract trips: pickups minus dropoffs (symmetric log scale)"</span>)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"NYC taxi extract: red = more pickups; blue = more dropoffs"</span>)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -440,16 +475,16 @@ Name: Source category labels, dtype: object</code></pre>
 <section id="summarize-trips-by-weekday-and-hour" class="level3">
 <h3 class="anchored" data-anchor-id="summarize-trips-by-weekday-and-hour">Summarize trips by weekday and hour</h3>
 <p>Compute a small summary table, then display it as a heatmap. These records cover part of January 2015.</p>
-<div id="3481c71b" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:35:41.553227Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:35:41.553111Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:35:41.646417Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:35:41.645908Z&quot;}" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>taxi[<span class="st">"weekday"</span>] <span class="op">=</span> taxi.tpep_pickup_datetime.dt.dayofweek</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>hourly_table <span class="op">=</span> taxi.groupby([<span class="st">"weekday"</span>, <span class="st">"pickup_hour"</span>]).size().compute().unstack(fill_value<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>hourly_table <span class="op">=</span> hourly_table.reindex(index<span class="op">=</span><span class="bu">range</span>(<span class="dv">7</span>), columns<span class="op">=</span><span class="bu">range</span>(<span class="dv">24</span>), fill_value<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="dv">3</span>))</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>plot <span class="op">=</span> ax.imshow(hourly_table, aspect<span class="op">=</span><span class="st">"auto"</span>, cmap<span class="op">=</span><span class="st">"viridis"</span>)</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(yticks<span class="op">=</span><span class="bu">range</span>(<span class="dv">7</span>), yticklabels<span class="op">=</span>[<span class="st">"Mon"</span>, <span class="st">"Tue"</span>, <span class="st">"Wed"</span>, <span class="st">"Thu"</span>, <span class="st">"Fri"</span>, <span class="st">"Sat"</span>, <span class="st">"Sun"</span>],</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>       xticks<span class="op">=</span><span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">24</span>, <span class="dv">3</span>), xlabel<span class="op">=</span><span class="st">"Pickup hour"</span>, title<span class="op">=</span><span class="st">"January 2015 extract: trips by weekday/hour"</span>)</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>fig.colorbar(plot, ax<span class="op">=</span>ax, label<span class="op">=</span><span class="st">"Extract trips"</span>)</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="3481c71b" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:50.389752Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:50.389636Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:50.477788Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:50.477332Z&quot;}" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>taxi[<span class="st">"weekday"</span>] <span class="op">=</span> taxi.tpep_pickup_datetime.dt.dayofweek</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>hourly_table <span class="op">=</span> taxi.groupby([<span class="st">"weekday"</span>, <span class="st">"pickup_hour"</span>]).size().compute().unstack(fill_value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>hourly_table <span class="op">=</span> hourly_table.reindex(index<span class="op">=</span><span class="bu">range</span>(<span class="dv">7</span>), columns<span class="op">=</span><span class="bu">range</span>(<span class="dv">24</span>), fill_value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="dv">3</span>))</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>plot <span class="op">=</span> ax.imshow(hourly_table, aspect<span class="op">=</span><span class="st">"auto"</span>, cmap<span class="op">=</span><span class="st">"viridis"</span>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(yticks<span class="op">=</span><span class="bu">range</span>(<span class="dv">7</span>), yticklabels<span class="op">=</span>[<span class="st">"Mon"</span>, <span class="st">"Tue"</span>, <span class="st">"Wed"</span>, <span class="st">"Thu"</span>, <span class="st">"Fri"</span>, <span class="st">"Sat"</span>, <span class="st">"Sun"</span>],</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>       xticks<span class="op">=</span><span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">24</span>, <span class="dv">3</span>), xlabel<span class="op">=</span><span class="st">"Pickup hour"</span>, title<span class="op">=</span><span class="st">"January 2015 extract: trips by weekday/hour"</span>)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>fig.colorbar(plot, ax<span class="op">=</span>ax, label<span class="op">=</span><span class="st">"Extract trips"</span>)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -462,20 +497,20 @@ Name: Source category labels, dtype: object</code></pre>
 <section id="make-a-24-hour-animation" class="level3">
 <h3 class="anchored" data-anchor-id="make-a-24-hour-animation">Make a 24-hour animation</h3>
 <p>Count dropoffs by hour and save a GIF. Keep one color scale for every frame so the brightness is comparable.</p>
-<div id="d2655a24" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:35:41.647805Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:35:41.647682Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:35:42.874509Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:35:42.874084Z&quot;}" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>taxi[<span class="st">"dropoff_hour"</span>] <span class="op">=</span> taxi[<span class="st">"dropoff_hour"</span>].astype(pd.CategoricalDtype(<span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">24</span>))))</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>by_hour <span class="op">=</span> taxi_canvas.points(taxi, <span class="st">"dropoff_x"</span>, <span class="st">"dropoff_y"</span>, agg<span class="op">=</span>ds.count_cat(<span class="st">"dropoff_hour"</span>))</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>max_count <span class="op">=</span> <span class="bu">max</span>(<span class="dv">2</span>, <span class="bu">int</span>(by_hour.<span class="bu">max</span>()))</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>frames <span class="op">=</span> []</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> ImageDraw</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> hour <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">24</span>):</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    image <span class="op">=</span> tf.set_background(tf.shade(by_hour.sel(dropoff_hour<span class="op">=</span>hour), cmap<span class="op">=</span>fire[<span class="dv">40</span>:],</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>                                       how<span class="op">=</span><span class="st">"log"</span>, span<span class="op">=</span>(<span class="dv">1</span>, max_count)), <span class="st">"black"</span>).to_pil().convert(<span class="st">"RGB"</span>)</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    ImageDraw.Draw(image).text((<span class="dv">16</span>, <span class="dv">16</span>), <span class="ss">f"</span><span class="sc">{</span>hour<span class="sc">:02d}</span><span class="ss">:00 | historical taxi extract"</span>, fill<span class="op">=</span><span class="st">"white"</span>)</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    frames.append(image)</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>frames[<span class="dv">0</span>].save(OUT <span class="op">/</span> <span class="st">"taxi_dropoffs_24h.gif"</span>, save_all<span class="op">=</span><span class="va">True</span>, append_images<span class="op">=</span>frames[<span class="dv">1</span>:],</span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>               duration<span class="op">=</span><span class="dv">250</span>, loop<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>display(HTML(<span class="st">'&lt;img src="outputs/viz/taxi_dropoffs_24h.gif" alt="24-hour taxi drop-off animation"&gt;'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="d2655a24" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:50.479136Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:50.479040Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:51.574977Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:51.574496Z&quot;}" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>taxi[<span class="st">"dropoff_hour"</span>] <span class="op">=</span> taxi[<span class="st">"dropoff_hour"</span>].astype(pd.CategoricalDtype(<span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">24</span>))))</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>by_hour <span class="op">=</span> taxi_canvas.points(taxi, <span class="st">"dropoff_x"</span>, <span class="st">"dropoff_y"</span>, agg<span class="op">=</span>ds.count_cat(<span class="st">"dropoff_hour"</span>))</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>max_count <span class="op">=</span> <span class="bu">max</span>(<span class="dv">2</span>, <span class="bu">int</span>(by_hour.<span class="bu">max</span>()))</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>frames <span class="op">=</span> []</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PIL <span class="im">import</span> ImageDraw</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> hour <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">24</span>):</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    image <span class="op">=</span> tf.set_background(tf.shade(by_hour.sel(dropoff_hour<span class="op">=</span>hour), cmap<span class="op">=</span>fire[<span class="dv">40</span>:],</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>                                       how<span class="op">=</span><span class="st">"log"</span>, span<span class="op">=</span>(<span class="dv">1</span>, max_count)), <span class="st">"black"</span>).to_pil().convert(<span class="st">"RGB"</span>)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    ImageDraw.Draw(image).text((<span class="dv">16</span>, <span class="dv">16</span>), <span class="ss">f"</span><span class="sc">{</span>hour<span class="sc">:02d}</span><span class="ss">:00 | historical taxi extract"</span>, fill<span class="op">=</span><span class="st">"white"</span>)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    frames.append(image)</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>frames[<span class="dv">0</span>].save(OUT <span class="op">/</span> <span class="st">"taxi_dropoffs_24h.gif"</span>, save_all<span class="op">=</span><span class="va">True</span>, append_images<span class="op">=</span>frames[<span class="dv">1</span>:],</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>               duration<span class="op">=</span><span class="dv">250</span>, loop<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>display(HTML(<span class="st">'&lt;img src="outputs/viz/taxi_dropoffs_24h.gif" alt="24-hour taxi drop-off animation"&gt;'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <img src="outputs/viz/taxi_dropoffs_24h.gif" alt="24-hour taxi drop-off animation">
 </div>
@@ -486,23 +521,23 @@ Name: Source category labels, dtype: object</code></pre>
 <h2 class="anchored" data-anchor-id="practice-philadelphia-parking-records">5. Practice: Philadelphia parking records</h2>
 <p>Read the CSV, remove missing or impossible coordinates, and project each partition to Web Mercator. Then make a density map.</p>
 <p><strong>Try it:</strong> change the map extent and image size. What changes about the visible pattern?</p>
-<div id="72684667" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:35:42.876200Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:35:42.876087Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:35:43.062101Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:35:43.061592Z&quot;}" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>parking <span class="op">=</span> dd.read_csv(DATA <span class="op">/</span> <span class="st">"parking_sample.csv"</span>, dtype<span class="op">=</span>{<span class="st">"lat"</span>: <span class="st">"float64"</span>, <span class="st">"lon"</span>: <span class="st">"float64"</span>})</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>parking <span class="op">=</span> parking.dropna(subset<span class="op">=</span>[<span class="st">"lat"</span>, <span class="st">"lon"</span>])</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>parking <span class="op">=</span> parking[parking.lat.between(<span class="op">-</span><span class="dv">85</span>, <span class="dv">85</span>) <span class="op">&amp;</span> parking.lon.between(<span class="op">-</span><span class="dv">180</span>, <span class="dv">180</span>)]</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> project_parking(partition):</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> partition.copy()</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    result[<span class="st">"x"</span>], result[<span class="st">"y"</span>] <span class="op">=</span> lnglat_to_meters(result.lon.to_numpy(), result.lat.to_numpy())</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> parking._meta.assign(x<span class="op">=</span>pd.Series(dtype<span class="op">=</span><span class="st">"float64"</span>), y<span class="op">=</span>pd.Series(dtype<span class="op">=</span><span class="st">"float64"</span>))</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>parking_xy <span class="op">=</span> parking.map_partitions(project_parking, meta<span class="op">=</span>meta)</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>philly_x, philly_y <span class="op">=</span> mercator_extent((<span class="op">-</span><span class="fl">75.28</span>, <span class="op">-</span><span class="fl">74.96</span>), (<span class="fl">39.86</span>, <span class="fl">40.14</span>))</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>parking_canvas <span class="op">=</span> ds.Canvas(plot_width<span class="op">=</span><span class="dv">650</span>, plot_height<span class="op">=</span><span class="dv">650</span>, x_range<span class="op">=</span>philly_x, y_range<span class="op">=</span>philly_y)</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>parking_counts <span class="op">=</span> parking_canvas.points(parking_xy, <span class="st">"x"</span>, <span class="st">"y"</span>, agg<span class="op">=</span>ds.count())</span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>parking_image <span class="op">=</span> tf.set_background(tf.shade(parking_counts, cmap<span class="op">=</span>fire[<span class="dv">40</span>:], how<span class="op">=</span><span class="st">"eq_hist"</span>), <span class="st">"black"</span>)</span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>display(parking_image.to_pil())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="72684667" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:51.576268Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:51.576143Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:51.758803Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:51.758314Z&quot;}" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>parking <span class="op">=</span> dd.read_csv(DATA <span class="op">/</span> <span class="st">"parking_sample.csv"</span>, dtype<span class="op">=</span>{<span class="st">"lat"</span>: <span class="st">"float64"</span>, <span class="st">"lon"</span>: <span class="st">"float64"</span>})</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>parking <span class="op">=</span> parking.dropna(subset<span class="op">=</span>[<span class="st">"lat"</span>, <span class="st">"lon"</span>])</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>parking <span class="op">=</span> parking[parking.lat.between(<span class="op">-</span><span class="dv">85</span>, <span class="dv">85</span>) <span class="op">&amp;</span> parking.lon.between(<span class="op">-</span><span class="dv">180</span>, <span class="dv">180</span>)]</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> project_parking(partition):</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> partition.copy()</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    result[<span class="st">"x"</span>], result[<span class="st">"y"</span>] <span class="op">=</span> lnglat_to_meters(result.lon.to_numpy(), result.lat.to_numpy())</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> parking._meta.assign(x<span class="op">=</span>pd.Series(dtype<span class="op">=</span><span class="st">"float64"</span>), y<span class="op">=</span>pd.Series(dtype<span class="op">=</span><span class="st">"float64"</span>))</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>parking_xy <span class="op">=</span> parking.map_partitions(project_parking, meta<span class="op">=</span>meta)</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>philly_x, philly_y <span class="op">=</span> mercator_extent((<span class="op">-</span><span class="fl">75.28</span>, <span class="op">-</span><span class="fl">74.96</span>), (<span class="fl">39.86</span>, <span class="fl">40.14</span>))</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>parking_canvas <span class="op">=</span> ds.Canvas(plot_width<span class="op">=</span><span class="dv">650</span>, plot_height<span class="op">=</span><span class="dv">650</span>, x_range<span class="op">=</span>philly_x, y_range<span class="op">=</span>philly_y)</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>parking_counts <span class="op">=</span> parking_canvas.points(parking_xy, <span class="st">"x"</span>, <span class="st">"y"</span>, agg<span class="op">=</span>ds.count())</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>parking_image <span class="op">=</span> tf.set_background(tf.shade(parking_counts, cmap<span class="op">=</span>fire[<span class="dv">40</span>:], how<span class="op">=</span><span class="st">"eq_hist"</span>), <span class="st">"black"</span>)</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>display(parking_image.to_pil())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">

@@ -83,9 +83,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Lecture outline</h2>
    
   <ul>
-  <li><a href="#before-you-start" id="toc-before-you-start" class="nav-link active" data-scroll-target="#before-you-start">Before you start</a></li>
+  <li><a href="#what-is-lidar" id="toc-what-is-lidar" class="nav-link active" data-scroll-target="#what-is-lidar">What is LiDAR?</a>
+  <ul class="collapse">
+  <li><a href="#how-does-a-pulse-become-a-3d-point" id="toc-how-does-a-pulse-become-a-3d-point" class="nav-link" data-scroll-target="#how-does-a-pulse-become-a-3d-point">How does a pulse become a 3D point?</a></li>
+  <li><a href="#why-can-one-pulse-have-several-returns" id="toc-why-can-one-pulse-have-several-returns" class="nav-link" data-scroll-target="#why-can-one-pulse-have-several-returns">Why can one pulse have several returns?</a></li>
+  <li><a href="#what-is-inside-a-las-file" id="toc-what-is-inside-a-las-file" class="nav-link" data-scroll-target="#what-is-inside-a-las-file">What is inside a LAS file?</a></li>
+  <li><a href="#dsm-dtm-and-height-above-ground" id="toc-dsm-dtm-and-height-above-ground" class="nav-link" data-scroll-target="#dsm-dtm-and-height-above-ground">DSM, DTM, and height above ground</a></li>
+  <li><a href="#from-points-to-pixels" id="toc-from-points-to-pixels" class="nav-link" data-scroll-target="#from-points-to-pixels">From points to pixels</a></li>
+  </ul></li>
+  <li><a href="#before-you-start" id="toc-before-you-start" class="nav-link" data-scroll-target="#before-you-start">Before you start</a></li>
   <li><a href="#download-and-save-the-lidar-files" id="toc-download-and-save-the-lidar-files" class="nav-link" data-scroll-target="#download-and-save-the-lidar-files">Download and save the LiDAR files</a></li>
-  <li><a href="#import-packages-and-set-the-output-folder" id="toc-import-packages-and-set-the-output-folder" class="nav-link" data-scroll-target="#import-packages-and-set-the-output-folder">1. Import packages and set the output folder</a></li>
+  <li><a href="#optional-download-the-same-las-files-with-python" id="toc-optional-download-the-same-las-files-with-python" class="nav-link" data-scroll-target="#optional-download-the-same-las-files-with-python">Optional: Download the same LAS files with Python</a></li>
+  <li><a href="#optional-extension-search-the-usgs-api-for-other-lidar-data" id="toc-optional-extension-search-the-usgs-api-for-other-lidar-data" class="nav-link" data-scroll-target="#optional-extension-search-the-usgs-api-for-other-lidar-data">Optional extension: Search the USGS API for other LiDAR data</a>
+  <ul class="collapse">
+  <li><a href="#download-one-selected-usgs-result" id="toc-download-one-selected-usgs-result" class="nav-link" data-scroll-target="#download-one-selected-usgs-result">Download one selected USGS result</a></li>
+  </ul></li>
+  <li><a href="#import-processing-packages-and-set-the-output-folder" id="toc-import-processing-packages-and-set-the-output-folder" class="nav-link" data-scroll-target="#import-processing-packages-and-set-the-output-folder">1. Import processing packages and set the output folder</a></li>
   <li><a href="#open-your-downloaded-files" id="toc-open-your-downloaded-files" class="nav-link" data-scroll-target="#open-your-downloaded-files">2. Open your downloaded files</a></li>
   <li><a href="#check-the-coordinate-system-and-units" id="toc-check-the-coordinate-system-and-units" class="nav-link" data-scroll-target="#check-the-coordinate-system-and-units">3. Check the coordinate system and units</a></li>
   <li><a href="#create-raw-dsm-rasters" id="toc-create-raw-dsm-rasters" class="nav-link" data-scroll-target="#create-raw-dsm-rasters">4. Create raw DSM rasters</a></li>
@@ -123,10 +136,106 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <p>We will use two Philadelphia LAS files, create a digital surface model with PDAL, and smooth isolated bright pixels.</p>
 <p>A <strong>DSM</strong> includes roofs, trees, and ground. Elevations are relative to a vertical datum; they are not building heights above ground.</p>
-<p><a href="lecture-11B.ipynb" download="">Download notebook</a> · <a href="lecture-11A.html">Previous lesson: large-data visualization</a></p>
+<p><a href="lecture-11B.ipynb" download="">Download notebook</a> · <a href="Visualizing%20Large%20Data-Lec2.html">Previous: Visualization II</a></p>
+<section id="what-is-lidar" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-lidar">What is LiDAR?</h2>
+<p><strong>LiDAR</strong> means <strong>Light Detection and Ranging</strong>. It is an active sensor: it sends laser pulses and measures the time taken for reflected light to return. Airborne systems combine these distances with GNSS positioning and an inertial measurement unit (IMU) to locate returns in three dimensions. Unlike a photograph, the basic output is a collection of measured points. See <a href="https://oceanservice.noaa.gov/geodesy/lidar.html">NOAA’s introduction to LiDAR</a>.</p>
+<section id="how-does-a-pulse-become-a-3d-point" class="level3">
+<h3 class="anchored" data-anchor-id="how-does-a-pulse-become-a-3d-point">How does a pulse become a 3D point?</h3>
+<p>The pulse travels to the surface and back, so range is half the round-trip distance: <strong>distance = speed of light × travel time / 2</strong>. Sensor position, viewing direction, and range locate the point. The illustration is schematic, not to scale.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lecture-11B_files/figure-html/98ed3936-1-lidar-pulse-distance.png" class="img-fluid figure-img"></p>
+<figcaption>An airborne sensor measures outgoing and returning laser light; range and sensor position locate a 3D point.</figcaption>
+</figure>
+</div>
+<p><em>Laser ranging measures distance; positioning and orientation turn that distance into coordinates.</em></p>
+</section>
+<section id="why-can-one-pulse-have-several-returns" class="level3">
+<h3 class="anchored" data-anchor-id="why-can-one-pulse-have-several-returns">Why can one pulse have several returns?</h3>
+<p>Parts of a pulse may reflect from leaves, branches, and the ground at different times. These can be recorded as separate returns. The first return is often near the top of a surface; a last return is not automatically ground. Some pulses produce only one return, and dense cover may prevent a ground return. <a href="https://coast.noaa.gov/data/digitalcoast/pdf/lidar-101.pdf">NOAA LiDAR 101</a> explains these concepts.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lecture-11B_files/figure-html/33506bb5-1-lidar-returns-point-cloud.png" class="img-fluid figure-img"></p>
+<figcaption>A pulse produces canopy, branch, and ground returns; a synthetic point-cloud profile shows ground, vegetation, and roof points.</figcaption>
+</figure>
+</div>
+<p><em>A point cloud contains discrete returns. Return order and surface classification describe different things.</em></p>
+</section>
+<section id="what-is-inside-a-las-file" class="level3">
+<h3 class="anchored" data-anchor-id="what-is-inside-a-las-file">What is inside a LAS file?</h3>
+<p><strong>LAS</strong> is a common binary point-cloud format. <strong>LAZ</strong> is a losslessly compressed form. PDAL reads both when the required format support is installed.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Attribute</th>
+<th>What it tells us</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>X, Y, Z</td>
+<td>Position and elevation in the file’s coordinate system</td>
+</tr>
+<tr class="even">
+<td>Return number</td>
+<td>Whether this is the first, intermediate, or last recorded return of a pulse</td>
+</tr>
+<tr class="odd">
+<td>Number of returns</td>
+<td>How many returns were recorded for that pulse</td>
+</tr>
+<tr class="even">
+<td>Classification</td>
+<td>An assigned label such as ground, vegetation, building, or noise</td>
+</tr>
+<tr class="odd">
+<td>Intensity</td>
+<td>Strength of the returned signal; not the same as a photograph’s brightness</td>
+</tr>
+<tr class="even">
+<td>CRS and units</td>
+<td>How to interpret coordinates and elevations</td>
+</tr>
+</tbody>
+</table>
+<p>A point cloud is irregularly spaced. Before interpreting elevations, inspect the coordinate reference system, units, and available ground classifications.</p>
+</section>
+<section id="dsm-dtm-and-height-above-ground" class="level3">
+<h3 class="anchored" data-anchor-id="dsm-dtm-and-height-above-ground">DSM, DTM, and height above ground</h3>
+<ul>
+<li><strong>DSM — digital surface model:</strong> represents the top surface, including roofs and trees.</li>
+<li><strong>DTM — digital terrain model:</strong> represents the ground beneath buildings and vegetation.</li>
+<li><strong>Height above ground:</strong> can be estimated from DSM − DTM when grids, units, and vertical references match.</li>
+</ul>
+<p>This tutorial creates a DSM. It does not produce a terrain model or directly measure building heights.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lecture-11B_files/figure-html/626d7f88-1-lidar-dsm-dtm-height.png" class="img-fluid figure-img"></p>
+<figcaption>A cross-section compares the top-surface DSM with the bare-earth DTM and shows height as their vertical difference.</figcaption>
+</figure>
+</div>
+<p><em>Elevation above a datum and height above local terrain are different quantities.</em></p>
+</section>
+<section id="from-points-to-pixels" class="level3">
+<h3 class="anchored" data-anchor-id="from-points-to-pixels">From points to pixels</h3>
+<p>Rasterization assigns an elevation to each grid cell using nearby returns. A maximum is sensitive to isolated high points. Interpolation and a small median filter can reduce speckle, but may also reduce small structures and canopy peaks. We retain the raw and smoothed results for comparison.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lecture-11B_files/figure-html/c03585e7-1-lidar-points-to-raster.png" class="img-fluid figure-img"></p>
+<figcaption>Synthetic points become a maximum-elevation raster; median filtering removes isolated high pixels.</figcaption>
+</figure>
+</div>
+<p><em>Synthetic teaching example. The processing section below uses IDW interpolation followed by a median filter.</em></p>
+</section>
+</section>
 <section id="before-you-start" class="level2">
 <h2 class="anchored" data-anchor-id="before-you-start">Before you start</h2>
-<p>Use <strong>Python (largeviz)</strong> for both lessons. Download <a href="environment-viz.yml" download="">environment-viz.yml</a> beside the notebooks. In a terminal opened in this lab folder:</p>
+<p>Use <strong>Python (largeviz)</strong> for all three sections. Download <a href="environment-viz.yml" download="">environment-viz.yml</a> beside the notebooks. In a terminal opened in this lab folder:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># First time only:</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> env create <span class="at">-f</span> environment-viz.yml</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># If largeviz already exists, update it instead:</span></span>
@@ -141,7 +250,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="1">
 <li>Create a folder named <code>week11</code> on your computer (or use the folder from Lecture 11A). Save <a href="lecture-11B.ipynb" download="">lecture-11B.ipynb</a> and <a href="environment-viz.yml" download="">environment-viz.yml</a> in it.</li>
 <li>Inside <code>week11</code>, create a <code>data</code> folder, then a <code>lidar</code> folder inside it.</li>
-<li>Download <strong>both</strong> LAS files using the direct links below. Save them in <code>data/lidar/</code> and keep their original filenames. If clicking a link does not download it, right-click and choose <strong>Save Link As…</strong>.</li>
+<li>Download <strong>both</strong> LAS files using the direct links below, <strong>or use the optional Python downloader in the next section</strong>. Save them in <code>data/lidar/</code> and keep their original filenames. If clicking a link does not download it, right-click and choose <strong>Save Link As…</strong>.</li>
 </ol>
 <table class="caption-top table">
 <thead>
@@ -174,25 +283,135 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         └── Philadelphia_456.las</code></pre>
 <p>Open the notebook from this folder and select <strong>Python (largeviz)</strong>. All paths below are relative to the notebook’s folder. If you saved the LAS files somewhere else, edit the two paths in Step 2.</p>
 </section>
-<section id="import-packages-and-set-the-output-folder" class="level2">
-<h2 class="anchored" data-anchor-id="import-packages-and-set-the-output-folder">1. Import packages and set the output folder</h2>
-<div id="e5de3368" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:52.840905Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:52.840789Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:53.753733Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:53.753217Z&quot;}" data-execution_count="1">
+<section id="optional-download-the-same-las-files-with-python" class="level2">
+<h2 class="anchored" data-anchor-id="optional-download-the-same-las-files-with-python">Optional: Download the same LAS files with Python</h2>
+<p>You can use this instead of clicking the links. It sends an <strong>HTTP GET</strong> request to PASDA’s file URLs; PASDA’s directory is a direct file service, not a catalog search API. The next optional section demonstrates a search API.</p>
+<p>The function streams the response to <code>data/lidar/</code> in chunks so the whole file does not enter memory. It writes a temporary <code>.part</code> file, checks its size and LAS header, and renames it after a complete download. Existing complete files are reused.</p>
+<p>Set <code>DOWNLOAD_PASDA = True</code> to download the two class files. Leave it <code>False</code> if you downloaded them manually. No API key is needed. The two files total about <strong>2.09 GB</strong>.</p>
+<div id="bebee6ce" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pdal</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rasterio</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rasterio.plot <span class="im">import</span> show</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyproj <span class="im">import</span> CRS</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.colors <span class="im">import</span> Normalize</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>OUT <span class="op">=</span> Path(<span class="st">"outputs/lidar/case_studies"</span>)</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>OUT.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"PDAL:"</span>, pdal.__version__)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> download_las_file(url, destination, expected_bytes<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    destination <span class="op">=</span> Path(destination)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    destination.parent.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> destination.exists() <span class="kw">and</span> (expected_bytes <span class="kw">is</span> <span class="va">None</span> <span class="kw">or</span> destination.stat().st_size <span class="op">==</span> expected_bytes):</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Already saved:"</span>, destination.name)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> destination</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    temporary <span class="op">=</span> destination.with_suffix(destination.suffix <span class="op">+</span> <span class="st">".part"</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Downloading:"</span>, destination.name)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> requests.get(url, stream<span class="op">=</span><span class="va">True</span>, timeout<span class="op">=</span>(<span class="dv">30</span>, <span class="dv">180</span>)) <span class="im">as</span> response:</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        response.raise_for_status()</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        header_size <span class="op">=</span> response.headers.get(<span class="st">"Content-Length"</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> temporary.<span class="bu">open</span>(<span class="st">"wb"</span>) <span class="im">as</span> stream:</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> chunk <span class="kw">in</span> response.iter_content(chunk_size<span class="op">=</span><span class="dv">1024</span> <span class="op">*</span> <span class="dv">1024</span>):</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> chunk:</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>                    stream.write(chunk)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    size <span class="op">=</span> temporary.stat().st_size</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    required_size <span class="op">=</span> expected_bytes <span class="cf">if</span> expected_bytes <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="cf">else</span> (<span class="bu">int</span>(header_size) <span class="cf">if</span> header_size <span class="cf">else</span> <span class="va">None</span>)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> required_size <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="kw">and</span> size <span class="op">!=</span> required_size:</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Incomplete download. Rerun this cell to try again."</span>)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> temporary.<span class="bu">open</span>(<span class="st">"rb"</span>) <span class="im">as</span> stream:</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> stream.read(<span class="dv">4</span>) <span class="op">!=</span> <span class="st">b"LASF"</span>:</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"The response is not a LAS/LAZ file. Check the download URL."</span>)</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    temporary.replace(destination)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Saved </span><span class="sc">{</span>size <span class="op">/</span> <span class="fl">1e6</span><span class="sc">:,.1f}</span><span class="ss"> MB:"</span>, destination)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> destination</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="ceff2d34" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>DOWNLOAD_PASDA <span class="op">=</span> <span class="va">True</span>  <span class="co"># Change to True to download the class data.</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>base_url <span class="op">=</span> <span class="st">"https://www.pasda.psu.edu/download/phillyLiDAR/2022/LAS/Classified_LAS/"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>files <span class="op">=</span> {<span class="st">"Philadelphia_394.las"</span>: <span class="dv">1_090_289_145</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>         <span class="st">"Philadelphia_456.las"</span>: <span class="dv">997_092_345</span>}</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> DOWNLOAD_PASDA:</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> filename, size <span class="kw">in</span> files.items():</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        download_las_file(base_url <span class="op">+</span> filename, Path(<span class="st">"data/lidar"</span>) <span class="op">/</span> filename, size)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Use the download links above, or set DOWNLOAD_PASDA = True."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Downloading: Philadelphia_394.las
+Saved 1,090.3 MB: data/lidar/Philadelphia_394.las
+Downloading: Philadelphia_456.las
+Saved 997.1 MB: data/lidar/Philadelphia_456.las</code></pre>
+</div>
+</div>
+</section>
+<section id="optional-extension-search-the-usgs-api-for-other-lidar-data" class="level2">
+<h2 class="anchored" data-anchor-id="optional-extension-search-the-usgs-api-for-other-lidar-data">Optional extension: Search the USGS API for other LiDAR data</h2>
+<p>The <a href="https://www.usgs.gov/faqs/there-api-accessing-national-map-data">USGS TNMAccess API</a> provides a searchable catalog. The pattern is <strong>request metadata → inspect results → download a selected file</strong>. <a href="https://tnmaccess.nationalmap.gov/api/v1/docs">API documentation</a>.</p>
+<p>The example searches a small Philadelphia bounding box. <code>bbox</code> uses <strong>west, south, east, north in longitude/latitude</strong>, not State Plane feet. <code>max=3</code> limits this response; additional results require pagination using <code>offset</code>. The response contains <code>items</code> with a <code>downloadURL</code> for each product. No API key is needed for this example.</p>
+<p>Set <code>SEARCH_USGS = True</code> to make the metadata request. Returned products can change. This extension may return LAZ files from different surveys; keep using the two PASDA files for the DSM workflow below, whose bounds and CRS checks are specific to those files.</p>
+<div id="da68d5e9" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>SEARCH_USGS <span class="op">=</span> <span class="va">False</span>  <span class="co"># Metadata only; does not download point clouds.</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>products <span class="op">=</span> []</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> SEARCH_USGS:</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> requests.get(</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"https://tnmaccess.nationalmap.gov/api/v1/products"</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        params<span class="op">=</span>{</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"datasets"</span>: <span class="st">"Lidar Point Cloud (LPC)"</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">"bbox"</span>: <span class="st">"-75.18,39.94,-75.15,39.96"</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"max"</span>: <span class="dv">3</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">"offset"</span>: <span class="dv">0</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"outputFormat"</span>: <span class="st">"JSON"</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>        timeout<span class="op">=</span><span class="dv">60</span>,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    response.raise_for_status()</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    catalog <span class="op">=</span> response.json()</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> catalog.get(<span class="st">"error"</span>):</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">RuntimeError</span>(catalog[<span class="st">"error"</span>])</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    products <span class="op">=</span> catalog.get(<span class="st">"items"</span>, [])</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Total matching products:"</span>, catalog.get(<span class="st">"total"</span>))</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> index, product <span class="kw">in</span> <span class="bu">enumerate</span>(products):</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(index, product.get(<span class="st">"title"</span>), product.get(<span class="st">"format"</span>))</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"  Download:"</span>, product.get(<span class="st">"downloadURL"</span>))</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Set SEARCH_USGS = True to search the USGS catalog."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Set SEARCH_USGS = True to search the USGS catalog.</code></pre>
+</div>
+</div>
+<section id="download-one-selected-usgs-result" class="level3">
+<h3 class="anchored" data-anchor-id="download-one-selected-usgs-result">Download one selected USGS result</h3>
+<p>Inspect the titles and metadata before choosing an index. This optional cell saves the selected file to a separate <code>data/lidar/usgs/</code> folder; it does not substitute it into the class workflow.</p>
+<div id="fc4bf72e" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>DOWNLOAD_USGS <span class="op">=</span> <span class="va">False</span>  <span class="co"># May download a large file.</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>selected_index <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> DOWNLOAD_USGS:</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> products:</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Run the USGS search first and inspect the results."</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="im">from</span> urllib.parse <span class="im">import</span> urlsplit, unquote</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    product <span class="op">=</span> products[selected_index]</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> product[<span class="st">"downloadURL"</span>]</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    filename <span class="op">=</span> Path(unquote(urlsplit(url).path)).name</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    download_las_file(url, Path(<span class="st">"data/lidar/usgs"</span>) <span class="op">/</span> filename)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="import-processing-packages-and-set-the-output-folder" class="level2">
+<h2 class="anchored" data-anchor-id="import-processing-packages-and-set-the-output-folder">1. Import processing packages and set the output folder</h2>
+<p>Continue here after both class LAS files are saved in <code>data/lidar/</code>.</p>
+<div id="e5de3368" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pdal</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rasterio</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rasterio.plot <span class="im">import</span> show</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyproj <span class="im">import</span> CRS</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.colors <span class="im">import</span> Normalize</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>OUT <span class="op">=</span> Path(<span class="st">"outputs/lidar/case_studies"</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>OUT.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"PDAL:"</span>, pdal.__version__)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>PDAL: 3.5.3</code></pre>
 </div>
@@ -201,15 +420,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="open-your-downloaded-files" class="level2">
 <h2 class="anchored" data-anchor-id="open-your-downloaded-files">2. Open your downloaded files</h2>
 <p>These PASDA tiles cover approximately 914 × 914 m each. They are case studies, not complete neighborhood coverage. The bounds below select the corresponding footprints in the source coordinate system.</p>
-<div id="f3ec999e" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:53.755005Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:53.754870Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:53.760376Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:53.759928Z&quot;}" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>cases <span class="op">=</span> [</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"zone"</span>: <span class="st">"University City"</span>, <span class="st">"name"</span>: <span class="st">"Philadelphia_394.las"</span>,</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>     <span class="st">"bounds"</span>: [<span class="dv">2685000</span>, <span class="dv">235000</span>, <span class="dv">2688000</span>, <span class="dv">238000</span>]},</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"zone"</span>: <span class="st">"Center City"</span>, <span class="st">"name"</span>: <span class="st">"Philadelphia_456.las"</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>     <span class="st">"bounds"</span>: [<span class="dv">2691000</span>, <span class="dv">235000</span>, <span class="dv">2694000</span>, <span class="dv">238000</span>]},</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(cases)[[<span class="st">"zone"</span>, <span class="st">"name"</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
+<div id="f3ec999e" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>cases <span class="op">=</span> [</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"zone"</span>: <span class="st">"University City"</span>, <span class="st">"name"</span>: <span class="st">"Philadelphia_394.las"</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>     <span class="st">"bounds"</span>: [<span class="dv">2685000</span>, <span class="dv">235000</span>, <span class="dv">2688000</span>, <span class="dv">238000</span>]},</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"zone"</span>: <span class="st">"Center City"</span>, <span class="st">"name"</span>: <span class="st">"Philadelphia_456.las"</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>     <span class="st">"bounds"</span>: [<span class="dv">2691000</span>, <span class="dv">235000</span>, <span class="dv">2694000</span>, <span class="dv">238000</span>]},</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(cases)[[<span class="st">"zone"</span>, <span class="st">"name"</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
 <div>
 
 
@@ -239,41 +458,41 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Set the paths to the files you downloaded. If you see <code>FileNotFoundError</code> in the next step, check that the files are in <code>data/lidar/</code> beside this notebook and that their names match exactly.</p>
-<div id="441b78c4" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:53.761420Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:53.761332Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:53.763052Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:53.762705Z&quot;}" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>las_paths <span class="op">=</span> [</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    Path(<span class="st">"data/lidar/Philadelphia_394.las"</span>),</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    Path(<span class="st">"data/lidar/Philadelphia_456.las"</span>),</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="441b78c4" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>las_paths <span class="op">=</span> [</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    Path(<span class="st">"data/lidar/Philadelphia_394.las"</span>),</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    Path(<span class="st">"data/lidar/Philadelphia_456.las"</span>),</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="check-the-coordinate-system-and-units" class="level2">
 <h2 class="anchored" data-anchor-id="check-the-coordinate-system-and-units">3. Check the coordinate system and units</h2>
 <p>Read the LAS header with <code>quickinfo</code>. Keep the native horizontal CRS and convert Z to meters using its vertical CRS. Convert the <strong>1 m</strong> pixel size to the horizontal coordinate units too. This changes units, not the vertical datum.</p>
-<div id="156e3450" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:53.764109Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:53.764038Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:53.853924Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:53.853330Z&quot;}" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>infos <span class="op">=</span> []</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> path <span class="kw">in</span> las_paths:</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    reader <span class="op">=</span> pdal.Pipeline(json.dumps([{<span class="st">"type"</span>: <span class="st">"readers.las"</span>, <span class="st">"filename"</span>: <span class="bu">str</span>(path)}]))</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    header <span class="op">=</span> reader.quickinfo[<span class="st">"readers.las"</span>]</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    crs <span class="op">=</span> CRS.from_wkt(header[<span class="st">"metadata"</span>][<span class="st">"srs"</span>][<span class="st">"compoundwkt"</span>])</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> crs.is_compound:</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Expected a horizontal + vertical CRS; inspect the LAS metadata."</span>)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    horizontal, vertical <span class="op">=</span> crs.sub_crs_list[:<span class="dv">2</span>]</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> horizontal.is_bound:</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        horizontal <span class="op">=</span> horizontal.source_crs</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> horizontal.is_projected:</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Expected projected XY coordinates."</span>)</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    infos.append({<span class="st">"points"</span>: header[<span class="st">"num_points"</span>],</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"horizontal"</span>: horizontal, <span class="st">"vertical"</span>: vertical,</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"xy_to_m"</span>: horizontal.axis_info[<span class="dv">0</span>].unit_conversion_factor,</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"z_to_m"</span>: vertical.axis_info[<span class="dv">0</span>].unit_conversion_factor})</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>pd.DataFrame([{<span class="st">"zone"</span>: case[<span class="st">"zone"</span>], <span class="st">"points"</span>: info[<span class="st">"points"</span>],</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>               <span class="st">"horizontal_crs"</span>: info[<span class="st">"horizontal"</span>].name,</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>               <span class="st">"xy_units"</span>: info[<span class="st">"horizontal"</span>].axis_info[<span class="dv">0</span>].unit_name,</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>               <span class="st">"vertical_crs"</span>: info[<span class="st">"vertical"</span>].name,</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>               <span class="st">"z_units"</span>: info[<span class="st">"vertical"</span>].axis_info[<span class="dv">0</span>].unit_name}</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>              <span class="cf">for</span> case, info <span class="kw">in</span> <span class="bu">zip</span>(cases, infos)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
+<div id="156e3450" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>infos <span class="op">=</span> []</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> path <span class="kw">in</span> las_paths:</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    reader <span class="op">=</span> pdal.Pipeline(json.dumps([{<span class="st">"type"</span>: <span class="st">"readers.las"</span>, <span class="st">"filename"</span>: <span class="bu">str</span>(path)}]))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    header <span class="op">=</span> reader.quickinfo[<span class="st">"readers.las"</span>]</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    crs <span class="op">=</span> CRS.from_wkt(header[<span class="st">"metadata"</span>][<span class="st">"srs"</span>][<span class="st">"compoundwkt"</span>])</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> crs.is_compound:</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Expected a horizontal + vertical CRS; inspect the LAS metadata."</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    horizontal, vertical <span class="op">=</span> crs.sub_crs_list[:<span class="dv">2</span>]</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> horizontal.is_bound:</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>        horizontal <span class="op">=</span> horizontal.source_crs</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> horizontal.is_projected:</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Expected projected XY coordinates."</span>)</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    infos.append({<span class="st">"points"</span>: header[<span class="st">"num_points"</span>],</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"horizontal"</span>: horizontal, <span class="st">"vertical"</span>: vertical,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"xy_to_m"</span>: horizontal.axis_info[<span class="dv">0</span>].unit_conversion_factor,</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"z_to_m"</span>: vertical.axis_info[<span class="dv">0</span>].unit_conversion_factor})</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>pd.DataFrame([{<span class="st">"zone"</span>: case[<span class="st">"zone"</span>], <span class="st">"points"</span>: info[<span class="st">"points"</span>],</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>               <span class="st">"horizontal_crs"</span>: info[<span class="st">"horizontal"</span>].name,</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>               <span class="st">"xy_units"</span>: info[<span class="st">"horizontal"</span>].axis_info[<span class="dv">0</span>].unit_name,</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>               <span class="st">"vertical_crs"</span>: info[<span class="st">"vertical"</span>].name,</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>               <span class="st">"z_units"</span>: info[<span class="st">"vertical"</span>].axis_info[<span class="dv">0</span>].unit_name}</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>              <span class="cf">for</span> case, info <span class="kw">in</span> <span class="bu">zip</span>(cases, infos)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
 <div>
 
 
@@ -323,48 +542,48 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>IDW:</strong> a distance-weighted average within <strong>1.5 m</strong> of each cell center; a smoother estimated surface.</li>
 </ul>
 <p>A small radius limits mixing across roofs and streets. No extra gap filling is applied. See <a href="https://pdal.io/en/stable/stages/writers.gdal.html">PDAL’s GDAL writer</a>.</p>
-<div id="dff74305" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:53.855166Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:53.855080Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:55:53.858282Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:55:53.857778Z&quot;}" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>CELL_SIZE_M <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>NODATA <span class="op">=</span> <span class="op">-</span><span class="fl">9999.0</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_dsm_pipeline(path, case, info, destination, method<span class="op">=</span><span class="st">"idw"</span>):</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    resolution <span class="op">=</span> CELL_SIZE_M <span class="op">/</span> info[<span class="st">"xy_to_m"</span>]</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    left, bottom, right, top <span class="op">=</span> case[<span class="st">"bounds"</span>]</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    origin_x <span class="op">=</span> math.floor(left <span class="op">/</span> resolution) <span class="op">*</span> resolution</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    origin_y <span class="op">=</span> math.floor(bottom <span class="op">/</span> resolution) <span class="op">*</span> resolution</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">"pipeline"</span>: [</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"type"</span>: <span class="st">"readers.las"</span>, <span class="st">"filename"</span>: <span class="bu">str</span>(path)},</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"type"</span>: <span class="st">"filters.crop"</span>, <span class="st">"bounds"</span>: <span class="ss">f"([</span><span class="sc">{</span>left<span class="sc">}</span><span class="ss">,</span><span class="sc">{</span>right<span class="sc">}</span><span class="ss">],[</span><span class="sc">{</span>bottom<span class="sc">}</span><span class="ss">,</span><span class="sc">{</span>top<span class="sc">}</span><span class="ss">])"</span>},</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"type"</span>: <span class="st">"filters.expression"</span>, <span class="st">"expression"</span>:</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>         <span class="st">"ReturnNumber == 1 &amp;&amp; Classification != 7 &amp;&amp; Classification != 18 &amp;&amp; Withheld == 0"</span>},</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"type"</span>: <span class="st">"filters.assign"</span>, <span class="st">"value"</span>: <span class="ss">f"Z = Z * </span><span class="sc">{</span>info[<span class="st">'z_to_m'</span>]<span class="sc">:.15g}</span><span class="ss">"</span>},</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"type"</span>: <span class="st">"writers.gdal"</span>, <span class="st">"filename"</span>: <span class="bu">str</span>(destination),</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>         <span class="st">"resolution"</span>: resolution, <span class="st">"origin_x"</span>: origin_x, <span class="st">"origin_y"</span>: origin_y,</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>         <span class="st">"width"</span>: math.floor((right<span class="op">-</span>origin_x)<span class="op">/</span>resolution) <span class="op">+</span> <span class="dv">1</span>,</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>         <span class="st">"height"</span>: math.floor((top<span class="op">-</span>origin_y)<span class="op">/</span>resolution) <span class="op">+</span> <span class="dv">1</span>,</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>         <span class="st">"output_type"</span>: method, <span class="st">"binmode"</span>: method <span class="op">==</span> <span class="st">"max"</span>,</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>         <span class="st">"radius"</span>: <span class="fl">1.5</span> <span class="op">*</span> resolution, <span class="st">"window_size"</span>: <span class="dv">0</span>,</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>         <span class="st">"data_type"</span>: <span class="st">"float32"</span>, <span class="st">"nodata"</span>: NODATA,</span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>         <span class="st">"override_srs"</span>: info[<span class="st">"horizontal"</span>].to_wkt(),</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>         <span class="st">"gdalopts"</span>: <span class="st">"COMPRESS=DEFLATE,TILED=YES"</span>},</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    ]}</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="dff74305" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>CELL_SIZE_M <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>NODATA <span class="op">=</span> <span class="op">-</span><span class="fl">9999.0</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_dsm_pipeline(path, case, info, destination, method<span class="op">=</span><span class="st">"idw"</span>):</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    resolution <span class="op">=</span> CELL_SIZE_M <span class="op">/</span> info[<span class="st">"xy_to_m"</span>]</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    left, bottom, right, top <span class="op">=</span> case[<span class="st">"bounds"</span>]</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    origin_x <span class="op">=</span> math.floor(left <span class="op">/</span> resolution) <span class="op">*</span> resolution</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    origin_y <span class="op">=</span> math.floor(bottom <span class="op">/</span> resolution) <span class="op">*</span> resolution</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">"pipeline"</span>: [</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"type"</span>: <span class="st">"readers.las"</span>, <span class="st">"filename"</span>: <span class="bu">str</span>(path)},</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"type"</span>: <span class="st">"filters.crop"</span>, <span class="st">"bounds"</span>: <span class="ss">f"([</span><span class="sc">{</span>left<span class="sc">}</span><span class="ss">,</span><span class="sc">{</span>right<span class="sc">}</span><span class="ss">],[</span><span class="sc">{</span>bottom<span class="sc">}</span><span class="ss">,</span><span class="sc">{</span>top<span class="sc">}</span><span class="ss">])"</span>},</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"type"</span>: <span class="st">"filters.expression"</span>, <span class="st">"expression"</span>:</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>         <span class="st">"ReturnNumber == 1 &amp;&amp; Classification != 7 &amp;&amp; Classification != 18 &amp;&amp; Withheld == 0"</span>},</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"type"</span>: <span class="st">"filters.assign"</span>, <span class="st">"value"</span>: <span class="ss">f"Z = Z * </span><span class="sc">{</span>info[<span class="st">'z_to_m'</span>]<span class="sc">:.15g}</span><span class="ss">"</span>},</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"type"</span>: <span class="st">"writers.gdal"</span>, <span class="st">"filename"</span>: <span class="bu">str</span>(destination),</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>         <span class="st">"resolution"</span>: resolution, <span class="st">"origin_x"</span>: origin_x, <span class="st">"origin_y"</span>: origin_y,</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>         <span class="st">"width"</span>: math.floor((right<span class="op">-</span>origin_x)<span class="op">/</span>resolution) <span class="op">+</span> <span class="dv">1</span>,</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>         <span class="st">"height"</span>: math.floor((top<span class="op">-</span>origin_y)<span class="op">/</span>resolution) <span class="op">+</span> <span class="dv">1</span>,</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>         <span class="st">"output_type"</span>: method, <span class="st">"binmode"</span>: method <span class="op">==</span> <span class="st">"max"</span>,</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>         <span class="st">"radius"</span>: <span class="fl">1.5</span> <span class="op">*</span> resolution, <span class="st">"window_size"</span>: <span class="dv">0</span>,</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>         <span class="st">"data_type"</span>: <span class="st">"float32"</span>, <span class="st">"nodata"</span>: NODATA,</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>         <span class="st">"override_srs"</span>: info[<span class="st">"horizontal"</span>].to_wkt(),</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>         <span class="st">"gdalopts"</span>: <span class="st">"COMPRESS=DEFLATE,TILED=YES"</span>},</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    ]}</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="f0978ea3" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:55:53.859474Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:55:53.859392Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:56:44.610182Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:56:44.609759Z&quot;}" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>raw_paths <span class="op">=</span> []</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>max_paths <span class="op">=</span> []</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> path, case, info <span class="kw">in</span> <span class="bu">zip</span>(las_paths, cases, infos):</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> method <span class="kw">in</span> [<span class="st">"max"</span>, <span class="st">"idw"</span>]:</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        destination <span class="op">=</span> OUT <span class="op">/</span> <span class="ss">f"</span><span class="sc">{</span>path<span class="sc">.</span>stem<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>method<span class="sc">}</span><span class="ss">.tif"</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        specification <span class="op">=</span> make_dsm_pipeline(path, case, info, destination, method)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        destination.with_suffix(<span class="st">".json"</span>).write_text(json.dumps(specification, indent<span class="op">=</span><span class="dv">2</span>))</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>        pipeline <span class="op">=</span> pdal.Pipeline(json.dumps(specification))</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>        pipeline.execute_streaming(chunk_size<span class="op">=</span><span class="dv">250_000</span>)</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> rasterio.<span class="bu">open</span>(destination, <span class="st">"r+"</span>) <span class="im">as</span> dst:</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>            dst.set_band_unit(<span class="dv">1</span>, <span class="st">"m"</span>)</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>            dst.update_tags(vertical_reference<span class="op">=</span>info[<span class="st">"vertical"</span>].name, method<span class="op">=</span>method)</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>        (max_paths <span class="cf">if</span> method <span class="op">==</span> <span class="st">"max"</span> <span class="cf">else</span> raw_paths).append(destination)</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(case[<span class="st">"zone"</span>], method, <span class="st">"→"</span>, destination.name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="f0978ea3" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>raw_paths <span class="op">=</span> []</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>max_paths <span class="op">=</span> []</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> path, case, info <span class="kw">in</span> <span class="bu">zip</span>(las_paths, cases, infos):</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> method <span class="kw">in</span> [<span class="st">"max"</span>, <span class="st">"idw"</span>]:</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>        destination <span class="op">=</span> OUT <span class="op">/</span> <span class="ss">f"</span><span class="sc">{</span>path<span class="sc">.</span>stem<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>method<span class="sc">}</span><span class="ss">.tif"</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>        specification <span class="op">=</span> make_dsm_pipeline(path, case, info, destination, method)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>        destination.with_suffix(<span class="st">".json"</span>).write_text(json.dumps(specification, indent<span class="op">=</span><span class="dv">2</span>))</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>        pipeline <span class="op">=</span> pdal.Pipeline(json.dumps(specification))</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>        pipeline.execute_streaming(chunk_size<span class="op">=</span><span class="dv">250_000</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> rasterio.<span class="bu">open</span>(destination, <span class="st">"r+"</span>) <span class="im">as</span> dst:</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>            dst.set_band_unit(<span class="dv">1</span>, <span class="st">"m"</span>)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>            dst.update_tags(vertical_reference<span class="op">=</span>info[<span class="st">"vertical"</span>].name, method<span class="op">=</span>method)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>        (max_paths <span class="cf">if</span> method <span class="op">==</span> <span class="st">"max"</span> <span class="cf">else</span> raw_paths).append(destination)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(case[<span class="st">"zone"</span>], method, <span class="st">"→"</span>, destination.name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>University City max → Philadelphia_394_max.tif
 University City idw → Philadelphia_394_idw.tif
@@ -377,30 +596,30 @@ Center City idw → Philadelphia_456_idw.tif</code></pre>
 <h2 class="anchored" data-anchor-id="remove-isolated-pixels-with-a-median-filter">5. Remove isolated pixels with a median filter</h2>
 <p>A <strong>3 × 3 median</strong> replaces each pixel with its neighborhood median. It reduces speckle while retaining broad roof edges better than a blur. It can remove small roof features and canopy peaks, so keep both raw rasters for analysis.</p>
 <p>Temporarily use nearest valid values so NoData cannot contaminate the filter, then restore the exact IDW NoData mask. We leave remaining gaps and water unfilled.</p>
-<div id="b9bfb210" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:56:44.611672Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:56:44.611574Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:56:45.023224Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:56:45.022718Z&quot;}" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.ndimage <span class="im">import</span> distance_transform_edt, median_filter</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>dsm_paths <span class="op">=</span> []</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> path <span class="kw">in</span> raw_paths:</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> rasterio.<span class="bu">open</span>(path) <span class="im">as</span> src:</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        data <span class="op">=</span> src.read(<span class="dv">1</span>, masked<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        valid <span class="op">=</span> <span class="op">~</span>np.ma.getmaskarray(data)</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        nearest <span class="op">=</span> distance_transform_edt(<span class="op">~</span>valid, return_distances<span class="op">=</span><span class="va">False</span>, return_indices<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        smooth <span class="op">=</span> median_filter(data.data[<span class="bu">tuple</span>(nearest)], size<span class="op">=</span><span class="dv">3</span>, mode<span class="op">=</span><span class="st">"nearest"</span>)</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        smooth[<span class="op">~</span>valid] <span class="op">=</span> src.nodata</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        profile <span class="op">=</span> src.profile.copy()</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        tags <span class="op">=</span> src.tags()</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    destination <span class="op">=</span> path.with_name(path.stem.replace(<span class="st">"_idw"</span>, <span class="st">"_dsm"</span>) <span class="op">+</span> <span class="st">".tif"</span>)</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> rasterio.<span class="bu">open</span>(destination, <span class="st">"w"</span>, <span class="op">**</span>profile) <span class="im">as</span> dst:</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>        dst.write(smooth.astype(<span class="st">"float32"</span>), <span class="dv">1</span>)</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>        dst.set_band_unit(<span class="dv">1</span>, <span class="st">"m"</span>)</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>        dst.update_tags(<span class="op">**</span>tags, smoothing<span class="op">=</span><span class="st">"3x3 median; IDW NoData mask retained"</span>)</span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    destination.with_suffix(<span class="st">".json"</span>).write_text(json.dumps({</span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"source_raster"</span>: path.name, <span class="st">"source_pipeline"</span>: path.with_suffix(<span class="st">".json"</span>).name,</span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"smoothing"</span>: <span class="st">"3x3 median"</span>, <span class="st">"preserve_nodata"</span>: <span class="va">True</span></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    }, indent<span class="op">=</span><span class="dv">2</span>))</span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    dsm_paths.append(destination)</span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(destination.name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="b9bfb210" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.ndimage <span class="im">import</span> distance_transform_edt, median_filter</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>dsm_paths <span class="op">=</span> []</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> path <span class="kw">in</span> raw_paths:</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> rasterio.<span class="bu">open</span>(path) <span class="im">as</span> src:</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>        data <span class="op">=</span> src.read(<span class="dv">1</span>, masked<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        valid <span class="op">=</span> <span class="op">~</span>np.ma.getmaskarray(data)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>        nearest <span class="op">=</span> distance_transform_edt(<span class="op">~</span>valid, return_distances<span class="op">=</span><span class="va">False</span>, return_indices<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>        smooth <span class="op">=</span> median_filter(data.data[<span class="bu">tuple</span>(nearest)], size<span class="op">=</span><span class="dv">3</span>, mode<span class="op">=</span><span class="st">"nearest"</span>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        smooth[<span class="op">~</span>valid] <span class="op">=</span> src.nodata</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>        profile <span class="op">=</span> src.profile.copy()</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>        tags <span class="op">=</span> src.tags()</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    destination <span class="op">=</span> path.with_name(path.stem.replace(<span class="st">"_idw"</span>, <span class="st">"_dsm"</span>) <span class="op">+</span> <span class="st">".tif"</span>)</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> rasterio.<span class="bu">open</span>(destination, <span class="st">"w"</span>, <span class="op">**</span>profile) <span class="im">as</span> dst:</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>        dst.write(smooth.astype(<span class="st">"float32"</span>), <span class="dv">1</span>)</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>        dst.set_band_unit(<span class="dv">1</span>, <span class="st">"m"</span>)</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>        dst.update_tags(<span class="op">**</span>tags, smoothing<span class="op">=</span><span class="st">"3x3 median; IDW NoData mask retained"</span>)</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    destination.with_suffix(<span class="st">".json"</span>).write_text(json.dumps({</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"source_raster"</span>: path.name, <span class="st">"source_pipeline"</span>: path.with_suffix(<span class="st">".json"</span>).name,</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"smoothing"</span>: <span class="st">"3x3 median"</span>, <span class="st">"preserve_nodata"</span>: <span class="va">True</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    }, indent<span class="op">=</span><span class="dv">2</span>))</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>    dsm_paths.append(destination)</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(destination.name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Philadelphia_394_dsm.tif
 Philadelphia_456_dsm.tif</code></pre>
@@ -410,25 +629,25 @@ Philadelphia_456_dsm.tif</code></pre>
 <section id="compare-before-and-after" class="level2">
 <h2 class="anchored" data-anchor-id="compare-before-and-after">6. Compare before and after</h2>
 <p>The same central 250 × 250 pixel window and color scale show maximum, IDW, and smoothed IDW for each tile. The GeoTIFFs keep elevation values in meters; color limits affect only the plots.</p>
-<div id="217d42e3" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:56:45.025646Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:56:45.025323Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:56:45.608702Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:56:45.608089Z&quot;}" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">9</span>), constrained_layout<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> row, (case, paths) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(cases, <span class="bu">zip</span>(max_paths, raw_paths, dsm_paths))):</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    windows <span class="op">=</span> []</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> path <span class="kw">in</span> paths:</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> rasterio.<span class="bu">open</span>(path) <span class="im">as</span> src:</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>            r, c <span class="op">=</span> src.height <span class="op">//</span> <span class="dv">2</span>, src.width <span class="op">//</span> <span class="dv">2</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>            windows.append(src.read(<span class="dv">1</span>, masked<span class="op">=</span><span class="va">True</span>)[r<span class="op">-</span><span class="dv">125</span>:r<span class="op">+</span><span class="dv">125</span>, c<span class="op">-</span><span class="dv">125</span>:c<span class="op">+</span><span class="dv">125</span>])</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    low, high <span class="op">=</span> np.percentile(np.concatenate([a.compressed() <span class="cf">for</span> a <span class="kw">in</span> windows]), [<span class="dv">2</span>, <span class="dv">98</span>])</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ax, data, title <span class="kw">in</span> <span class="bu">zip</span>(axes[row], windows, [<span class="st">"Maximum"</span>, <span class="st">"IDW"</span>, <span class="st">"IDW + median"</span>]):</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>        ax.imshow(data, cmap<span class="op">=</span><span class="st">"gray"</span>, vmin<span class="op">=</span>low, vmax<span class="op">=</span>high, interpolation<span class="op">=</span><span class="st">"nearest"</span>)</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>        ax.set_title(<span class="ss">f"</span><span class="sc">{</span>case[<span class="st">'zone'</span>]<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>title<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>        ax.set_axis_off()</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>fig.savefig(OUT <span class="op">/</span> <span class="st">"dsm_before_after.png"</span>, dpi<span class="op">=</span><span class="dv">160</span>)</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="217d42e3" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">9</span>), constrained_layout<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> row, (case, paths) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(cases, <span class="bu">zip</span>(max_paths, raw_paths, dsm_paths))):</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    windows <span class="op">=</span> []</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> path <span class="kw">in</span> paths:</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> rasterio.<span class="bu">open</span>(path) <span class="im">as</span> src:</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>            r, c <span class="op">=</span> src.height <span class="op">//</span> <span class="dv">2</span>, src.width <span class="op">//</span> <span class="dv">2</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>            windows.append(src.read(<span class="dv">1</span>, masked<span class="op">=</span><span class="va">True</span>)[r<span class="op">-</span><span class="dv">125</span>:r<span class="op">+</span><span class="dv">125</span>, c<span class="op">-</span><span class="dv">125</span>:c<span class="op">+</span><span class="dv">125</span>])</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    low, high <span class="op">=</span> np.percentile(np.concatenate([a.compressed() <span class="cf">for</span> a <span class="kw">in</span> windows]), [<span class="dv">2</span>, <span class="dv">98</span>])</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ax, data, title <span class="kw">in</span> <span class="bu">zip</span>(axes[row], windows, [<span class="st">"Maximum"</span>, <span class="st">"IDW"</span>, <span class="st">"IDW + median"</span>]):</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>        ax.imshow(data, cmap<span class="op">=</span><span class="st">"gray"</span>, vmin<span class="op">=</span>low, vmax<span class="op">=</span>high, interpolation<span class="op">=</span><span class="st">"nearest"</span>)</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>        ax.set_title(<span class="ss">f"</span><span class="sc">{</span>case[<span class="st">'zone'</span>]<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>title<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>        ax.set_axis_off()</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>fig.savefig(OUT <span class="op">/</span> <span class="st">"dsm_before_after.png"</span>, dpi<span class="op">=</span><span class="dv">160</span>)</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="lecture-11B_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="lecture-11B_files/figure-html/cell-13-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -436,22 +655,22 @@ Philadelphia_456_dsm.tif</code></pre>
 <section id="check-and-plot-the-final-dsms" class="level3">
 <h3 class="anchored" data-anchor-id="check-and-plot-the-final-dsms">Check and plot the final DSMs</h3>
 <p>Check CRS, pixel size, coverage, and elevation range. Both maps below use one elevation scale.</p>
-<div id="2ba03f6e" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:56:45.610838Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:56:45.610667Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:56:45.644910Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:56:45.644340Z&quot;}" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>summary <span class="op">=</span> []</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>rasters <span class="op">=</span> []</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> path, case, info <span class="kw">in</span> <span class="bu">zip</span>(dsm_paths, cases, infos):</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> rasterio.<span class="bu">open</span>(path) <span class="im">as</span> src:</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>        data <span class="op">=</span> src.read(<span class="dv">1</span>, masked<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> src.count <span class="op">==</span> <span class="dv">1</span> <span class="kw">and</span> src.crs <span class="op">==</span> info[<span class="st">"horizontal"</span>]</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> np.isclose(src.res[<span class="dv">0</span>] <span class="op">*</span> info[<span class="st">"xy_to_m"</span>], CELL_SIZE_M)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> data.count() <span class="op">&gt;</span> <span class="dv">0</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>        rasters.append((data, src.transform))</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>        summary.append({<span class="st">"zone"</span>: case[<span class="st">"zone"</span>], <span class="st">"shape"</span>: data.shape,</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"pixel_size_m"</span>: src.res[<span class="dv">0</span>] <span class="op">*</span> info[<span class="st">"xy_to_m"</span>],</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"valid_percent"</span>: <span class="dv">100</span> <span class="op">*</span> data.count() <span class="op">/</span> data.size,</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"min_m"</span>: <span class="bu">float</span>(data.<span class="bu">min</span>()), <span class="st">"max_m"</span>: <span class="bu">float</span>(data.<span class="bu">max</span>())})</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="9">
+<div id="2ba03f6e" class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>summary <span class="op">=</span> []</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>rasters <span class="op">=</span> []</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> path, case, info <span class="kw">in</span> <span class="bu">zip</span>(dsm_paths, cases, infos):</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> rasterio.<span class="bu">open</span>(path) <span class="im">as</span> src:</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>        data <span class="op">=</span> src.read(<span class="dv">1</span>, masked<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> src.count <span class="op">==</span> <span class="dv">1</span> <span class="kw">and</span> src.crs <span class="op">==</span> info[<span class="st">"horizontal"</span>]</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> np.isclose(src.res[<span class="dv">0</span>] <span class="op">*</span> info[<span class="st">"xy_to_m"</span>], CELL_SIZE_M)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> data.count() <span class="op">&gt;</span> <span class="dv">0</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>        rasters.append((data, src.transform))</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>        summary.append({<span class="st">"zone"</span>: case[<span class="st">"zone"</span>], <span class="st">"shape"</span>: data.shape,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"pixel_size_m"</span>: src.res[<span class="dv">0</span>] <span class="op">*</span> info[<span class="st">"xy_to_m"</span>],</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"valid_percent"</span>: <span class="dv">100</span> <span class="op">*</span> data.count() <span class="op">/</span> data.size,</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"min_m"</span>: <span class="bu">float</span>(data.<span class="bu">min</span>()), <span class="st">"max_m"</span>: <span class="bu">float</span>(data.<span class="bu">max</span>())})</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>pd.DataFrame(summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
 <div>
 
 
@@ -492,25 +711,25 @@ Philadelphia_456_dsm.tif</code></pre>
 </div>
 </div>
 </div>
-<div id="df570664" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T02:56:45.646479Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T02:56:45.646330Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T02:56:46.576496Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T02:56:46.575930Z&quot;}" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>values <span class="op">=</span> np.concatenate([data.compressed() <span class="cf">for</span> data, transform <span class="kw">in</span> rasters])</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>vmin, vmax <span class="op">=</span> np.percentile(values, [<span class="dv">2</span>, <span class="dv">98</span>])</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>norm <span class="op">=</span> Normalize(vmin<span class="op">=</span>vmin, vmax<span class="op">=</span><span class="bu">max</span>(vmax, vmin <span class="op">+</span> <span class="dv">1</span>))</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>cmap <span class="op">=</span> plt.colormaps[<span class="st">"terrain"</span>].copy()</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>cmap.set_bad(<span class="st">"lightgray"</span>)</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">6</span>), constrained_layout<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, case, (data, transform) <span class="kw">in</span> <span class="bu">zip</span>(axes, cases, rasters):</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    show(data, transform<span class="op">=</span>transform, ax<span class="op">=</span>ax, cmap<span class="op">=</span>cmap, norm<span class="op">=</span>norm, adjust<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    ax.<span class="bu">set</span>(title<span class="op">=</span>case[<span class="st">"zone"</span>], xlabel<span class="op">=</span><span class="st">"Easting (US survey ft)"</span>, ylabel<span class="op">=</span><span class="st">"Northing (US survey ft)"</span>)</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    ax.ticklabel_format(style<span class="op">=</span><span class="st">"plain"</span>, useOffset<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>fig.colorbar(plt.cm.ScalarMappable(norm<span class="op">=</span>norm, cmap<span class="op">=</span>cmap), ax<span class="op">=</span>axes,</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>             label<span class="op">=</span><span class="st">"DSM elevation (m; source vertical datum)"</span>, shrink<span class="op">=</span><span class="fl">0.75</span>, extend<span class="op">=</span><span class="st">"both"</span>)</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>fig.savefig(OUT <span class="op">/</span> <span class="st">"center_city_university_city_dsm.png"</span>, dpi<span class="op">=</span><span class="dv">160</span>)</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="df570664" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>values <span class="op">=</span> np.concatenate([data.compressed() <span class="cf">for</span> data, transform <span class="kw">in</span> rasters])</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>vmin, vmax <span class="op">=</span> np.percentile(values, [<span class="dv">2</span>, <span class="dv">98</span>])</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>norm <span class="op">=</span> Normalize(vmin<span class="op">=</span>vmin, vmax<span class="op">=</span><span class="bu">max</span>(vmax, vmin <span class="op">+</span> <span class="dv">1</span>))</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>cmap <span class="op">=</span> plt.colormaps[<span class="st">"terrain"</span>].copy()</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>cmap.set_bad(<span class="st">"lightgray"</span>)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">6</span>), constrained_layout<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, case, (data, transform) <span class="kw">in</span> <span class="bu">zip</span>(axes, cases, rasters):</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    show(data, transform<span class="op">=</span>transform, ax<span class="op">=</span>ax, cmap<span class="op">=</span>cmap, norm<span class="op">=</span>norm, adjust<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    ax.<span class="bu">set</span>(title<span class="op">=</span>case[<span class="st">"zone"</span>], xlabel<span class="op">=</span><span class="st">"Easting (US survey ft)"</span>, ylabel<span class="op">=</span><span class="st">"Northing (US survey ft)"</span>)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    ax.ticklabel_format(style<span class="op">=</span><span class="st">"plain"</span>, useOffset<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>fig.colorbar(plt.cm.ScalarMappable(norm<span class="op">=</span>norm, cmap<span class="op">=</span>cmap), ax<span class="op">=</span>axes,</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>             label<span class="op">=</span><span class="st">"DSM elevation (m; source vertical datum)"</span>, shrink<span class="op">=</span><span class="fl">0.75</span>, extend<span class="op">=</span><span class="st">"both"</span>)</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>fig.savefig(OUT <span class="op">/</span> <span class="st">"center_city_university_city_dsm.png"</span>, dpi<span class="op">=</span><span class="dv">160</span>)</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="lecture-11B_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="lecture-11B_files/figure-html/cell-15-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>

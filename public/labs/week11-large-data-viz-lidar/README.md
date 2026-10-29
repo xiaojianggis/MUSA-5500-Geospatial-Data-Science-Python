@@ -1,9 +1,12 @@
 # Week 11: Large-data visualization and LiDAR
 
-- **Lecture 11A:** Dask tables → Datashader density maps → Census categories → taxi animation → parking exercise.
-- **Lecture 11B:** two Philadelphia LAS tiles → raw maximum and IDW rasters → median-smoothed DSMs → before/after plots.
+1. [Visualization I: Dask and Datashader](Visualizing%20Large%20Data-Lec1.html) — OSM points, Census density, color scales, and city maps. [Notebook](Visualizing%20Large%20Data-Lec1.ipynb).
+2. [Visualization II: Queries, movement, and animation](Visualizing%20Large%20Data-Lec2.html) — category queries, district boundaries, taxi maps, hourly slider/GIF, radial heatmap, and parking exercise. [Notebook](Visualizing%20Large%20Data-Lec2.ipynb).
+3. [LiDAR data processing](lecture-11B.html) — LiDAR basics with four diagrams; manual or Python downloads; a USGS catalog API example; raw maximum/IDW rasters, smoothed DSMs, and before/after plots. [Notebook](lecture-11B.ipynb).
 
-Both tutorials use **Python (largeviz)**. Save the notebooks and downloaded data in one local folder, then open the notebooks there and run cells from top to bottom.
+Each notebook runs independently. The two visualization notebooks have been repaired from the original lectures and use local teaching extracts. The older combined `lecture-11A` remains available as a reference; use the two visualization notebooks above for the three-section teaching sequence.
+
+All three sections use **Python (largeviz)**. Save the notebooks and downloaded data in one local folder, then open the notebooks there and run cells from top to bottom.
 
 ## Create or update the environment
 
@@ -39,9 +42,9 @@ conda run -n largeviz python -c "import numpy, numba, scipy.special, dask.datafr
 
 ## Data and outputs
 
-Download [Lecture 11A](lecture-11A.ipynb) and [Lecture 11B](lecture-11B.ipynb). The HTML tutorials include the same direct data links and folder instructions below. If a link opens in the browser, right-click it and choose **Save Link As…**. Keep the original filenames.
+Download the three notebooks linked above. The HTML tutorials include the same direct data links and folder instructions below. If a link opens in the browser, right-click it and choose **Save Link As…**. Keep the original filenames.
 
-For Lecture 11A, save these files in `data/samples/` beside the notebooks:
+For the two visualization sections, save these files in `data/samples/` beside the notebooks:
 
 | Data | Download |
 | --- | --- |
@@ -49,8 +52,9 @@ For Lecture 11A, save these files in `data/samples/` beside the notebooks:
 | Census dots | [census_sample.parquet](data/samples/census_sample.parquet) |
 | Taxi trips | [taxi_sample.parquet](data/samples/taxi_sample.parquet) |
 | Parking records | [parking_sample.csv](data/samples/parking_sample.csv) |
+| Historical congressional boundaries (Visualization II) | [districts_2015.geojson](data/samples/districts_2015.geojson) |
 
-See [data provenance](data/samples/provenance.json) for sources and sampling. These are teaching extracts, not representative estimates. Outputs are `outputs/viz/osm_density.png` and `outputs/viz/taxi_dropoffs_24h.gif`.
+See [data provenance](data/samples/provenance.json) for sources and sampling. These are teaching extracts, not representative estimates. Visualization I exports images to `outputs/viz1/`. Visualization II exports its GIF and standalone JavaScript hour slider to `outputs/viz2/`. The slider works in static HTML; zooming enlarges precomputed frames rather than recalculating density.
 
 For Lecture 11B, download both files and save them in `data/lidar/` beside the notebooks:
 
@@ -59,11 +63,12 @@ For Lecture 11B, download both files and save them in `data/lidar/` beside the n
 | University City | [Philadelphia_394.las](https://www.pasda.psu.edu/download/phillyLiDAR/2022/LAS/Classified_LAS/Philadelphia_394.las) | about 1.09 GB |
 | Center City | [Philadelphia_456.las](https://www.pasda.psu.edu/download/phillyLiDAR/2022/LAS/Classified_LAS/Philadelphia_456.las) | about 997 MB |
 
-Wait for both downloads to finish; no extraction is needed. Allow at least 3 GB of free space. The notebook reads these local files; it does not download or cache data automatically.
+Wait for both downloads to finish; no extraction is needed. Allow at least 3 GB of free space. The processing cells read these local files. Alternatively, use the notebook’s optional Python HTTP downloader (`DOWNLOAD_PASDA = True`) to save the same two files in `data/lidar/`. It streams files to disk, checks expected size and the LAS header, and reuses complete local downloads. Network downloads are disabled by default.
 
 ```text
 week11/
-├── lecture-11A.ipynb
+├── Visualizing Large Data-Lec1.ipynb
+├── Visualizing Large Data-Lec2.ipynb
 ├── lecture-11B.ipynb
 ├── environment-viz.yml
 └── data/
@@ -71,7 +76,8 @@ week11/
     │   ├── osm_sample.parquet
     │   ├── census_sample.parquet
     │   ├── taxi_sample.parquet
-    │   └── parking_sample.csv
+    │   ├── parking_sample.csv
+    │   └── districts_2015.geojson
     └── lidar/
         ├── Philadelphia_394.las
         └── Philadelphia_456.las
@@ -116,8 +122,20 @@ Replace placeholders with the patch name and a small EPSG:3857 bounding box. Con
 After running and saving the notebooks, from the repository root:
 
 ```bash
-quarto render public/labs/week11-large-data-viz-lidar/lecture-11A.ipynb --to html
+quarto render "public/labs/week11-large-data-viz-lidar/Visualizing Large Data-Lec1.ipynb" --to html
+quarto render "public/labs/week11-large-data-viz-lidar/Visualizing Large Data-Lec2.ipynb" --to html
 quarto render public/labs/week11-large-data-viz-lidar/lecture-11B.ipynb --to html
 ```
 
 Quarto renders saved outputs; it does not rerun downloads or processing.
+
+## LiDAR concepts and API examples
+
+The LiDAR notebook now introduces laser travel time, multiple returns and point clouds, LAS/LAZ attributes, DSM versus DTM, and rasterization/smoothing. Four original schematic graphics are embedded in the notebook, so students do not need to download an image folder to see them. Standalone PNG/SVG copies are in `imgs/`; rebuild them with `python make_lidar_figures.py` in `largeviz`.
+
+Two optional download examples are included:
+
+1. **PASDA file requests:** use `requests.get(..., stream=True)` to download the exact class LAS tiles into `data/lidar/`. This is HTTP file access, not a catalog search API.
+2. **USGS TNMAccess API:** request catalog metadata for a longitude/latitude bounding box, inspect product titles and `downloadURL`, and optionally download one selected LAS/LAZ product into `data/lidar/usgs/`. Set `SEARCH_USGS = True` to search and `DOWNLOAD_USGS = True` only after inspecting the results. The rest of the class workflow continues to use the two PASDA tiles.
+
+References: [NOAA LiDAR introduction](https://oceanservice.noaa.gov/geodesy/lidar.html), [NOAA LiDAR 101](https://coast.noaa.gov/data/digitalcoast/pdf/lidar-101.pdf), and [USGS TNMAccess API documentation](https://tnmaccess.nationalmap.gov/api/v1/docs).

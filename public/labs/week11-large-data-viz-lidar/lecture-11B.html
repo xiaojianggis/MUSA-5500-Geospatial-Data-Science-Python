@@ -711,7 +711,7 @@ Philadelphia_456_dsm.tif</code></pre>
 </div>
 </div>
 </div>
-<div id="df570664" class="cell" data-execution_count="22">
+<div id="df570664" class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>values <span class="op">=</span> np.concatenate([data.compressed() <span class="cf">for</span> data, transform <span class="kw">in</span> rasters])</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>vmin, vmax <span class="op">=</span> np.percentile(values, [<span class="dv">2</span>, <span class="dv">98</span>])</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>norm <span class="op">=</span> Normalize(vmin<span class="op">=</span>vmin, vmax<span class="op">=</span><span class="bu">max</span>(vmax, vmin <span class="op">+</span> <span class="dv">1</span>))</span>

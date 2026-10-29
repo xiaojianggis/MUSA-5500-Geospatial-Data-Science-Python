@@ -2,20 +2,21 @@ name: largeviz
 channels:
   - conda-forge
   - nodefaults
+
 dependencies:
   - python=3.12
-  - numpy=1.26.4
-  - numba=0.59.1
-  - pandas=2.2.2
-  - dask=2024.5.0
-  - datashader=0.16.2
-  - pyarrow=14.0.2
+  - numpy
+  - numba
+  - pandas
+  - dask
+  - datashader
+  - pyarrow
   - geopandas
   - pyogrio
   - colorcet
   - matplotlib
   - pillow
-  - bokeh=3.4.1
+  - bokeh
   - requests
   - fsspec
   - jupyterlab
@@ -23,9 +24,9 @@ dependencies:
   - notebook
   - nbconvert
   - nbclient
-  - python-pdal=3.5.3
-  - rasterio=1.5.0
-  - pyproj=3.7.2
-  - scipy=1.17.1
+  - python-pdal
+  - rasterio
+  - pyproj
+  - scipy
   - laspy
   - mercantile

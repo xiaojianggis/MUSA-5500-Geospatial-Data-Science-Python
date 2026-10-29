@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Week 12A: Census analysis with DuckDB Spatial</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="lecture-12A_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lecture-12A_files/libs/quarto-html/quarto.js"></script>
+<script src="lecture-12A_files/libs/quarto-html/popper.min.js"></script>
+<script src="lecture-12A_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="lecture-12A_files/libs/quarto-html/anchor.min.js"></script>
+<link href="lecture-12A_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lecture-12A_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="lecture-12A_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="lecture-12A_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="lecture-12A_files/libs/bootstrap/bootstrap-973236bd072d72a04ee9cd82dcc9cb29.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="lecture-presentation.css">
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tutorial steps</h2>
+   
+  <ul>
+  <li><a href="#what-is-a-database" id="toc-what-is-a-database" class="nav-link active" data-scroll-target="#what-is-a-database">1. What is a database?</a></li>
+  <li><a href="#reuse-your-week-11-data-and-prepare-python" id="toc-reuse-your-week-11-data-and-prepare-python" class="nav-link" data-scroll-target="#reuse-your-week-11-data-and-prepare-python">2. Reuse your Week 11 data and prepare Python</a></li>
+  <li><a href="#create-and-connect-to-a-database" id="toc-create-and-connect-to-a-database" class="nav-link" data-scroll-target="#create-and-connect-to-a-database">3. Create and connect to a database</a></li>
+  <li><a href="#create-tables-and-import-source-files" id="toc-create-tables-and-import-source-files" class="nav-link" data-scroll-target="#create-tables-and-import-source-files">4. Create tables and import source files</a>
+  <ul class="collapse">
+  <li><a href="#inspect-the-schema-and-data-quality" id="toc-inspect-the-schema-and-data-quality" class="nav-link" data-scroll-target="#inspect-the-schema-and-data-quality">Inspect the schema and data quality</a></li>
+  </ul></li>
+  <li><a href="#select-filter-sort-and-summarize-with-sql" id="toc-select-filter-sort-and-summarize-with-sql" class="nav-link" data-scroll-target="#select-filter-sort-and-summarize-with-sql">5. Select, filter, sort, and summarize with SQL</a>
+  <ul class="collapse">
+  <li><a href="#visualize-the-query-result" id="toc-visualize-the-query-result" class="nav-link" data-scroll-target="#visualize-the-query-result">Visualize the query result</a></li>
+  </ul></li>
+  <li><a href="#ask-a-spatial-question-which-district-contains-a-location" id="toc-ask-a-spatial-question-which-district-contains-a-location" class="nav-link" data-scroll-target="#ask-a-spatial-question-which-district-contains-a-location">6. Ask a spatial question: which district contains a location?</a>
+  <ul class="collapse">
+  <li><a href="#find-sample-dots-within-2-km" id="toc-find-sample-dots-within-2-km" class="nav-link" data-scroll-target="#find-sample-dots-within-2-km">Find sample dots within 2 km</a></li>
+  </ul></li>
+  <li><a href="#spatial-join-summarize-dots-by-district" id="toc-spatial-join-summarize-dots-by-district" class="nav-link" data-scroll-target="#spatial-join-summarize-dots-by-district">7. Spatial join: summarize dots by district</a>
+  <ul class="collapse">
+  <li><a href="#what-about-spatial-indexes" id="toc-what-about-spatial-indexes" class="nav-link" data-scroll-target="#what-about-spatial-indexes">What about spatial indexes?</a></li>
+  </ul></li>
+  <li><a href="#map-the-analysis-result" id="toc-map-the-analysis-result" class="nav-link" data-scroll-target="#map-the-analysis-result">8. Map the analysis result</a></li>
+  <li><a href="#export-small-files-for-the-website" id="toc-export-small-files-for-the-website" class="nav-link" data-scroll-target="#export-small-files-for-the-website">9. Export small files for the website</a></li>
+  <li><a href="#close-and-reopen-the-database" id="toc-close-and-reopen-the-database" class="nav-link" data-scroll-target="#close-and-reopen-the-database">10. Close and reopen the database</a></li>
+  <li><a href="#try-it-yourself" id="toc-try-it-yourself" class="nav-link" data-scroll-target="#try-it-yourself">Try it yourself</a></li>
+  </ul>
+</nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Week 12A: Census analysis with DuckDB Spatial</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Create a database, query Census point data with Python and SQL, ask spatial questions, and export maps for a website.</p>
+<p><a href="lecture-12A.ipynb" download="">Download notebook</a> · <a href="lecture-12B.html">Next: Quarto, ChatGPT, and GitHub Pages</a></p>
+<section id="what-is-a-database" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-a-database">1. What is a database?</h2>
+<p>A database stores organized data and lets us ask questions without rewriting files by hand. A <strong>table</strong> has rows (records) and columns (attributes). A <strong>schema</strong> describes column names and types. A <strong>primary key</strong> uniquely identifies a record. A <strong>query</strong> selects or summarizes records; <strong>SQL</strong> is the language we use here.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>File / tool</th>
+<th>Main role in this lab</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Parquet / GeoJSON</td>
+<td>Downloadable source files</td>
+</tr>
+<tr class="even">
+<td>DuckDB <code>.duckdb</code> file</td>
+<td>Persistent database with tables, views, and geometry</td>
+</tr>
+<tr class="odd">
+<td>Python</td>
+<td>Open connections, send SQL, inspect results, and plot</td>
+</tr>
+<tr class="even">
+<td>CSV / GeoJSON / PNG</td>
+<td>Small exports we can publish on a static website</td>
+</tr>
+</tbody>
+</table>
+<p>DuckDB runs inside Python and stores this database in one file. It is convenient for local analytical work. A shared application with many writers would normally use a server database instead. Its <strong>Spatial</strong> extension adds geometry types and spatial functions. <a href="https://duckdb.org/docs/1.5/clients/python/overview">DuckDB Python documentation</a> · <a href="https://duckdb.org/docs/1.5/core_extensions/spatial/overview">Spatial extension</a>.</p>
+</section>
+<section id="reuse-your-week-11-data-and-prepare-python" class="level2">
+<h2 class="anchored" data-anchor-id="reuse-your-week-11-data-and-prepare-python">2. Reuse your Week 11 data and prepare Python</h2>
+<p><strong>No new Census data download is needed.</strong> Use the same <code>census_sample.parquet</code> and <code>districts_2015.geojson</code> files from Week 11. Save this notebook and <a href="environment.yml" download="">environment.yml</a> in a new <code>week12</code> folder next to your <code>week11</code> folder:</p>
+<pre class="text"><code>course-work/
+├── week11/
+│   └── data/samples/
+│       ├── census_sample.parquet
+│       └── districts_2015.geojson
+└── week12/
+    ├── lecture-12A.ipynb
+    └── environment.yml</code></pre>
+<p>Open the notebook from <code>week12</code>. <code>DATA = Path("../week11/data/samples")</code> below points to your existing files. If you used another folder name, edit that one path. The point file is the previous week’s systematically thinned <strong>synthetic 2010 Census dot extract</strong>; the polygons are historical 2015 congressional boundaries. We select Pennsylvania inside DuckDB. Counts are <strong>sample dots, not population estimates or current district demographics</strong>. <a href="../week11-large-data-viz-lidar/data/samples/provenance.json">Original data provenance</a>.</p>
+<p>Open a terminal in <code>week12</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> env create <span class="at">-f</span> environment.yml</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate census-web</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> ipykernel install <span class="at">--user</span> <span class="at">--name</span> census-web <span class="at">--display-name</span> <span class="st">"Python (census-web)"</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">jupyter</span> lab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Select <strong>Python (census-web)</strong>. Quarto is installed separately for the next section. For an existing environment, use <code>conda env update -n census-web -f environment.yml</code> instead.</p>
+<div id="a1ff958b" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:01.728073Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:01.727696Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:09.421007Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:09.420417Z&quot;}" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> duckdb</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>DATA <span class="op">=</span> Path(<span class="st">"../week11/data/samples"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>OUT <span class="op">=</span> Path(<span class="st">"outputs"</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>OUT.mkdir(exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"DuckDB:"</span>, duckdb.__version__)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>DuckDB: 1.5.6</code></pre>
+</div>
+</div>
+</section>
+<section id="create-and-connect-to-a-database" class="level2">
+<h2 class="anchored" data-anchor-id="create-and-connect-to-a-database">3. Create and connect to a database</h2>
+<p><code>connect()</code> creates the file if it does not exist, or opens it if it does. <code>:memory:</code> would create a temporary database instead. This file stays local; the website will use small exports, not a live connection to this Python session.</p>
+<p><code>INSTALL spatial</code> downloads the extension the first time and needs internet access. <code>LOAD spatial</code> activates it in each new connection. If installation fails, check the network and use the DuckDB version in <code>environment.yml</code>. <a href="https://duckdb.org/docs/1.5/core_extensions/spatial/overview">Extension documentation</a>.</p>
+<div id="620fb909" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:09.422396Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:09.422238Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:09.503793Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:09.503401Z&quot;}" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>database_path <span class="op">=</span> OUT <span class="op">/</span> <span class="st">"census_tutorial.duckdb"</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>con <span class="op">=</span> duckdb.<span class="ex">connect</span>(<span class="bu">str</span>(database_path))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"INSTALL spatial"</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"LOAD spatial"</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"SELECT 2 + 3 AS first_query"</span>).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">first_query</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="create-tables-and-import-source-files" class="level2">
+<h2 class="anchored" data-anchor-id="create-tables-and-import-source-files">4. Create tables and import source files</h2>
+<p>We will make two tables: <code>census_points</code> and <code>districts</code>. Their ID columns are primary keys. The next two cells <strong>rebuild these demonstration tables</strong> on rerun; use this tutorial database, not a shared database with other work.</p>
+<p>First import Pennsylvania polygons, then keep only Census points they cover. A coarse coordinate filter reduces the first scan; the final <code>ST_Covers</code> test defines the selection precisely.</p>
+<p>The point source uses EPSG:3857, and the boundary GeoJSON uses longitude/latitude, EPSG:4326. Transform both to <strong>EPSG:26918 (UTM zone 18N, meters)</strong> for local spatial operations. <code>always_xy := true</code> makes longitude/X the first axis. Do not measure distances directly in longitude/latitude degrees. A geometry column does not relieve us of tracking its CRS. <a href="https://duckdb.org/docs/1.5/core_extensions/spatial/functions">Spatial functions</a>.</p>
+<div id="a36a4331" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:09.505129Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:09.505017Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:09.565158Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:09.564481Z&quot;}" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="st">    CREATE OR REPLACE TABLE districts (</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="st">        district_id VARCHAR PRIMARY KEY,</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="st">        geom GEOMETRY</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="st">    )</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="st">    INSERT INTO districts</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT STATEFP || CD114FP AS district_id,</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="st">           ST_Transform(geom, 'EPSG:4326', 'EPSG:26918', always_xy := true)</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM ST_Read(?)</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE STATEFP = '42'</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>, [<span class="bu">str</span>(DATA <span class="op">/</span> <span class="st">"districts_2015.geojson"</span>)])</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"SHOW TABLES"</span>).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>districts</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="468248ab" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:09.566336Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:09.566243Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:09.752419Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:09.751766Z&quot;}" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="st">    CREATE OR REPLACE TABLE census_points (</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="st">        point_id INTEGER PRIMARY KEY,</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="st">        category VARCHAR,</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="st">        geom GEOMETRY</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="st">    )</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="st">    INSERT INTO census_points</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="st">    WITH candidates AS (</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="st">        SELECT easting AS x, northing AS y, race::VARCHAR AS category,</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="st">               ST_Transform(ST_Point(easting, northing), 'EPSG:3857', 'EPSG:26918', always_xy := true) AS geom</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="st">        FROM read_parquet(?)</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="st">        WHERE easting BETWEEN -9000000 AND -8200000</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="st">          AND northing BETWEEN 4750000 AND 5300000</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="st">    )</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT row_number() OVER (ORDER BY p.x, p.y, p.category), p.category, p.geom</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM candidates p</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE EXISTS (SELECT 1 FROM districts d WHERE ST_Covers(d.geom, p.geom))</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>, [<span class="bu">str</span>(DATA <span class="op">/</span> <span class="st">"census_sample.parquet"</span>)])</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"SELECT point_id, category, ST_AsText(geom) AS coordinates FROM census_points LIMIT 5"</span>).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">point_id</th>
+<th data-quarto-table-cell-role="th">category</th>
+<th data-quarto-table-cell-role="th">coordinates</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1</td>
+<td>w</td>
+<td>POINT (37508.231711089786 4580881.17369423)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2</td>
+<td>w</td>
+<td>POINT (37476.98586446396 4580105.704547788)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>3</td>
+<td>w</td>
+<td>POINT (31695.953387025045 4488475.852722617)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4</td>
+<td>w</td>
+<td>POINT (35015.90324350167 4541065.591734792)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5</td>
+<td>w</td>
+<td>POINT (37381.941080673656 4578292.468608493)</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<section id="inspect-the-schema-and-data-quality" class="level3">
+<h3 class="anchored" data-anchor-id="inspect-the-schema-and-data-quality">Inspect the schema and data quality</h3>
+<p>Check counts, unique IDs, empty or invalid geometry, and categories before analysis. <code>df()</code> returns the small query result as a pandas DataFrame; it need not load the whole source table.</p>
+<div id="9cb16528" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:09.753786Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:09.753659Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:09.765060Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:09.764567Z&quot;}" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>display(con.execute(<span class="st">"DESCRIBE census_points"</span>).df())</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>display(con.execute(<span class="st">"""</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT count(*) AS sample_dots,</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="st">           count(DISTINCT point_id) AS unique_ids,</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="st">           count(*) FILTER (WHERE geom IS NULL OR ST_IsEmpty(geom)) AS missing_geometry</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM census_points</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>).df())</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"SELECT count(*) AS districts, bool_and(ST_IsValid(geom)) AS all_valid FROM districts"</span>).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">column_name</th>
+<th data-quarto-table-cell-role="th">column_type</th>
+<th data-quarto-table-cell-role="th">null</th>
+<th data-quarto-table-cell-role="th">key</th>
+<th data-quarto-table-cell-role="th">default</th>
+<th data-quarto-table-cell-role="th">extra</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>point_id</td>
+<td>INTEGER</td>
+<td>NO</td>
+<td>PRI</td>
+<td>None</td>
+<td>None</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>category</td>
+<td>VARCHAR</td>
+<td>YES</td>
+<td>None</td>
+<td>None</td>
+<td>None</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>geom</td>
+<td>GEOMETRY</td>
+<td>YES</td>
+<td>None</td>
+<td>None</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">sample_dots</th>
+<th data-quarto-table-cell-role="th">unique_ids</th>
+<th data-quarto-table-cell-role="th">missing_geometry</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>63552</td>
+<td>63552</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">districts</th>
+<th data-quarto-table-cell-role="th">all_valid</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>18</td>
+<td>True</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="select-filter-sort-and-summarize-with-sql" class="level2">
+<h2 class="anchored" data-anchor-id="select-filter-sort-and-summarize-with-sql">5. Select, filter, sort, and summarize with SQL</h2>
+<p><code>SELECT</code> chooses columns; <code>WHERE</code> filters rows; <code>GROUP BY</code> forms groups; <code>ORDER BY</code> sorts; <code>LIMIT</code> keeps a small result. <code>?</code> is a parameter placeholder: pass Python values separately instead of inserting user text into SQL strings.</p>
+<div id="d16fa779" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:09.766213Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:09.766130Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:09.770959Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:09.770532Z&quot;}" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>category <span class="op">=</span> <span class="st">"b"</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT point_id, category</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM census_points</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE category = ?</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="st">    ORDER BY point_id</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="st">    LIMIT 5</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>, [category]).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">point_id</th>
+<th data-quarto-table-cell-role="th">category</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>23</td>
+<td>b</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>34</td>
+<td>b</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>36</td>
+<td>b</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>38</td>
+<td>b</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>50</td>
+<td>b</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="79b0fa66" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:09.772242Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:09.772156Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:09.777775Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:09.777291Z&quot;}" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="st">    CREATE OR REPLACE VIEW category_summary AS</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT category, count(*) AS sample_dots,</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="st">           round(100.0 * count(*) / (SELECT count(*) FROM census_points), 2) AS sample_percent</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM census_points</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY category</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>category_counts <span class="op">=</span> con.execute(<span class="st">"SELECT * FROM category_summary ORDER BY sample_dots DESC"</span>).df()</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>category_counts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">category</th>
+<th data-quarto-table-cell-role="th">sample_dots</th>
+<th data-quarto-table-cell-role="th">sample_percent</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>w</td>
+<td>50564</td>
+<td>79.56</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>b</td>
+<td>6653</td>
+<td>10.47</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>h</td>
+<td>3629</td>
+<td>5.71</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>a</td>
+<td>1683</td>
+<td>2.65</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>o</td>
+<td>1023</td>
+<td>1.61</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>A <strong>view</strong> stores a query definition rather than another copy of the result. Here it updates automatically when the underlying teaching table changes.</p>
+<section id="visualize-the-query-result" class="level3">
+<h3 class="anchored" data-anchor-id="visualize-the-query-result">Visualize the query result</h3>
+<p>Use a bar chart for counts. The source categories are White (<code>w</code>), Black (<code>b</code>), Asian (<code>a</code>), Hispanic (<code>h</code>), and Other (<code>o</code>). They are source-specific historical categories, not an exhaustive description of identity.</p>
+<div id="0b968428" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:09.779115Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:09.779047Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:10.111944Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:10.111471Z&quot;}" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> {<span class="st">"w"</span>: <span class="st">"White"</span>, <span class="st">"b"</span>: <span class="st">"Black"</span>, <span class="st">"a"</span>: <span class="st">"Asian"</span>, <span class="st">"h"</span>: <span class="st">"Hispanic"</span>, <span class="st">"o"</span>: <span class="st">"Other"</span>}</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>ax.bar(category_counts[<span class="st">"category"</span>].<span class="bu">map</span>(labels), category_counts[<span class="st">"sample_dots"</span>], color<span class="op">=</span><span class="st">"#176b87"</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylabel<span class="op">=</span><span class="st">"Sample dots"</span>, title<span class="op">=</span><span class="st">"Pennsylvania teaching extract: category counts"</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>fig.savefig(OUT <span class="op">/</span> <span class="st">"category_counts.png"</span>, dpi<span class="op">=</span><span class="dv">160</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lecture-12A_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="ask-a-spatial-question-which-district-contains-a-location" class="level2">
+<h2 class="anchored" data-anchor-id="ask-a-spatial-question-which-district-contains-a-location">6. Ask a spatial question: which district contains a location?</h2>
+<p>A spatial predicate compares geometries. <code>ST_Covers(polygon, point)</code> includes a polygon boundary; <code>ST_Contains</code> excludes boundary-only points. Transform the test point from longitude/latitude into the same CRS as the districts. This example uses Philadelphia City Hall.</p>
+<div id="0294c4e0" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:10.113774Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:10.113628Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:10.122490Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:10.121985Z&quot;}" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>longitude, latitude <span class="op">=</span> <span class="op">-</span><span class="fl">75.1636</span>, <span class="fl">39.9526</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="st">    WITH location AS (</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="st">        SELECT ST_Transform(ST_Point(?, ?), 'EPSG:4326', 'EPSG:26918', always_xy := true) AS geom</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="st">    )</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT d.district_id</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM districts d, location p</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE ST_Covers(d.geom, p.geom)</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>, [longitude, latitude]).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">district_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>4201</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<section id="find-sample-dots-within-2-km" class="level3">
+<h3 class="anchored" data-anchor-id="find-sample-dots-within-2-km">Find sample dots within 2 km</h3>
+<p><code>ST_DWithin()</code> uses the units of our projected CRS: meters. It counts points from the extract, not people actually living within the circle. Change <code>radius_m</code> and compare the result.</p>
+<div id="f79ee469" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:10.123606Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:10.123520Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:10.134738Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:10.134225Z&quot;}" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>radius_m <span class="op">=</span> <span class="dv">2000</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>nearby_counts <span class="op">=</span> con.execute(<span class="st">"""</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="st">    WITH location AS (</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="st">        SELECT ST_Transform(ST_Point(?, ?), 'EPSG:4326', 'EPSG:26918', always_xy := true) AS geom</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="st">    )</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT p.category, count(*) AS sample_dots</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM census_points p, location c</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE ST_DWithin(p.geom, c.geom, ?)</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY p.category</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="st">    ORDER BY sample_dots DESC</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>, [longitude, latitude, radius_m]).df()</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>nearby_counts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">category</th>
+<th data-quarto-table-cell-role="th">sample_dots</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>w</td>
+<td>341</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>b</td>
+<td>94</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>a</td>
+<td>57</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>h</td>
+<td>32</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>o</td>
+<td>8</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="spatial-join-summarize-dots-by-district" class="level2">
+<h2 class="anchored" data-anchor-id="spatial-join-summarize-dots-by-district">7. Spatial join: summarize dots by district</h2>
+<p>A spatial join matches rows by location instead of an ID. Points on a shared boundary could match more than one polygon. We assign those points once, to the smallest matching district ID, so our totals do not double count. This is a reproducible teaching rule, not a demographic allocation method.</p>
+<div id="a10f802b" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:10.136055Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:10.135970Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:10.359539Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:10.359146Z&quot;}" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="st">    CREATE OR REPLACE VIEW point_district AS</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT p.point_id, min(d.district_id) AS district_id</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM census_points p</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="st">    JOIN districts d ON ST_Covers(d.geom, p.geom)</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY p.point_id</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="st">    CREATE OR REPLACE VIEW district_summary AS</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT d.district_id, count(a.point_id) AS sample_dots</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM districts d</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="st">    LEFT JOIN point_district a ON d.district_id = a.district_id</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY d.district_id</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>district_counts <span class="op">=</span> con.execute(<span class="st">"SELECT * FROM district_summary ORDER BY district_id"</span>).df()</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>district_counts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">district_id</th>
+<th data-quarto-table-cell-role="th">sample_dots</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>4201</td>
+<td>3466</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>4202</td>
+<td>2661</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>4203</td>
+<td>3581</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4204</td>
+<td>3539</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>4205</td>
+<td>3448</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>4206</td>
+<td>3599</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>4207</td>
+<td>4008</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>4208</td>
+<td>3617</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>4209</td>
+<td>3518</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>4210</td>
+<td>3473</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>4211</td>
+<td>3568</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>4212</td>
+<td>3879</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>4213</td>
+<td>4025</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>4214</td>
+<td>3218</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>4215</td>
+<td>3556</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">15</td>
+<td>4216</td>
+<td>3395</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">16</td>
+<td>4217</td>
+<td>3463</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">17</td>
+<td>4218</td>
+<td>3538</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="aeacb2be" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:10.360973Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:10.360829Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:10.607519Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:10.606872Z&quot;}" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>point_count <span class="op">=</span> con.execute(<span class="st">"SELECT count(*) FROM census_points"</span>).fetchone()[<span class="dv">0</span>]</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>assigned_count <span class="op">=</span> con.execute(<span class="st">"SELECT count(*) FROM point_district"</span>).fetchone()[<span class="dv">0</span>]</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> point_count <span class="op">==</span> assigned_count <span class="op">==</span> <span class="bu">int</span>(district_counts[<span class="st">"sample_dots"</span>].<span class="bu">sum</span>())</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"All </span><span class="sc">{</span>point_count<span class="sc">:,}</span><span class="ss"> sample dots assigned once across </span><span class="sc">{</span><span class="bu">len</span>(district_counts)<span class="sc">}</span><span class="ss"> districts."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>All 63,552 sample dots assigned once across 18 districts.</code></pre>
+</div>
+</div>
+<section id="what-about-spatial-indexes" class="level3">
+<h3 class="anchored" data-anchor-id="what-about-spatial-indexes">What about spatial indexes?</h3>
+<p>An R-tree index can help some supported spatial filters on larger data. This small example does not need one, and not every query uses the index. Use <code>EXPLAIN</code> and measure performance before claiming a speedup. <a href="https://duckdb.org/docs/1.5/core_extensions/spatial/r-tree_indexes">DuckDB spatial indexes</a>.</p>
+<div id="4446d1c6" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:10.609374Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:10.609188Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:10.612970Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:10.612442Z&quot;}" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"CREATE INDEX IF NOT EXISTS district_geom_idx ON districts USING RTREE (geom)"</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Created an optional R-tree index on district geometry."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Created an optional R-tree index on district geometry.</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="map-the-analysis-result" class="level2">
+<h2 class="anchored" data-anchor-id="map-the-analysis-result">8. Map the analysis result</h2>
+<p>Return geometry as WKB (well-known binary) to create a GeoDataFrame. Tell GeoPandas the actual CRS; assigning a CRS does not transform coordinates. The map colors are <strong>counts of sample dots</strong>, not density or current population.</p>
+<div id="948c9125" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:10.614316Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:10.614198Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:10.997150Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:10.996561Z&quot;}" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>map_table <span class="op">=</span> con.execute(<span class="st">"""</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT d.district_id, s.sample_dots, ST_AsWKB(d.geom) AS geometry_wkb</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM districts d JOIN district_summary s USING (district_id)</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="st">    ORDER BY district_id</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>).df()</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>geometry <span class="op">=</span> gpd.GeoSeries.from_wkb(map_table.pop(<span class="st">"geometry_wkb"</span>).<span class="bu">map</span>(<span class="bu">bytes</span>), crs<span class="op">=</span><span class="st">"EPSG:26918"</span>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>district_map <span class="op">=</span> gpd.GeoDataFrame(map_table, geometry<span class="op">=</span>geometry)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>district_map.plot(column<span class="op">=</span><span class="st">"sample_dots"</span>, cmap<span class="op">=</span><span class="st">"YlGnBu"</span>, edgecolor<span class="op">=</span><span class="st">"white"</span>, linewidth<span class="op">=</span><span class="fl">0.6</span>,</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>                  legend<span class="op">=</span><span class="va">True</span>, legend_kwds<span class="op">=</span>{<span class="st">"label"</span>: <span class="st">"Sample dots"</span>}, ax<span class="op">=</span>ax)</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(title<span class="op">=</span><span class="st">"Historical Pennsylvania districts: Census teaching dot counts"</span>)</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>fig.savefig(OUT <span class="op">/</span> <span class="st">"district_sample_map.png"</span>, dpi<span class="op">=</span><span class="dv">160</span>)</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="lecture-12A_files/figure-html/cell-15-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="export-small-files-for-the-website" class="level2">
+<h2 class="anchored" data-anchor-id="export-small-files-for-the-website">9. Export small files for the website</h2>
+<p>Static websites can show exported tables, charts, and GeoJSON without starting Python or opening the DuckDB database. CSV keeps IDs as text only if the reader preserves them. GeoJSON is exported in longitude/latitude for web mapping.</p>
+<div id="bb1e789e" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:10.998894Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:10.998778Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:16.845103Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:16.844692Z&quot;}" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>category_counts.to_csv(OUT <span class="op">/</span> <span class="st">"category_counts.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>category_counts.to_json(OUT <span class="op">/</span> <span class="st">"category_counts.json"</span>, orient<span class="op">=</span><span class="st">"records"</span>, indent<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>district_counts.to_csv(OUT <span class="op">/</span> <span class="st">"district_counts.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>district_map.to_crs(<span class="st">"EPSG:4326"</span>).to_file(OUT <span class="op">/</span> <span class="st">"district_sample.geojson"</span>, driver<span class="op">=</span><span class="st">"GeoJSON"</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Exports saved in outputs/."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Exports saved in outputs/.</code></pre>
+</div>
+</div>
+</section>
+<section id="close-and-reopen-the-database" class="level2">
+<h2 class="anchored" data-anchor-id="close-and-reopen-the-database">10. Close and reopen the database</h2>
+<p>Closing the connection does not delete the database file. Reopen in read-only mode to check persistence. Load Spatial again before working with geometries. Close connections before sharing the file; this is not a web server.</p>
+<div id="6c1b262e" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:16.846455Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:16.846301Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:16.954334Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:16.953503Z&quot;}" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>con.close()</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> duckdb.<span class="ex">connect</span>(<span class="bu">str</span>(database_path), read_only<span class="op">=</span><span class="va">True</span>) <span class="im">as</span> saved:</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    saved.execute(<span class="st">"LOAD spatial"</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    restored_count <span class="op">=</span> saved.execute(<span class="st">"SELECT count(*) FROM census_points"</span>).fetchone()[<span class="dv">0</span>]</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> restored_count <span class="op">==</span> point_count</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Reopened database:"</span>, database_path, <span class="st">"| sample dots:"</span>, restored_count)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reopened database: outputs/census_tutorial.duckdb | sample dots: 63552</code></pre>
+</div>
+</div>
+</section>
+<section id="try-it-yourself" class="level2">
+<h2 class="anchored" data-anchor-id="try-it-yourself">Try it yourself</h2>
+<ol type="1">
+<li>Filter two source categories with <code>WHERE category IN (...)</code> and group by category.</li>
+<li>Change the search location and compare 1 km, 2 km, and 5 km radii.</li>
+<li>Join category values to district assignments and count each category by district.</li>
+<li>Explain why a sample-dot count is not a population estimate or a density.</li>
+<li>Publish a map and a short explanation of the method in the next section.</li>
+</ol>
+<p><strong>Outputs:</strong> local <code>outputs/census_tutorial.duckdb</code>, CSV/JSON summaries, GeoJSON, and two PNG charts. Keep the database local; publish the small exports.</p>
+<p><strong>Next:</strong> <a href="lecture-12B.html">Quarto, ChatGPT, and GitHub Pages</a>.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

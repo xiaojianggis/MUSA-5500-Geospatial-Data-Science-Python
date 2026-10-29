@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Census dots, queried in DuckDB</title><link rel="stylesheet" href="styles.css">
+<script src="app.js" defer></script>
+</head>
+<body>
+<header><div class="wrap"><p class="eyebrow">DATABASE → ANALYSIS → WEB</p>
+<h1>Census dots, queried in DuckDB</h1><p class="intro">A class example of spatial joins, local databases, and sharing analysis on the web.</p>
+<a href="#results" class="button">Explore the results ↓</a></div></header>
+<main class="wrap">
+<section class="note" aria-label="Data limitations"><strong>A teaching extract, not a population estimate.</strong>
+These synthetic 2010 Census locations were systematically thinned, then assigned to historical 2015 Pennsylvania congressional districts. Counts describe sample dots, not current district populations.</section>
+<section id="results" class="grid"><div><p class="eyebrow">SQL GROUP BY</p><h2>Counts by source category</h2>
+<p id="total" aria-live="polite">Loading the exported query results…</p>
+<ul id="chart" aria-label="Sample-dot counts by source category"></ul><p id="error" role="alert" hidden></p>
+<noscript><p>Enable JavaScript to display the counts, or download the query results.</p></noscript>
+<p class="muted">Bars scale to the largest category. These are historical source labels.</p>
+</div><div class="method"><h2>How the database answered</h2><ol>
+<li>Read the previous week's Parquet points and GeoJSON districts.</li>
+<li>Transform both to a local projected CRS.</li>
+<li>Use <code>ST_Covers</code> to match each dot to a district.</li>
+<li>Group in SQL and export only the summary and map.</li></ol>
+<a href="assets/district_counts.csv" download>Download the district query result (CSV) ↗</a></div></section>
+<section class="map"><p class="eyebrow">SPATIAL JOIN</p><h2>Where the sample dots fall</h2>
+<figure><img src="assets/district_sample_map.png" alt="Map of historical 2015 Pennsylvania congressional districts colored by counts of sample Census dots, not population density.">
+<figcaption>Each polygon is a historical district. Color measures its sample-dot count; larger or more densely sampled areas may have more dots. The map does not estimate current demographics.</figcaption></figure></section>
+<section class="sources"><h2>Sources and interpretation</h2>
+<p>The demonstration reuses the class's thinned synthetic Census dot file and 2015 district GeoJSON. The dot data originated in the <a href="https://s3.amazonaws.com/datashader-data/census2010.parq.zip">Datashader Census archive</a>;
+boundaries originated in <a href="https://www2.census.gov/geo/tiger/GENZ2015/shp/cb_2015_us_cd114_20m.zip">Census cartographic boundary files</a>.</p>
+<p>Boundary ties are assigned once to the smallest matching district ID. This is a reproducible teaching convention, not a demographic allocation method. No database or Python process runs in your browser; you are viewing exported results.</p></section>
+</main><footer class="wrap">Built from a DuckDB Spatial notebook · A static class-project website</footer>
+</body></html>

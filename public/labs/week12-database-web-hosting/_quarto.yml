@@ -1,0 +1,10 @@
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    toc-title: Tutorial steps
+    css: lecture-presentation.css
+    code-fold: false
+execute:
+  enabled: false

@@ -1,0 +1,17 @@
+/* Shared presentation styles for the Week 11 lectures. */
+:root { --lecture-accent: #175e83; }
+#title-block-header { display: none; }
+main.content { font-size: 1.08rem; line-height: 1.65; }
+main h1 { font-size: 2.5rem; color: #123e57; margin-bottom: 1.2rem; }
+main h2 { font-size: 1.95rem; color: #123e57; border-bottom: 3px solid var(--lecture-accent); padding-bottom: .45rem; margin-top: 3rem; }
+main h3 { font-size: 1.5rem; color: var(--lecture-accent); margin-top: 2rem; }
+main h4 { font-size: 1.2rem; font-weight: 650; margin-top: 1.5rem; }
+main h5 { font-size: 1.08rem; font-weight: 650; color: #52616b; }
+.cell-output pre { max-height: 22rem; overflow: auto; padding: .8rem; background: #f5f7f9; border-left: 3px solid #b7ccd8; }
+.cell-output-display { max-height: 32rem; overflow: auto; }
+main img { max-width: 100%; height: auto; }
+#TOC { font-size: .92rem; }
+@media print { .cell-output pre, .cell-output-display { max-height: none; overflow: visible; } }
+
+/* Keep maps and figures fully visible; constrain only long text and tables. */
+.cell-output-display:has(iframe), .cell-output-display:has(img), .cell-output-display:has(svg), .cell-output-display:has(.bk-root) { max-height: none; overflow: visible; }

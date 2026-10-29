@@ -1,0 +1,14 @@
+---
+title: "From a spatial database to a public story"
+---
+
+This class project uses DuckDB Spatial to query the previous week's historical Census teaching extract.
+
+- [Read the rendered notebook](report.ipynb) for the table and map.
+- [Explore the plain HTML story page](website/index.html) for a custom website view of the same exports.
+
+The data are synthetic historical Census dots assigned to 2015 Pennsylvania districts. Counts are sample dots, not population estimates, density, or current demographics.
+
+## Method
+
+Read local Parquet and GeoJSON files, transform geometries to a projected CRS, join points to polygons, and export summary files. This website serves those exports; it does not run Python or DuckDB on the server.

@@ -71,12 +71,16 @@ const schedule = [
   },
     { w: 10, date: "10/29/26", topic: "Analyzing and Visualizing Large Datasets", 
     lab: [
-      {label: "10.1 Visualizing large datasets", href: `${base}labs/week11-large-data-viz-lidar/lecture-11A.html`},
-      {label: "10.2 LiDAR data processing", href: `${base}labs/week11-large-data-viz-lidar/lecture-11B.html`}
+      {label: "10.1 Visualization I: Dask and Datashader", href: `${base}labs/week11-large-data-viz-lidar/Visualizing%20Large%20Data-Lec1.html`},
+      {label: "10.2 Visualization II: Queries, movement, and animation", href: `${base}labs/week11-large-data-viz-lidar/Visualizing%20Large%20Data-Lec2.html`},
+      {label: "10.3 LiDAR data processing", href: `${base}labs/week11-large-data-viz-lidar/lecture-11B.html`}
     ]
   },
-  { w: 11, date: "11/5/26", topic: "Web hosting: GitHub, Vibe coding, create web pages", 
-    lab: "Publish notebooks & sites" 
+  { w: 11, date: "11/5/26", topic: "Spatial databases and web hosting",
+    lab: [
+      {label: "11.1 Census analysis with DuckDB Spatial", href: `${base}labs/week12-database-web-hosting/lecture-12A.html`},
+      {label: "11.2 Quarto, ChatGPT, and GitHub Pages", href: `${base}labs/week12-database-web-hosting/lecture-12B.html`}
+    ]
   },
   { w: 12, date: "11/12/26", topic: "Machine Learning (I)", 
     lab: [

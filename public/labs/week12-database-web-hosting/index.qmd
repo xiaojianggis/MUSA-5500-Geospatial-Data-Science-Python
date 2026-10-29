@@ -1,0 +1,33 @@
+---
+title: "Week 12: Databases and web hosting"
+---
+
+Use the Census data you already have to learn spatial SQL, then turn the analysis into a public-facing report and website.
+
+## 1. Create and query a spatial database
+
+[Open the DuckDB Spatial tutorial](lecture-12A.html)
+
+Connect Python to a persistent database, import the Week 11 Census points and district polygons, ask location and distance questions, join by geometry, and export maps and summaries.
+
+<a href="lecture-12A.ipynb" download>Download the database notebook</a>
+
+## 2. Turn the analysis into a website
+
+[Open the publishing tutorial](lecture-12B.html)
+
+Render a notebook with Quarto, use ChatGPT prompts or a reusable skill to help create a website, preview through localhost, then publish the generated files with GitHub Pages.
+
+<a href="lecture-12B.ipynb" download>Download the publishing notes</a>
+
+## Start here
+
+- **Reuse your Week 11 data:** `census_sample.parquet` and `districts_2015.geojson`. No new Census download is needed.
+- [Environment file](environment.yml) — create the `census-web` environment.
+- [Download this tutorial folder](downloads/week12-tutorials.zip).
+- [Standalone website starter](downloads/starter-website.zip).
+- [Quarto website starter](downloads/quarto-site.zip).
+- [Reusable skill example](downloads/census-story-site-skill.zip).
+- [Setup and folder instructions](README.md).
+
+The Census dots are synthetic historical teaching data; their counts are not population estimates or current demographics. Both tutorials keep that distinction visible.

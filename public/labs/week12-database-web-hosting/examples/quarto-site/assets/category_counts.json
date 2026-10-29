@@ -1,0 +1,27 @@
+[
+  {
+    "category":"w",
+    "sample_dots":50564,
+    "sample_percent":79.56
+  },
+  {
+    "category":"b",
+    "sample_dots":6653,
+    "sample_percent":10.47
+  },
+  {
+    "category":"h",
+    "sample_dots":3629,
+    "sample_percent":5.71
+  },
+  {
+    "category":"a",
+    "sample_dots":1683,
+    "sample_percent":2.65
+  },
+  {
+    "category":"o",
+    "sample_dots":1023,
+    "sample_percent":1.61
+  }
+]

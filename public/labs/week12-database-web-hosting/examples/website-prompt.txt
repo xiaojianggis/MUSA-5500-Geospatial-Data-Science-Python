@@ -1,0 +1,20 @@
+Create a small, responsive Census analysis website for a class project.
+
+Audience: classmates learning spatial databases. Explain the analysis in plain language.
+Inputs I will provide: category_counts.json, district_counts.csv, and district_sample_map.png, exported from DuckDB Spatial.
+Context: these are synthetic historical 2010 Census dots from a thinned teaching extract, assigned to 2015 Pennsylvania congressional districts. Counts are sample dots, not population estimates, density, or current demographics.
+
+Return three complete files: index.html, styles.css, and app.js. Put the supplied data and image in assets/ and use relative paths. No framework, build step, API key, external CDN, or Python server-side processing is needed.
+
+Include:
+- A title and short explanation of the DuckDB workflow.
+- A labeled category bar chart populated from assets/category_counts.json.
+- The supplied map, with descriptive alt text and a caption explaining sample-dot counts.
+- A short methods/source/limitations section.
+- Semantic HTML, readable contrast, keyboard-friendly controls if any, and a layout that works on a phone.
+- A useful message if loading the data fails; do not invent placeholder counts.
+
+First list the expected asset filenames. Then give the three file contents and explain how to save them and preview with:
+python -m http.server 8000 --bind 127.0.0.1
+
+Do not publish the site or make GitHub changes. After I test it, help me revise one issue at a time.

@@ -1,0 +1,7 @@
+.quarto/
+.ipynb_checkpoints/
+*.duckdb
+*.duckdb.wal
+.DS_Store
+
+/.quarto/

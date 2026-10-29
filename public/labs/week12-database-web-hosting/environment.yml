@@ -1,0 +1,17 @@
+name: census-web
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.12
+  - python-duckdb=1.5.6
+  - pandas=2.2
+  - matplotlib
+  - pyarrow
+  - shapely
+  - geopandas
+  - requests
+  - jupyterlab
+  - ipykernel
+  - nbclient
+  - nbconvert

@@ -1,0 +1,24 @@
+project:
+  type: website
+  output-dir: docs
+  render:
+    - index.qmd
+    - report.ipynb
+  resources:
+    - assets/**
+    - website/**
+website:
+  title: "Census database story"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: report.ipynb
+        text: Notebook report
+      - href: website/index.html
+        text: Story website
+format:
+  html:
+    toc: true
+execute:
+  enabled: false

@@ -1,0 +1,8 @@
+__pycache__/
+.ipynb_checkpoints/
+.quarto/
+outputs/*.duckdb
+outputs/*.duckdb.wal
+examples/quarto-site/docs/
+
+/.quarto/

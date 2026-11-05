@@ -115,12 +115,23 @@ quarto render public/labs/week12-database-web-hosting/lecture-12B.ipynb --to htm
 
 The module configuration renders saved notebook outputs. It does not rerun the database import or publish externally.
 
-## Section 3: Full-stack Census GIS
+## Section 3: County Census tract explorer
 
-Lecture 12C is a town Census tract explorer: choose a state and municipality, prepare real 2020–2024 ACS estimates and matching 2024 town/tract boundaries, then map population, median income, poverty rate, or median home value. Leaflet displays the choropleth and town boundary; FastAPI prepares and serves data; SQLite saves towns locally. Tracts may cross town boundaries, so values remain whole-tract estimates.
+Lecture 12C now uses **State → County → Prepare census tract data**. County names load automatically for each state; towns, townships, and places are not listed. The app prepares all Census tracts assigned to that county by FIPS code, joins real 2020–2024 ACS estimates, and maps population, income, poverty rate, or median home value for individual tracts.
 
-Activate `geospatial` and run `conda install -c conda-forge fastapi uvicorn httpx shapely`. From this lecture folder, run `cd examples/census-full-stack`, then `python -m uvicorn app:app --host 127.0.0.1 --port 8000`. Open http://127.0.0.1:8000/, search Harrisburg or Pittsburgh, and click **Prepare town data**. For a standalone download extract [census-full-stack.zip](downloads/census-full-stack.zip) beside the notebook and enter `census-full-stack` instead. No API key is needed: estimates use Census Reporter's public Census ACS mirror and boundaries use Census TIGERweb.
+From this lecture folder:
 
-New downloads are stored in the existing `data/tract-explorer` folder; the app database is `examples/census-full-stack/data/tracts.sqlite`. The historical synthetic dots and district files remain inputs to Part A only. See the app README for optional CLI preparation and offline tests.
+```bash
+conda activate geospatial
+conda install -c conda-forge fastapi uvicorn httpx shapely
+cd examples/census-full-stack
+python -m uvicorn app:app --host 127.0.0.1 --port 8000
+```
 
-Render the notes with `quarto render public/labs/week12-database-web-hosting/lecture-12C.ipynb --to html --no-execute` from the course repository root. The optional HTTP client cell requires the app to be running and Harrisburg prepared. Quarto/GitHub Pages serve the lecture; the Python app requires its own server.
+Open http://127.0.0.1:8000/. Try Pennsylvania → Dauphin County (42043, 67 tracts) and New Jersey → Mercer County (34021, 84 tracts). For the standalone ZIP enter `census-full-stack` instead. Restart the old server and hard-refresh after upgrading from the town selector.
+
+[Tract-only dataset](downloads/census-tract-data.zip) · [Runnable app](downloads/census-full-stack.zip). Data are in `data/census-tracts`; state county catalogs are in `data/county-lists`. New county database tables exclude old municipality data while preserving legacy tables. Previous town exports are archived under `data/tract-explorer/legacy-town-exports` and excluded from current downloads.
+
+No API key is needed: estimates come from the Census Reporter ACS mirror and geography from Census TIGERweb. Quarto/GitHub Pages serve the lecture; the application needs its Python server. See the app README and lecture-12C for preparation, downloads, tests, and interpretation.
+
+Render with `quarto render public/labs/week12-database-web-hosting/lecture-12C.ipynb --to html --no-execute` from the repository root.

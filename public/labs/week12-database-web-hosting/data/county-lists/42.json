@@ -1,0 +1,404 @@
+[
+  {
+    "county_id": "42001",
+    "name": "Adams County",
+    "state_fips": "42",
+    "county_fips": "001"
+  },
+  {
+    "county_id": "42003",
+    "name": "Allegheny County",
+    "state_fips": "42",
+    "county_fips": "003"
+  },
+  {
+    "county_id": "42005",
+    "name": "Armstrong County",
+    "state_fips": "42",
+    "county_fips": "005"
+  },
+  {
+    "county_id": "42007",
+    "name": "Beaver County",
+    "state_fips": "42",
+    "county_fips": "007"
+  },
+  {
+    "county_id": "42009",
+    "name": "Bedford County",
+    "state_fips": "42",
+    "county_fips": "009"
+  },
+  {
+    "county_id": "42011",
+    "name": "Berks County",
+    "state_fips": "42",
+    "county_fips": "011"
+  },
+  {
+    "county_id": "42013",
+    "name": "Blair County",
+    "state_fips": "42",
+    "county_fips": "013"
+  },
+  {
+    "county_id": "42015",
+    "name": "Bradford County",
+    "state_fips": "42",
+    "county_fips": "015"
+  },
+  {
+    "county_id": "42017",
+    "name": "Bucks County",
+    "state_fips": "42",
+    "county_fips": "017"
+  },
+  {
+    "county_id": "42019",
+    "name": "Butler County",
+    "state_fips": "42",
+    "county_fips": "019"
+  },
+  {
+    "county_id": "42021",
+    "name": "Cambria County",
+    "state_fips": "42",
+    "county_fips": "021"
+  },
+  {
+    "county_id": "42023",
+    "name": "Cameron County",
+    "state_fips": "42",
+    "county_fips": "023"
+  },
+  {
+    "county_id": "42025",
+    "name": "Carbon County",
+    "state_fips": "42",
+    "county_fips": "025"
+  },
+  {
+    "county_id": "42027",
+    "name": "Centre County",
+    "state_fips": "42",
+    "county_fips": "027"
+  },
+  {
+    "county_id": "42029",
+    "name": "Chester County",
+    "state_fips": "42",
+    "county_fips": "029"
+  },
+  {
+    "county_id": "42031",
+    "name": "Clarion County",
+    "state_fips": "42",
+    "county_fips": "031"
+  },
+  {
+    "county_id": "42033",
+    "name": "Clearfield County",
+    "state_fips": "42",
+    "county_fips": "033"
+  },
+  {
+    "county_id": "42035",
+    "name": "Clinton County",
+    "state_fips": "42",
+    "county_fips": "035"
+  },
+  {
+    "county_id": "42037",
+    "name": "Columbia County",
+    "state_fips": "42",
+    "county_fips": "037"
+  },
+  {
+    "county_id": "42039",
+    "name": "Crawford County",
+    "state_fips": "42",
+    "county_fips": "039"
+  },
+  {
+    "county_id": "42041",
+    "name": "Cumberland County",
+    "state_fips": "42",
+    "county_fips": "041"
+  },
+  {
+    "county_id": "42043",
+    "name": "Dauphin County",
+    "state_fips": "42",
+    "county_fips": "043"
+  },
+  {
+    "county_id": "42045",
+    "name": "Delaware County",
+    "state_fips": "42",
+    "county_fips": "045"
+  },
+  {
+    "county_id": "42047",
+    "name": "Elk County",
+    "state_fips": "42",
+    "county_fips": "047"
+  },
+  {
+    "county_id": "42049",
+    "name": "Erie County",
+    "state_fips": "42",
+    "county_fips": "049"
+  },
+  {
+    "county_id": "42051",
+    "name": "Fayette County",
+    "state_fips": "42",
+    "county_fips": "051"
+  },
+  {
+    "county_id": "42053",
+    "name": "Forest County",
+    "state_fips": "42",
+    "county_fips": "053"
+  },
+  {
+    "county_id": "42055",
+    "name": "Franklin County",
+    "state_fips": "42",
+    "county_fips": "055"
+  },
+  {
+    "county_id": "42057",
+    "name": "Fulton County",
+    "state_fips": "42",
+    "county_fips": "057"
+  },
+  {
+    "county_id": "42059",
+    "name": "Greene County",
+    "state_fips": "42",
+    "county_fips": "059"
+  },
+  {
+    "county_id": "42061",
+    "name": "Huntingdon County",
+    "state_fips": "42",
+    "county_fips": "061"
+  },
+  {
+    "county_id": "42063",
+    "name": "Indiana County",
+    "state_fips": "42",
+    "county_fips": "063"
+  },
+  {
+    "county_id": "42065",
+    "name": "Jefferson County",
+    "state_fips": "42",
+    "county_fips": "065"
+  },
+  {
+    "county_id": "42067",
+    "name": "Juniata County",
+    "state_fips": "42",
+    "county_fips": "067"
+  },
+  {
+    "county_id": "42069",
+    "name": "Lackawanna County",
+    "state_fips": "42",
+    "county_fips": "069"
+  },
+  {
+    "county_id": "42071",
+    "name": "Lancaster County",
+    "state_fips": "42",
+    "county_fips": "071"
+  },
+  {
+    "county_id": "42073",
+    "name": "Lawrence County",
+    "state_fips": "42",
+    "county_fips": "073"
+  },
+  {
+    "county_id": "42075",
+    "name": "Lebanon County",
+    "state_fips": "42",
+    "county_fips": "075"
+  },
+  {
+    "county_id": "42077",
+    "name": "Lehigh County",
+    "state_fips": "42",
+    "county_fips": "077"
+  },
+  {
+    "county_id": "42079",
+    "name": "Luzerne County",
+    "state_fips": "42",
+    "county_fips": "079"
+  },
+  {
+    "county_id": "42081",
+    "name": "Lycoming County",
+    "state_fips": "42",
+    "county_fips": "081"
+  },
+  {
+    "county_id": "42083",
+    "name": "McKean County",
+    "state_fips": "42",
+    "county_fips": "083"
+  },
+  {
+    "county_id": "42085",
+    "name": "Mercer County",
+    "state_fips": "42",
+    "county_fips": "085"
+  },
+  {
+    "county_id": "42087",
+    "name": "Mifflin County",
+    "state_fips": "42",
+    "county_fips": "087"
+  },
+  {
+    "county_id": "42089",
+    "name": "Monroe County",
+    "state_fips": "42",
+    "county_fips": "089"
+  },
+  {
+    "county_id": "42091",
+    "name": "Montgomery County",
+    "state_fips": "42",
+    "county_fips": "091"
+  },
+  {
+    "county_id": "42093",
+    "name": "Montour County",
+    "state_fips": "42",
+    "county_fips": "093"
+  },
+  {
+    "county_id": "42095",
+    "name": "Northampton County",
+    "state_fips": "42",
+    "county_fips": "095"
+  },
+  {
+    "county_id": "42097",
+    "name": "Northumberland County",
+    "state_fips": "42",
+    "county_fips": "097"
+  },
+  {
+    "county_id": "42099",
+    "name": "Perry County",
+    "state_fips": "42",
+    "county_fips": "099"
+  },
+  {
+    "county_id": "42101",
+    "name": "Philadelphia County",
+    "state_fips": "42",
+    "county_fips": "101"
+  },
+  {
+    "county_id": "42103",
+    "name": "Pike County",
+    "state_fips": "42",
+    "county_fips": "103"
+  },
+  {
+    "county_id": "42105",
+    "name": "Potter County",
+    "state_fips": "42",
+    "county_fips": "105"
+  },
+  {
+    "county_id": "42107",
+    "name": "Schuylkill County",
+    "state_fips": "42",
+    "county_fips": "107"
+  },
+  {
+    "county_id": "42109",
+    "name": "Snyder County",
+    "state_fips": "42",
+    "county_fips": "109"
+  },
+  {
+    "county_id": "42111",
+    "name": "Somerset County",
+    "state_fips": "42",
+    "county_fips": "111"
+  },
+  {
+    "county_id": "42113",
+    "name": "Sullivan County",
+    "state_fips": "42",
+    "county_fips": "113"
+  },
+  {
+    "county_id": "42115",
+    "name": "Susquehanna County",
+    "state_fips": "42",
+    "county_fips": "115"
+  },
+  {
+    "county_id": "42117",
+    "name": "Tioga County",
+    "state_fips": "42",
+    "county_fips": "117"
+  },
+  {
+    "county_id": "42119",
+    "name": "Union County",
+    "state_fips": "42",
+    "county_fips": "119"
+  },
+  {
+    "county_id": "42121",
+    "name": "Venango County",
+    "state_fips": "42",
+    "county_fips": "121"
+  },
+  {
+    "county_id": "42123",
+    "name": "Warren County",
+    "state_fips": "42",
+    "county_fips": "123"
+  },
+  {
+    "county_id": "42125",
+    "name": "Washington County",
+    "state_fips": "42",
+    "county_fips": "125"
+  },
+  {
+    "county_id": "42127",
+    "name": "Wayne County",
+    "state_fips": "42",
+    "county_fips": "127"
+  },
+  {
+    "county_id": "42129",
+    "name": "Westmoreland County",
+    "state_fips": "42",
+    "county_fips": "129"
+  },
+  {
+    "county_id": "42131",
+    "name": "Wyoming County",
+    "state_fips": "42",
+    "county_fips": "131"
+  },
+  {
+    "county_id": "42133",
+    "name": "York County",
+    "state_fips": "42",
+    "county_fips": "133"
+  }
+]

@@ -1,6 +1,6 @@
-# Town Census tract explorer — lecture 12C
+# County Census tract explorer — lecture 12C
 
-Prepare real ACS data for towns in different states, then compare census tracts using a Leaflet choropleth. Python/FastAPI serves both frontend and API; SQLite stores prepared towns. This replaces the historical district and synthetic-dot radius demo.
+Select **State → County → Prepare census tract data**, then visualize individual census tracts. All map features and exported rows are tract-level ACS estimates. The selectors list counties and Census county equivalents only; no towns, townships, or places.
 
 ## Run locally
 
@@ -13,96 +13,77 @@ cd examples/census-full-stack
 python -m uvicorn app:app --host 127.0.0.1 --port 8000
 ```
 
-For the standalone ZIP, extract `census-full-stack` beside the notebook and use `cd census-full-stack` instead. Keep the terminal running. Open **http://127.0.0.1:8000/**, not the HTML file directly. API docs: **http://127.0.0.1:8000/docs**. Stop with Ctrl+C. After code changes, restart Uvicorn and hard-refresh the browser.
+For the standalone ZIP use `cd census-full-stack`. Open **http://127.0.0.1:8000/**. Keep the terminal running; Ctrl+C stops it. After upgrading from the town version, stop the old server, start the updated app, and hard-refresh.
 
-No map or Census API key is needed. Initial preparation downloads public data. Leaflet and OpenStreetMap tiles need internet access; already prepared estimates are stored locally.
+No API key is needed. Initial downloads, Leaflet, and free OpenStreetMap tiles require internet. Prepared county estimates persist locally in SQLite.
 
-## Prepare and explore towns
+## Choose counties in different states
 
-1. Choose Pennsylvania and search **Harrisburg**.
-2. Select **Harrisburg city — Incorporated place (`28:4232800`)** and click **Prepare town data**.
-3. Wait for downloads and the tract choropleth. The purple dashed line outlines the town.
-4. Choose population, median household income, poverty rate, or median owner-occupied home value.
-5. Search **Pittsburgh**, select **Pittsburgh city — Incorporated place (`28:4261000`)**, and prepare it.
-6. Switch between prepared towns. Click a tract or its table row for details and an orange selected boundary.
-7. Choose another state and town. Search covers incorporated places, CDPs, and county subdivisions/townships. Check the geography type; names may repeat.
+1. Select Pennsylvania; its county names load automatically.
+2. Select **Dauphin County (42043)** and prepare it: **67 census tracts**.
+3. Switch among population, median household income, poverty rate, and median home value.
+4. Select New Jersey, then **Mercer County (34021)** and prepare it: **84 census tracts**.
+5. Switch saved datasets using **Prepared county**. State names distinguish counties with the same name.
+6. Click a tract or its table row to inspect estimates, MOEs, and an orange selected-tract boundary.
 
-The app starts with an empty prepared-town list in a fresh installation. No manual build is required before starting Uvicorn. Previously prepared towns reappear after restart. Repreparing replaces one town and reuses cached source responses.
+County equivalents (such as parishes, boroughs, census areas, and independent cities) appear where they are part of Census county geography. County names choose the study area; colors and records remain census tract data, not county aggregates.
 
-## Data and interpretation
+## Preparation and data
 
-- **Estimates:** U.S. Census **2020–2024 ACS five-year**, delivered through the public [Census Reporter API](https://github.com/censusreporter/census-api/blob/master/API.md). The direct Census API may require a key; the mirror keeps this lesson key-free.
-- **Boundaries:** matching [Census TIGERweb ACS 2024](https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2024/MapServer), not current boundaries or the old district data.
-- **Measures:** B01003 total population; B19013 median household income; B17001 below-poverty count / poverty-status universe × 100; B25077 median owner-occupied home value. Dollars are 2024 dollars.
-- **Selection:** whole tracts with positive-area overlap with the town. Tracts are not clipped or apportioned to the town. Touching-only neighbors are excluded. Display geometry is slightly simplified after selection.
-- **Uncertainty:** available 90% margins of error accompany direct estimates. Poverty displays its numerator/denominator; the rate MOE is not calculated. Null/suppressed estimates are gray, distinct from true zero. Upper-coded medians show `+`.
-- **Comparisons:** class breaks stay fixed per variable across towns. Population is a count, not density. Whole-tract estimates include areas outside the town; do not call their sum a town total. Medians cannot be summed.
+The 2024 TIGERweb county layer supplies names and five-digit FIPS codes. The tract query filters directly by two-digit state and three-digit county codes. Every returned 11-digit tract GEOID must begin with the selected county FIPS. This includes the county's complete tract set, rather than tracts intersecting a town. Results are paginated and checked before replacing saved data.
 
-## Files and storage
+Estimates: real **2020–2024 ACS five-year** via the public Census Reporter mirror. Boundaries: matching Census TIGERweb ACS 2024. Fields: B01003 population (count, not density), B19013 median household income (2024 dollars), B17001 poverty numerator / poverty-status universe × 100, B25077 median owner-occupied home value (2024 dollars).
 
-In the repository layout:
+Class breaks stay fixed per variable across counties. Direct estimates include available 90% MOEs; poverty rate MOE is not calculated, but its numerator/denominator and their MOEs are included. Null/gray means unavailable, not zero. Upper-coded medians show `+`. Medians cannot be summed. Geometries are slightly simplified for display after selection by FIPS.
 
-```text
-lecture folder/
-├── data/tract-explorer/
-│   ├── source-cache/                  # original public JSON responses
-│   └── towns/28-4232800/prepared.json  # joined estimates, boundary, provenance
-└── examples/census-full-stack/
-    ├── app.py
-    ├── database.py
-    ├── prepare_data.py
-    ├── test_app.py
-    ├── static/
-    └── data/tracts.sqlite              # database created on first server start
-```
+Files beside the notebook:
 
-The standalone ZIP puts `census-full-stack` beside the shared data folder. Layout detection sets the same sibling source-data destination automatically. The old `census_sample.parquet`, `districts_2015.geojson`, and DuckDB files are unused and remain unchanged.
+- `data/census-tracts/acs2024_tracts.geojson`: one polygon feature per unique tract in prepared counties.
+- `data/census-tracts/acs2024_tracts.csv`: same flat attributes without geometry.
+- `data/census-tracts/counties/<fips>_tracts.geojson` and `.csv`: county-specific tract datasets.
+- `data/census-tracts/README.txt`: data dictionary.
+- `data/county-lists/<state-fips>.json`: county names for each visited state.
+- `data/tract-explorer/source-cache`: cached public responses.
+- `data/tract-explorer/counties/<fips>/prepared.json`: joined data/provenance.
 
-`CENSUS_DB` overrides the SQLite path; `CENSUS_DATA_DIR` overrides the source-cache/package folder. Use the same settings for the API and CLI. Do not point the SQLite app at an old DuckDB file.
+The generated classroom snapshot covers Dauphin County, PA, and Mercer County, NJ. It is not nationwide. Prepare additional counties to expand it. Every record includes an 11-digit `geoid` and five-digit `county_geoid`; preserve FIPS columns as text in CSV.
 
-## Optional command-line preparation
+The database is `data/tracts.sqlite` inside the app folder. New `counties` and `county_tracts` tables exclude old municipality records while leaving legacy town tables intact. Earlier municipality exports are archived in `data/tract-explorer/legacy-town-exports`, outside the active dataset/download. Original Part A dot/district files remain unchanged.
 
-Run in the app directory:
+## CLI
+
+From the app directory:
 
 ```bash
-python prepare_data.py --state 42 --search Harrisburg
-python prepare_data.py --town 28:4232800
-python prepare_data.py --town 28:4261000
+python prepare_data.py --state 42 --list-counties
+python prepare_data.py --county 42043
+python prepare_data.py --county 34021
+python prepare_data.py --export
 ```
 
-Search returns IDs; use those IDs rather than guessing. The former `--data` CLI has been replaced. Refresh the app after CLI preparation. To refresh remote responses for this fixed vintage, stop the server, remove only the sibling `data/tract-explorer/source-cache` folder, restart, and reprepare the town.
+`--export` uses saved data without downloads. `CENSUS_DB` overrides the SQLite file, and `CENSUS_DATA_DIR` overrides the internal cache/package folder; deliverable tract data and county catalogs are sibling folders of that cache. Keep API/CLI settings consistent. Do not use an old DuckDB file as the SQLite database.
 
 ## API
 
 | Route | Purpose |
 | --- | --- |
-| `GET /api/health` | Status, vintage, prepared-town count |
-| `GET /api/config` | Variable descriptions and sources |
-| `GET /api/places?state=42&q=Harrisburg` | Search town IDs and geography types |
-| `POST /api/prepare` | Body `{"town_id":"28:4232800"}`; download and save one town |
-| `GET /api/towns` | List prepared towns |
-| `GET /api/tracts?town_id=28:4232800&variable=income` | Choropleth GeoJSON with all metrics, boundary, provenance |
+| `/api/counties?state=42` | State's county names and IDs |
+| `POST /api/prepare` | JSON `{"county_id":"42043"}` prepares complete tract data for the county |
+| `/api/prepared-counties` | Prepared counties, state codes, tract counts |
+| `/api/tracts?county_id=42043&variable=income` | Tract choropleth GeoJSON |
+| `/api/dataset?county_id=42043&format=geojson` | Flat tract-only download; `format=csv` returns CSV |
+| `/api/config`, `/api/health`, `/docs` | Variables, readiness, interactive docs |
 
-Variable keys: `population`, `income`, `poverty`, `home_value`. Invalid inputs return 422, unprepared towns 404, and failed upstream preparation 502. Failed downloads do not replace existing database data. SQL uses bound parameters. A single server worker is sufficient for this teaching app.
+Omit `county_id` on `/api/dataset` to export all unique prepared county tracts. Variable keys: `population`, `income`, `poverty`, `home_value`. The old town endpoints and IDs are replaced by county endpoints and five-digit FIPS codes.
 
-## Verify
+## Verify and troubleshoot
 
 ```bash
 python -m unittest -v
 ```
 
-Six offline integration tests use isolated synthetic fixtures and a temporary database; no prepared town, network, or server is required. Checks cover overlap versus touching, whole geometries, joins, missing values, zeros, poverty denominators, top-coding, release consistency, failed-download preservation, repreparation, route validation, and static assets.
+Eight offline tests cover complete county selection by FIPS, wrong-county rejection, state county lists, uncertainty/missing values, release mismatch, incomplete-download protection, preserving other counties/legacy towns, and tract-only exports.
 
-Browser checks: search → prepare → choropleth; switch all variables; prepare a second town; switch towns; inspect popups and table rows; restart and check persistence. In browser Network inspect `/api/tracts`; compare one feature to `prepared.json`.
+Browser checks: select PA/Dauphin; prepare; switch variables; select NJ/Mercer; prepare; switch saved counties; select a tract; download CSV/GeoJSON and verify GEOID prefixes. Restart and check persistence.
 
-## Troubleshooting
-
-- **Old district/radius page:** stop the old server, start from the updated app directory, and hard-refresh.
-- **Map library unavailable:** allow `unpkg.com`; a missing Leaflet library is reported in the page.
-- **Streets blank but tracts visible:** check `tile.openstreetmap.org` requests and internet access.
-- **Preparation fails:** check public Census TIGERweb/Census Reporter connectivity and the Uvicorn terminal. Existing prepared towns remain usable.
-- **No matches:** verify state, spelling, and geography type.
-- **File is not a database:** unset a `CENSUS_DB` pointing at an old DuckDB file; default is `data/tracts.sqlite`.
-- **Port occupied:** stop the previous server or use `--port 8001` and that URL everywhere.
-
-Quarto/GitHub Pages publish lecture HTML, not this Python service. A deployed app needs a Python-capable host, persistent storage, HTTPS, and separate decisions about public preparation jobs and access. Running locally does not publish the app.
+If the town selector remains, restart the old server and hard-refresh. Use **Reload county list** on list-download failure. Check `unpkg.com` for a missing Leaflet library and `tile.openstreetmap.org` for missing streets. Failed preparation retains previously saved data. Use Uvicorn, not a static server or direct HTML file. Quarto/GitHub Pages publish the lecture, not this Python API; hosted execution needs a Python-capable host and persistent storage.

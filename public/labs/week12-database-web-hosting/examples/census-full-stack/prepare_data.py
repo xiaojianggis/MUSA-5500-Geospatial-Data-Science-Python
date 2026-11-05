@@ -1,4 +1,4 @@
-"""Prepare ACS tract estimates and matching town boundaries; usable from CLI or API."""
+"""Prepare ACS tract estimates and county-based selections; usable from CLI or API."""
 import argparse
 from datetime import datetime, timezone
 import hashlib
@@ -12,11 +12,11 @@ import httpx
 from shapely.geometry import mapping, shape
 from shapely.validation import make_valid
 
-from database import DATA_DIR, VARIABLES, YEAR, initialize, save_town
+from database import DATA_DIR, VARIABLES, YEAR, initialize, save_county
+from datasets import export_datasets, write_atomic
 
 TIGER = f'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS{YEAR}/MapServer'
 ACS = f'https://api.censusreporter.org/1.0/data/show/acs{YEAR}_5yr'
-KINDS = {28: 'Incorporated place', 30: 'Census-designated place', 22: 'County subdivision / township'}
 PREPARE_LOCK = Lock()
 
 
@@ -35,9 +35,9 @@ def get_json(url, params):
         response.raise_for_status()
         result = response.json()
     except (httpx.HTTPError, ValueError) as error:
-        raise DataError('Public data download failed. Check internet access and try again; already prepared towns remain available.') from error
+        raise DataError('Public data download failed. Check internet access and try again; already prepared counties remain available.') from error
     if isinstance(result, dict) and result.get('error'):
-        raise DataError('The public data service rejected the query. Try a smaller town or retry later.')
+        raise DataError('The public data service rejected the query. Try a smaller county or retry later.')
     target.parent.mkdir(parents=True, exist_ok=True)
     # Atomic cache writes avoid partial files if interrupted or read concurrently.
     import tempfile
@@ -69,15 +69,17 @@ def tiger_features(layer, where, *, geometry=True, envelope=None):
     return features
 
 
-def places(state):
+def counties(state):
     if not re.fullmatch(r'\d{2}', state):
         raise DataError('State must be a two-digit FIPS code, such as 42 for Pennsylvania.')
     output = []
-    for layer, kind in KINDS.items():
-        for f in tiger_features(layer, f"STATE='{state}'", geometry=False):
-            p = f['properties']
-            output.append({'town_id': f"{layer}:{p['GEOID']}", 'name': p['NAME'], 'kind': kind, 'state': state})
-    return sorted(output, key=lambda p: (p['name'], p['kind']))
+    for f in tiger_features(82, f"STATE='{state}'", geometry=False):
+        p = f['properties']
+        output.append({'county_id': p['GEOID'], 'name': p['NAME'],
+                       'state_fips': p['GEOID'][:2], 'county_fips': p['GEOID'][2:]})
+    output.sort(key=lambda c: c['name'])
+    write_atomic(DATA_DIR.parent / 'county-lists' / f'{state}.json', json.dumps(output, ensure_ascii=False, indent=2))
+    return output
 
 
 def clean_number(value):
@@ -111,25 +113,21 @@ def metrics_for(tables):
     return result
 
 
-def build(town_id):
-    match = re.fullmatch(r'(22|28|30):(\d{7}|\d{10})', town_id)
-    if not match or len(match[2]) != (10 if match[1] == '22' else 7):
-        raise DataError('Choose a valid town ID from the town search results.')
-    layer, geoid = int(match[1]), match[2]
+def build(county_id):
+    if not re.fullmatch(r'\d{5}', county_id):
+        raise DataError('Choose a valid five-digit county FIPS code from the county list.')
     with PREPARE_LOCK:
-        boundaries = tiger_features(layer, f"GEOID='{geoid}'")
-        if len(boundaries) != 1:
-            raise DataError('Town boundary not found in the 2024 Census geography.')
-        boundary = boundaries[0]
-        town_shape = make_valid(shape(boundary['geometry']))
-        if town_shape.is_empty:
-            raise DataError('Town has no usable boundary geometry.')
-        # Tract/place boundaries do not nest; select positive-area overlap, not touching neighbors.
-        candidates = tiger_features(8, f"STATE='{geoid[:2]}'", envelope=town_shape.bounds)
-        tracts = [f for f in candidates if make_valid(shape(f['geometry'])).intersection(town_shape).area > 1e-10]
-        if not tracts:
-            raise DataError('No overlapping Census tracts found for this town.')
-        tracts = list({f['properties']['GEOID']: f for f in tracts}.values())
+        matches = [c for c in counties(county_id[:2]) if c['county_id'] == county_id]
+        if len(matches) != 1:
+            raise DataError('County not found in the 2024 Census geography.')
+        county_name = matches[0]['name']
+        # Census tracts nest in counties. Match their geographic codes, not polygon overlap.
+        candidates = tiger_features(8, f"STATE='{county_id[:2]}' AND COUNTY='{county_id[2:]}'")
+        if not candidates:
+            raise DataError('No Census tracts found for this county.')
+        if any(not f['properties']['GEOID'].startswith(county_id) for f in candidates):
+            raise DataError('Boundary response includes a tract from another county; no data were saved.')
+        tracts = list({f['properties']['GEOID']: f for f in candidates}.values())
         estimates, release = {}, None
         for start in range(0, len(tracts), 50):
             ids = ['14000US' + f['properties']['GEOID'] for f in tracts[start:start+50]]
@@ -143,33 +141,38 @@ def build(town_id):
             tract_id = f['properties']['GEOID']
             tables = estimates.get('14000US' + tract_id)
             if tables is None:
-                raise DataError(f'ACS response is missing tract {tract_id}; no incomplete town was saved.')
+                raise DataError(f'ACS response is missing tract {tract_id}; no incomplete county was saved.')
             output.append({'geoid': tract_id, 'name': f['properties']['NAME'],
                            'geometry': mapping(make_valid(shape(f['geometry'])).simplify(0.0001, preserve_topology=True)),
                            'metrics': metrics_for(tables)})
         stamp = datetime.now(timezone.utc).isoformat()
-        town = {'town_id': town_id, 'name': boundary['properties']['NAME'], 'prepared_at': stamp,
-                'boundary': {**boundary, 'geometry': mapping(town_shape.simplify(0.0001, preserve_topology=True))},
-                'source': {'estimates': ACS, 'boundaries': TIGER, 'release': release,
-                           'selection': 'Whole tracts with positive-area overlap with the town boundary; no areal apportionment.'}}
+        county = {'county_id': county_id, 'name': county_name, 'prepared_at': stamp,
+                  'source': {'estimates': ACS, 'boundaries': TIGER, 'release': release,
+                             'selection': f'All Census tracts assigned to county FIPS {county_id}; no spatial overlap selection.'}}
         initialize()
-        save_town(town, output)
-        # Human-readable prepared package beside the notebook's existing data.
-        package = DATA_DIR / 'towns' / town_id.replace(':', '-')
+        save_county(county, output)
+        package = DATA_DIR / 'counties' / county_id
         package.mkdir(parents=True, exist_ok=True)
-        (package / 'prepared.json').write_text(json.dumps({'town': town, 'tracts': output}, indent=2))
-        return {'town_id': town_id, 'name': town['name'], 'tract_count': len(output), 'year': YEAR, 'prepared_at': stamp}
+        write_atomic(package / 'prepared.json', json.dumps({'county': county, 'tracts': output}, indent=2))
+        export_datasets(DATA_DIR.parent / 'census-tracts', county_id)
+        return {'county_id': county_id, 'name': county_name, 'tract_count': len(output), 'year': YEAR, 'prepared_at': stamp,
+                'geography_level': 'census_tract', 'dataset_folder': str(DATA_DIR.parent / 'census-tracts')}
+
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--state', default='42', help='State FIPS for --search, e.g. 42')
-    parser.add_argument('--search', help='Find a town name; returns IDs to prepare')
-    parser.add_argument('--town', help='ID from search, e.g. 28:4232800 for Harrisburg')
+    parser.add_argument('--state', default='42', help='State FIPS for --list-counties, e.g. 42')
+    parser.add_argument('--list-counties', action='store_true', help='List all counties/county equivalents in --state')
+    parser.add_argument('--export', action='store_true', help='Export prepared county tract datasets')
+    parser.add_argument('--county', help='Five-digit county FIPS, e.g. 42043 for Dauphin County, PA')
     args = parser.parse_args()
-    if args.search:
-        print(json.dumps([p for p in places(args.state) if args.search.casefold() in p['name'].casefold()], indent=2))
-    elif args.town:
-        print(json.dumps(build(args.town), indent=2))
+    if args.list_counties:
+        print(json.dumps(counties(args.state), indent=2))
+    elif args.export:
+        initialize()
+        print(f'Exported {export_datasets(DATA_DIR.parent / "census-tracts")} unique Census tracts.')
+    elif args.county:
+        print(json.dumps(build(args.county), indent=2))
     else:
-        parser.error('Use --search NAME or --town ID. The old synthetic-dot --data workflow has been replaced.')
+        parser.error('Use --list-counties, --export, or --county FIPS. County selection replaces the town workflow.')

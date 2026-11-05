@@ -4,14 +4,15 @@ import json
 from typing import Literal
 
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from database import ROOT, VARIABLES, YEAR, connect, initialize, prepared_towns
-from prepare_data import DataError, build, places
+from database import ROOT, VARIABLES, YEAR, connect, initialize, prepared_counties
+from prepare_data import DataError, build, counties
+from datasets import dataset, csv_text
 
-TownID = r'^(22|28|30):(?:\d{7}|\d{10})$'
+CountyID = r'^\d{5}$'
 
 
 @asynccontextmanager
@@ -20,18 +21,21 @@ async def lifespan(app):
     yield
 
 
-app = FastAPI(title='Town Census tract explorer', lifespan=lifespan)
+app = FastAPI(title='Census tract data explorer', lifespan=lifespan)
 app.mount('/static', StaticFiles(directory=ROOT / 'static'), name='static')
 
 
 @app.get('/', include_in_schema=False)
 def home():
-    return FileResponse(ROOT / 'static/index.html')
+    return FileResponse(ROOT / 'static/index.html', headers={'Cache-Control':'no-store'})
 
 
 @app.get('/api/health')
 def health():
-    return {'status': 'ok', 'year': YEAR, 'prepared_towns': len(prepared_towns())}
+    with connect() as con:
+        tract_count = con.execute('SELECT count(DISTINCT geoid) FROM county_tracts').fetchone()[0]
+    return {'status': 'ok', 'year': YEAR, 'geography_level': 'census_tract',
+            'prepared_tracts': tract_count, 'prepared_counties': len(prepared_counties())}
 
 
 @app.get('/api/config')
@@ -40,46 +44,59 @@ def config():
             'sources': {'estimates': 'U.S. Census ACS via Census Reporter', 'boundaries': 'Census TIGERweb ACS 2024'}}
 
 
-@app.get('/api/places')
-def search_places(state: str = Query('42', pattern=r'^\d{2}$'), q: str = Query(..., min_length=2, max_length=80)):
+@app.get('/api/counties')
+def list_counties(state: str = Query('42', pattern=r'^\d{2}$')):
     try:
-        return [p for p in places(state) if q.casefold() in p['name'].casefold()][:100]
+        return counties(state)
     except DataError as error:
         raise HTTPException(502, str(error)) from error
 
 
-@app.get('/api/towns')
-def towns():
-    return prepared_towns()
+@app.get('/api/prepared-counties')
+def saved_counties():
+    return prepared_counties()
 
 
 class PrepareRequest(BaseModel):
-    town_id: str = Field(pattern=TownID)
+    model_config = {'extra': 'forbid'}
+    county_id: str = Field(pattern=CountyID)
 
 
 @app.post('/api/prepare')
 def prepare(request: PrepareRequest):
     try:
-        return build(request.town_id)
+        return build(request.county_id)
     except DataError as error:
         raise HTTPException(502, str(error)) from error
 
 
 @app.get('/api/tracts')
-def tracts(town_id: str = Query(..., pattern=TownID),
+def tracts(county_id: str = Query(..., pattern=CountyID),
            variable: Literal['population', 'income', 'poverty', 'home_value'] = 'income'):
     with connect() as con:
-        town = con.execute('SELECT * FROM towns WHERE town_id=?', [town_id]).fetchone()
-        if town is None:
-            raise HTTPException(404, 'Prepare this town first using the Prepare town data button.')
-        rows = con.execute('SELECT * FROM tracts WHERE town_id=? ORDER BY geoid', [town_id]).fetchall()
+        county = con.execute('SELECT * FROM counties WHERE county_id=?', [county_id]).fetchone()
+        if county is None:
+            raise HTTPException(404, 'Prepare this county first using the Prepare census tract data button.')
+        rows = con.execute('SELECT * FROM county_tracts WHERE county_id=? ORDER BY geoid', [county_id]).fetchall()
     features = []
     for row in rows:
         metrics = json.loads(row['metrics'])
         features.append({'type': 'Feature', 'geometry': json.loads(row['geometry']),
                          'properties': {'geoid': row['geoid'], 'name': row['name'],
                                         **metrics[variable], 'metrics': metrics}})
-    return {'type': 'FeatureCollection', 'features': features, 'town_id': town_id, 'town_name': town['name'],
-            'year': town['year'], 'prepared_at': town['prepared_at'], 'variable': variable,
-            'variable_info': VARIABLES[variable], 'boundary': json.loads(town['boundary']),
-            'source': json.loads(town['source'])}
+    return {'type': 'FeatureCollection', 'features': features, 'county_id': county_id, 'county_name': county['name'],
+            'year': county['year'], 'prepared_at': county['prepared_at'], 'variable': variable,
+            'variable_info': VARIABLES[variable],
+            'source': json.loads(county['source']), 'geography_level': 'census_tract'}
+
+
+@app.get('/api/dataset')
+def download_dataset(county_id: str | None = Query(None, pattern=CountyID),
+                     format: Literal['geojson','csv'] = 'geojson'):
+    data = dataset(county_id)
+    if not data['features']:
+        raise HTTPException(404, 'Prepare tract data for this area first.')
+    name = f"acs2024_{county_id.replace(':','-') if county_id else 'all'}_tracts.{format}"
+    return Response(content=csv_text(data) if format == 'csv' else json.dumps(data, ensure_ascii=False, allow_nan=False),
+                    media_type='text/csv' if format == 'csv' else 'application/geo+json',
+                    headers={'Content-Disposition': f'attachment; filename="{name}"'})

@@ -24,9 +24,9 @@ Beginner walkthrough: render your saved notebook with Quarto, use ChatGPT and vi
 
 [Open the full-stack GIS demo](lecture-12C.html)
 
-Choose a town and prepare real ACS five-year estimates and Census tract boundaries. Use a Leaflet choropleth to compare population, income, poverty, and home value at the tract level, with a Python/FastAPI backend and persistent local SQLite storage.
+Select a state to load its county-name dropdown, then prepare the complete county Census tract dataset. Map population, income, poverty, and home value for individual tracts with FastAPI and SQLite. County names choose the area; every colored polygon and downloaded record remains a census tract.
 
-<a href="lecture-12C.ipynb" download>Download lecture 12C</a> · [Download the complete runnable project](downloads/census-full-stack.zip)
+<a href="lecture-12C.ipynb" download>Download lecture 12C</a> · [Download the complete runnable project](downloads/census-full-stack.zip) · [Tract-only dataset](downloads/census-tract-data.zip)
 
 ## Start here
 

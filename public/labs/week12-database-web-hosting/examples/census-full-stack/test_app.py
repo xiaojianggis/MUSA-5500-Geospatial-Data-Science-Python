@@ -1,4 +1,6 @@
-"""Offline integration tests with clearly synthetic fixtures; no downloads required."""
+"""Offline county/tract integration tests with synthetic fixtures and temporary storage."""
+import csv
+import io
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -14,7 +16,7 @@ import prepare_data
 
 
 def feature(geoid, name, bounds):
-    return {'type': 'Feature', 'properties': {'GEOID': geoid, 'NAME': name, 'STATE': '42'},
+    return {'type': 'Feature', 'properties': {'GEOID': geoid, 'NAME': name, 'STATE': geoid[:2]},
             'geometry': mapping(box(*bounds))}
 
 
@@ -42,14 +44,15 @@ class TractExplorer(unittest.TestCase):
         self.db_patch.stop(); self.data_patch.stop(); self.tmp.cleanup()
 
     def upstream(self, url, params):
-        if url.endswith('/28/query'):
-            return {'type': 'FeatureCollection', 'features': [feature('4232800', 'Fixture town', (0,0,2,2))]}
+        if url.endswith('/82/query'):
+            return {'type': 'FeatureCollection', 'features': [feature('42043', 'Dauphin County', (0,0,2,2))]}
         if url.endswith('/8/query'):
-            # First crosses town boundary; second is inside; third only touches.
+            self.assertIn("STATE='42'",params['where'])
+            self.assertIn("COUNTY='043'",params['where'])
+            # Both belong to this county by GEOID, regardless of town overlap.
             return {'type': 'FeatureCollection', 'features': [
                 feature('42043000100', 'Tract 1', (-1,0,1,2)),
-                feature('42043000200', 'Tract 2', (1,0,2,2)),
-                feature('42043000300', 'Touching neighbor', (2,0,3,2))]}
+                feature('42043000200', 'Tract 2', (20,20,21,21))]}
         if url == prepare_data.ACS:
             return {'release': {'id': 'acs2024_5yr', 'name': 'ACS 2024 5-year'}, 'data': {
                 '14000US42043000100': tables(),
@@ -58,86 +61,130 @@ class TractExplorer(unittest.TestCase):
 
     def prepare(self):
         with patch.object(prepare_data, 'get_json', side_effect=self.upstream):
-            response = self.client.post('/api/prepare', json={'town_id': '28:4232800'})
-        self.assertEqual(response.status_code, 200, response.text)
+            response = self.client.post('/api/prepare', json={'county_id': '42043'})
+        self.assertEqual(response.status_code,200,response.text)
         return response.json()
 
-    def test_preparation_join_overlap_and_rates(self):
-        self.assertEqual(self.prepare()['tract_count'], 2)
-        response = self.client.get('/api/tracts', params={'town_id':'28:4232800','variable':'poverty'})
-        self.assertEqual(response.status_code, 200)
+    def test_full_county_tract_selection_and_rates(self):
+        self.assertEqual(self.prepare()['tract_count'],2)
+        response = self.client.get('/api/tracts',params={'county_id':'42043','variable':'poverty'})
+        self.assertEqual(response.status_code,200)
         data = response.json()
-        self.assertEqual(len(data['features']), 2)
-        self.assertEqual(data['features'][0]['properties']['value'], 10)
+        self.assertEqual(data['county_name'],'Dauphin County')
+        self.assertEqual(data['geography_level'],'census_tract')
+        self.assertNotIn('boundary',data)
+        self.assertEqual(len(data['features']),2)
+        self.assertTrue(all(f['properties']['geoid'].startswith('42043') for f in data['features']))
+        self.assertEqual(data['features'][0]['properties']['value'],10)
         self.assertIsNone(data['features'][1]['properties']['value'])
-        self.assertEqual(data['features'][1]['properties']['metrics']['population']['value'], 0)
+        self.assertEqual(data['features'][1]['properties']['metrics']['population']['value'],0)
         self.assertIsNone(data['features'][1]['properties']['metrics']['income']['value'])
-        # Whole geometry retained rather than falsely allocating tract estimates to town.
-        self.assertEqual(min(x for x,y in data['features'][0]['geometry']['coordinates'][0]), -1)
-        self.assertEqual(data['boundary']['properties']['GEOID'], '4232800')
-        self.assertTrue((prepare_data.DATA_DIR / 'towns/28-4232800/prepared.json').is_file())
-        self.assertEqual(self.client.get('/api/health').json()['prepared_towns'], 1)
-        self.assertEqual(self.client.get('/api/towns').json()[0]['tract_count'], 2)
+        self.assertTrue((prepare_data.DATA_DIR/'counties/42043/prepared.json').is_file())
+        self.assertEqual(self.client.get('/api/health').json()['prepared_counties'],1)
+        self.assertEqual(self.client.get('/api/prepared-counties').json()[0]['tract_count'],2)
 
-    def test_variables_and_reprepare_preserve_other_towns(self):
+    def test_reprepare_preserves_other_counties_and_excludes_legacy_towns(self):
         self.prepare()
         with database.connect() as con:
-            con.execute("INSERT INTO towns SELECT '28:4259000',name,year,prepared_at,boundary,source FROM towns LIMIT 1")
+            con.execute("INSERT INTO counties SELECT '34021','Mercer County',year,prepared_at,source FROM counties LIMIT 1")
+            con.execute('CREATE TABLE towns (town_id TEXT)')
+            con.execute("INSERT INTO towns VALUES ('28:4232800')")
         self.prepare()
-        self.assertEqual(len(self.client.get('/api/towns').json()), 2)
+        self.assertEqual(len(self.client.get('/api/prepared-counties').json()),2)
+        with database.connect() as con:
+            self.assertEqual(con.execute('SELECT count(*) FROM towns').fetchone()[0],1)
         for variable in database.VARIABLES:
-            response = self.client.get('/api/tracts',params={'town_id':'28:4232800','variable':variable})
-            self.assertEqual(response.status_code,200)
-            self.assertEqual(len(response.json()['features']),2)
-        income = self.client.get('/api/tracts',params={'town_id':'28:4232800','variable':'income'}).json()
+            result=self.client.get('/api/tracts',params={'county_id':'42043','variable':variable})
+            self.assertEqual(result.status_code,200)
+            self.assertEqual(len(result.json()['features']),2)
+        income=self.client.get('/api/tracts',params={'county_id':'42043','variable':'income'}).json()
         self.assertEqual(income['features'][0]['properties']['moe'],5000)
 
-    def test_incomplete_download_never_replaces_prepared_town(self):
+    def test_incomplete_download_never_replaces_prepared_county(self):
         self.prepare()
-        original = self.client.get('/api/tracts',params={'town_id':'28:4232800'}).json()
-        def incomplete(url, params):
-            result = self.upstream(url, params)
-            if url == prepare_data.ACS:
-                result['data'].pop('14000US42043000200')
+        original=self.client.get('/api/tracts',params={'county_id':'42043'}).json()
+        def incomplete(url,params):
+            result=self.upstream(url,params)
+            if url==prepare_data.ACS: result['data'].pop('14000US42043000200')
             return result
-        with patch.object(prepare_data, 'get_json', side_effect=incomplete):
-            result = self.client.post('/api/prepare',json={'town_id':'28:4232800'})
-        self.assertEqual(result.status_code,502)
-        self.assertEqual(self.client.get('/api/tracts',params={'town_id':'28:4232800'}).json(),original)
+        with patch.object(prepare_data,'get_json',side_effect=incomplete):
+            response=self.client.post('/api/prepare',json={'county_id':'42043'})
+        self.assertEqual(response.status_code,502)
+        self.assertEqual(self.client.get('/api/tracts',params={'county_id':'42043'}).json(),original)
+
+    def test_wrong_county_tract_is_rejected(self):
+        def wrong_county(url,params):
+            result=self.upstream(url,params)
+            if url.endswith('/8/query'):
+                result['features'].append(feature('42045000100','Neighboring county tract',(1,1,2,2)))
+            return result
+        with patch.object(prepare_data,'get_json',side_effect=wrong_county):
+            response=self.client.post('/api/prepare',json={'county_id':'42043'})
+        self.assertEqual(response.status_code,502)
+        self.assertEqual(self.client.get('/api/prepared-counties').json(),[])
 
     def test_release_mismatch_and_invalid_parameters(self):
-        def wrong_release(url, params):
-            result = self.upstream(url, params)
-            if url == prepare_data.ACS:
-                result['release']['id'] = 'acs2023_5yr'
+        def wrong_release(url,params):
+            result=self.upstream(url,params)
+            if url==prepare_data.ACS: result['release']['id']='acs2023_5yr'
             return result
-        with patch.object(prepare_data, 'get_json', side_effect=wrong_release):
-            self.assertEqual(self.client.post('/api/prepare',json={'town_id':'28:4232800'}).status_code,502)
-        self.assertEqual(self.client.get('/api/towns').json(),[])
-        for town_id in ['bad', "28:42' OR 1=1", '../secrets']:
-            self.assertEqual(self.client.post('/api/prepare',json={'town_id':town_id}).status_code,422)
-        self.assertEqual(self.client.get('/api/tracts',params={'town_id':'28:4232800'}).status_code,404)
-        self.assertEqual(self.client.get('/api/tracts',params={'town_id':'28:4232800','variable':'sql'}).status_code,422)
-        self.assertEqual(self.client.get('/api/places',params={'state':"42'",'q':'Town'}).status_code,422)
+        with patch.object(prepare_data,'get_json',side_effect=wrong_release):
+            self.assertEqual(self.client.post('/api/prepare',json={'county_id':'42043'}).status_code,502)
+        for county_id in ['bad',"42' OR 1=1",'../secrets','28:4232800']:
+            self.assertEqual(self.client.post('/api/prepare',json={'county_id':county_id}).status_code,422)
+        self.assertEqual(self.client.post('/api/prepare',json={'town_id':'28:4232800'}).status_code,422)
+        self.assertEqual(self.client.get('/api/tracts',params={'county_id':'42043'}).status_code,404)
+        self.assertEqual(self.client.get('/api/tracts',params={'county_id':'42043','variable':'sql'}).status_code,422)
+        self.assertEqual(self.client.get('/api/counties',params={'state':"42'"}).status_code,422)
 
-    def test_search_and_static_frontend(self):
-        matches = [{'town_id':'28:4232800','name':'Harrisburg city','kind':'Incorporated place','state':'42'},
-                   {'town_id':'28:4259000','name':'Pittsburgh city','kind':'Incorporated place','state':'42'}]
-        with patch('app.places',return_value=matches):
-            self.assertEqual(len(self.client.get('/api/places',params={'state':'42','q':'harris'}).json()),1)
-        for url in ['/', '/static/app.js', '/static/styles.css','/docs','/api/config','/api/health']:
+    def test_state_county_lists_and_static_frontend(self):
+        for state in ['42','34']:
+            matches=[{'county_id':f'{state}{i:03d}','name':f'County {i}','state_fips':state,'county_fips':f'{i:03d}'} for i in range(120)]
+            with patch('app.counties',return_value=matches) as fetch_counties:
+                response=self.client.get('/api/counties',params={'state':state})
+                self.assertEqual(response.status_code,200)
+                self.assertEqual(len(response.json()),120)
+                fetch_counties.assert_called_once_with(state)
+        for url in ['/','/static/app.js','/static/styles.css','/docs','/api/config','/api/health']:
             self.assertEqual(self.client.get(url).status_code,200)
         self.assertEqual(self.client.get('/static/database.py').status_code,404)
-        self.assertNotIn('City Hall',self.client.get('/').text)
+        html=self.client.get('/').text
+        self.assertIn('County</label>',html)
+        self.assertNotIn('Town / municipality',html)
+
+    def test_county_tract_exports_are_flat_and_unique(self):
+        self.prepare()
+        data=self.client.get('/api/dataset').json()
+        self.assertEqual(data['geography_level'],'census_tract')
+        self.assertNotIn('boundary',data)
+        self.assertEqual(len(data['features']),2)
+        for f in data['features']:
+            p=f['properties']
+            self.assertEqual(len(p['geoid']),11)
+            self.assertEqual(p['county_geoid'],p['geoid'][:5])
+            self.assertEqual(p['county_name'],'Dauphin County')
+            self.assertIn('population',p)
+            self.assertNotIn('metrics',p)
+        response=self.client.get('/api/dataset',params={'county_id':'42043','format':'csv'})
+        self.assertEqual(response.status_code,200)
+        rows=list(csv.DictReader(io.StringIO(response.text)))
+        self.assertEqual(len(rows),2)
+        self.assertEqual(rows[0]['geoid'],'42043000100')
+        self.assertEqual(float(rows[0]['poverty']),10)
+        self.assertEqual(rows[1]['income'],'')
+        exported=prepare_data.DATA_DIR.parent/'census-tracts'
+        self.assertEqual(len(json.loads((exported/'acs2024_tracts.geojson').read_text())['features']),2)
+        self.assertTrue((exported/'counties/42043_tracts.csv').is_file())
+        self.assertFalse((exported/'areas').exists())
 
     def test_missing_values_and_topcoding(self):
         for value in [None,'null',-666666666,float('nan')]:
             self.assertIsNone(prepare_data.clean_number(value))
-        result = prepare_data.metrics_for(tables(income=250001))
+        result=prepare_data.metrics_for(tables(income=250001))
         self.assertEqual(result['income']['value'],250000)
         self.assertTrue(result['income']['topcoded'])
         self.assertEqual(result['poverty']['value'],10)
 
 
-if __name__ == '__main__':
+if __name__=='__main__':
     unittest.main()

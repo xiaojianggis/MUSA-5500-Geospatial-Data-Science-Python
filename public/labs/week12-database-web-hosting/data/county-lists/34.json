@@ -1,0 +1,128 @@
+[
+  {
+    "county_id": "34001",
+    "name": "Atlantic County",
+    "state_fips": "34",
+    "county_fips": "001"
+  },
+  {
+    "county_id": "34003",
+    "name": "Bergen County",
+    "state_fips": "34",
+    "county_fips": "003"
+  },
+  {
+    "county_id": "34005",
+    "name": "Burlington County",
+    "state_fips": "34",
+    "county_fips": "005"
+  },
+  {
+    "county_id": "34007",
+    "name": "Camden County",
+    "state_fips": "34",
+    "county_fips": "007"
+  },
+  {
+    "county_id": "34009",
+    "name": "Cape May County",
+    "state_fips": "34",
+    "county_fips": "009"
+  },
+  {
+    "county_id": "34011",
+    "name": "Cumberland County",
+    "state_fips": "34",
+    "county_fips": "011"
+  },
+  {
+    "county_id": "34013",
+    "name": "Essex County",
+    "state_fips": "34",
+    "county_fips": "013"
+  },
+  {
+    "county_id": "34015",
+    "name": "Gloucester County",
+    "state_fips": "34",
+    "county_fips": "015"
+  },
+  {
+    "county_id": "34017",
+    "name": "Hudson County",
+    "state_fips": "34",
+    "county_fips": "017"
+  },
+  {
+    "county_id": "34019",
+    "name": "Hunterdon County",
+    "state_fips": "34",
+    "county_fips": "019"
+  },
+  {
+    "county_id": "34021",
+    "name": "Mercer County",
+    "state_fips": "34",
+    "county_fips": "021"
+  },
+  {
+    "county_id": "34023",
+    "name": "Middlesex County",
+    "state_fips": "34",
+    "county_fips": "023"
+  },
+  {
+    "county_id": "34025",
+    "name": "Monmouth County",
+    "state_fips": "34",
+    "county_fips": "025"
+  },
+  {
+    "county_id": "34027",
+    "name": "Morris County",
+    "state_fips": "34",
+    "county_fips": "027"
+  },
+  {
+    "county_id": "34029",
+    "name": "Ocean County",
+    "state_fips": "34",
+    "county_fips": "029"
+  },
+  {
+    "county_id": "34031",
+    "name": "Passaic County",
+    "state_fips": "34",
+    "county_fips": "031"
+  },
+  {
+    "county_id": "34033",
+    "name": "Salem County",
+    "state_fips": "34",
+    "county_fips": "033"
+  },
+  {
+    "county_id": "34035",
+    "name": "Somerset County",
+    "state_fips": "34",
+    "county_fips": "035"
+  },
+  {
+    "county_id": "34037",
+    "name": "Sussex County",
+    "state_fips": "34",
+    "county_fips": "037"
+  },
+  {
+    "county_id": "34039",
+    "name": "Union County",
+    "state_fips": "34",
+    "county_fips": "039"
+  },
+  {
+    "county_id": "34041",
+    "name": "Warren County",
+    "state_fips": "34",
+    "county_fips": "041"
+  }
+]

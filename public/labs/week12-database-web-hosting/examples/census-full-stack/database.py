@@ -1,4 +1,4 @@
-"""Local prepared-town store. Original lecture 12A/district databases stay untouched."""
+"""Local prepared-county store. Original lecture 12A/district databases stay untouched."""
 from contextlib import contextmanager
 from pathlib import Path
 import json
@@ -36,29 +36,29 @@ def connect(path=None):
 def initialize():
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     with connect() as con:
-        con.execute('''CREATE TABLE IF NOT EXISTS towns (
-            town_id TEXT PRIMARY KEY, name TEXT NOT NULL, year INTEGER NOT NULL,
-            prepared_at TEXT NOT NULL, boundary TEXT NOT NULL, source TEXT NOT NULL)''')
-        con.execute('''CREATE TABLE IF NOT EXISTS tracts (
-            town_id TEXT NOT NULL, geoid TEXT NOT NULL, name TEXT NOT NULL,
+        # New county tables keep earlier town datasets intact but out of county results.
+        con.execute('''CREATE TABLE IF NOT EXISTS counties (
+            county_id TEXT PRIMARY KEY, name TEXT NOT NULL, year INTEGER NOT NULL,
+            prepared_at TEXT NOT NULL, source TEXT NOT NULL)''')
+        con.execute('''CREATE TABLE IF NOT EXISTS county_tracts (
+            county_id TEXT NOT NULL, geoid TEXT NOT NULL, name TEXT NOT NULL,
             geometry TEXT NOT NULL, metrics TEXT NOT NULL,
-            PRIMARY KEY (town_id, geoid))''')
+            PRIMARY KEY (county_id, geoid))''')
 
 
-def prepared_towns():
+def prepared_counties():
     with connect() as con:
-        return [dict(row) for row in con.execute('''SELECT t.town_id, t.name, t.year, t.prepared_at,
-            count(r.geoid) AS tract_count FROM towns t LEFT JOIN tracts r USING(town_id)
-            GROUP BY t.town_id ORDER BY t.name''')]
+        return [dict(row) for row in con.execute('''SELECT c.county_id, c.name, c.year, c.prepared_at,
+            substr(c.county_id,1,2) AS state_fips, count(r.geoid) AS tract_count
+            FROM counties c LEFT JOIN county_tracts r USING(county_id)
+            GROUP BY c.county_id ORDER BY c.name,c.county_id''')]
 
 
-def save_town(town, features):
-    # Replace one town atomically; other prepared towns remain available.
+def save_county(county, features):
     with connect() as con:
-        con.execute('DELETE FROM tracts WHERE town_id=?', [town['town_id']])
-        con.execute('''INSERT OR REPLACE INTO towns VALUES (?, ?, ?, ?, ?, ?)''',
-                    [town['town_id'], town['name'], YEAR, town['prepared_at'],
-                     json.dumps(town['boundary']), json.dumps(town['source'])])
-        con.executemany('INSERT INTO tracts VALUES (?, ?, ?, ?, ?)', [
-            (town['town_id'], f['geoid'], f['name'], json.dumps(f['geometry']), json.dumps(f['metrics']))
+        con.execute('DELETE FROM county_tracts WHERE county_id=?', [county['county_id']])
+        con.execute('INSERT OR REPLACE INTO counties VALUES (?, ?, ?, ?, ?)',
+                    [county['county_id'], county['name'], YEAR, county['prepared_at'], json.dumps(county['source'])])
+        con.executemany('INSERT INTO county_tracts VALUES (?, ?, ?, ?, ?)', [
+            (county['county_id'], f['geoid'], f['name'], json.dumps(f['geometry']), json.dumps(f['metrics']))
             for f in features])

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Census query lab</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="/static/styles.css">
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script defer src="/static/app.js"></script></head>
+<body><header><span>WEEK 12 · FULL STACK GIS</span><h1>Census query lab</h1><p>A click on the map becomes a Python request, a spatial SQL query, and a new result.</p></header>
+<main><aside><h2>Explore the teaching sample</h2>
+<p class="notice">Synthetic 2010 Census dots · 2015 districts. Counts are sample dots, not population estimates or current demographics.</p>
+<label for="category">Historical source category</label><select id="category"><option value="all">All categories</option><option value="w">White</option><option value="b">Black</option><option value="a">Asian</option><option value="h">Hispanic</option><option value="o">Other</option></select>
+<label for="radius">Search radius</label><select id="radius"><option value="1000">1 km</option><option value="2000" selected>2 km</option><option value="5000">5 km</option><option value="10000">10 km</option></select>
+<button id="philly" type="button">Try Philadelphia City Hall</button>
+<p id="status" role="status" aria-live="polite">Loading districts…</p>
+<h2 id="total">Choose a location</h2><p id="location"></p><ul id="counts"></ul>
+<p><a href="/docs">Explore the API docs</a> · <a id="request" href="/api/health" target="_blank" rel="noopener">View last response</a></p>
+<p class="hint">District shading shows category sample-dot counts. Click inside Pennsylvania to query a radius. Border searches count only points in the Pennsylvania extract.</p>
+</aside><section class="map-panel" aria-label="Interactive district map"><div id="map"></div><div class="legend"><strong>Sample dots per historical district</strong><div id="legend">Loading…</div><small>Counts, not density; color thresholds change with the selected category.</small></div></section></main>
+<footer>Browser → FastAPI (Python) → DuckDB Spatial → JSON → map. Leaflet and OpenStreetMap tiles require internet access.</footer></body></html>

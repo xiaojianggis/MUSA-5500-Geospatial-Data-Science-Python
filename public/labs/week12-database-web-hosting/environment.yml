@@ -1,9 +1,10 @@
-name: census-web
+# Dependency reference for the existing course geospatial environment.
+# Follow the notebooks to install additional packages without creating a new environment.
+name: geospatial
 channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - python=3.12
   - python-duckdb=1.5.6
   - pandas=2.2
   - matplotlib
@@ -15,3 +16,6 @@ dependencies:
   - ipykernel
   - nbclient
   - nbconvert
+  - fastapi
+  - uvicorn
+  - httpx

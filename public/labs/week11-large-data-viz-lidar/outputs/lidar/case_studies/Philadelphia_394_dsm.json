@@ -1,0 +1,6 @@
+{
+  "source_raster": "Philadelphia_394_idw.tif",
+  "source_pipeline": "Philadelphia_394_idw.json",
+  "smoothing": "3x3 median",
+  "preserve_nodata": true
+}

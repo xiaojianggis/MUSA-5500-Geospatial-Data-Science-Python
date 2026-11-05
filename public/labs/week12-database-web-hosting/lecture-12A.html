@@ -84,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#what-is-a-database" id="toc-what-is-a-database" class="nav-link active" data-scroll-target="#what-is-a-database">1. What is a database?</a></li>
-  <li><a href="#reuse-your-week-11-data-and-prepare-python" id="toc-reuse-your-week-11-data-and-prepare-python" class="nav-link" data-scroll-target="#reuse-your-week-11-data-and-prepare-python">2. Reuse your Week 11 data and prepare Python</a></li>
+  <li><a href="#download-data-into-week12data-and-prepare-python" id="toc-download-data-into-week12data-and-prepare-python" class="nav-link" data-scroll-target="#download-data-into-week12data-and-prepare-python">2. Download data into week12/data and prepare Python</a></li>
   <li><a href="#create-and-connect-to-a-database" id="toc-create-and-connect-to-a-database" class="nav-link" data-scroll-target="#create-and-connect-to-a-database">3. Create and connect to a database</a></li>
   <li><a href="#create-tables-and-import-source-files" id="toc-create-tables-and-import-source-files" class="nav-link" data-scroll-target="#create-tables-and-import-source-files">4. Create tables and import source files</a>
   <ul class="collapse">
@@ -169,35 +169,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <p>DuckDB runs inside Python and stores this database in one file. It is convenient for local analytical work. A shared application with many writers would normally use a server database instead. Its <strong>Spatial</strong> extension adds geometry types and spatial functions. <a href="https://duckdb.org/docs/1.5/clients/python/overview">DuckDB Python documentation</a> · <a href="https://duckdb.org/docs/1.5/core_extensions/spatial/overview">Spatial extension</a>.</p>
 </section>
-<section id="reuse-your-week-11-data-and-prepare-python" class="level2">
-<h2 class="anchored" data-anchor-id="reuse-your-week-11-data-and-prepare-python">2. Reuse your Week 11 data and prepare Python</h2>
-<p><strong>No new Census data download is needed.</strong> Use the same <code>census_sample.parquet</code> and <code>districts_2015.geojson</code> files from Week 11. Save this notebook and <a href="environment.yml" download="">environment.yml</a> in a new <code>week12</code> folder next to your <code>week11</code> folder:</p>
-<pre class="text"><code>course-work/
-├── week11/
-│   └── data/samples/
-│       ├── census_sample.parquet
-│       └── districts_2015.geojson
-└── week12/
-    ├── lecture-12A.ipynb
-    └── environment.yml</code></pre>
-<p>Open the notebook from <code>week12</code>. <code>DATA = Path("../week11/data/samples")</code> below points to your existing files. If you used another folder name, edit that one path. The point file is the previous week’s systematically thinned <strong>synthetic 2010 Census dot extract</strong>; the polygons are historical 2015 congressional boundaries. We select Pennsylvania inside DuckDB. Counts are <strong>sample dots, not population estimates or current district demographics</strong>. <a href="../week11-large-data-viz-lidar/data/samples/provenance.json">Original data provenance</a>.</p>
-<p>Open a terminal in <code>week12</code>:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> env create <span class="at">-f</span> environment.yml</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate census-web</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> ipykernel install <span class="at">--user</span> <span class="at">--name</span> census-web <span class="at">--display-name</span> <span class="st">"Python (census-web)"</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">jupyter</span> lab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Select <strong>Python (census-web)</strong>. Quarto is installed separately for the next section. For an existing environment, use <code>conda env update -n census-web -f environment.yml</code> instead.</p>
+<section id="download-data-into-week12data-and-prepare-python" class="level2">
+<h2 class="anchored" data-anchor-id="download-data-into-week12data-and-prepare-python">2. Download data into week12/data and prepare Python</h2>
+<p>Create a local <strong><code>week12</code></strong> folder and a <strong><code>data</code></strong> subfolder. Download both required files using these links and save them directly in <strong><code>week12/data/</code></strong>, keeping the filenames unchanged:</p>
+<ul>
+<li><a href="../week11-large-data-viz-lidar/data/samples/census_sample.parquet" download="">Download census_sample.parquet</a></li>
+<li><a href="../week11-large-data-viz-lidar/data/samples/districts_2015.geojson" download="">Download districts_2015.geojson</a></li>
+</ul>
+<p>If your browser saves files to Downloads, move them into <code>week12/data</code> before running the notebook. These are the same teaching datasets used in Week 11; Week 12 reads its own local copies.</p>
+<pre class="text"><code>week12/
+├── data/
+│   ├── census_sample.parquet
+│   └── districts_2015.geojson
+├── lecture-12A.ipynb
+├── lecture-12B.ipynb
+└── lecture-12C.ipynb</code></pre>
+<p>Open Jupyter from <code>week12</code> and save the notebooks there. The notebook uses <code>DATA = Path("data")</code> to read these files. Generated analysis exports go into <code>week12/outputs</code>.</p>
+<p>The points are synthetic 2010 Census teaching dots and the polygons are historical 2015 congressional boundaries. Counts are <strong>sample dots, not population estimates or current district demographics</strong>. <a href="../week11-large-data-viz-lidar/data/samples/provenance.json">Data provenance</a>.</p>
+<p>Keep using the <strong><code>geospatial</code> environment</strong> created earlier in the course. Install the additional packages into that environment; you do not need to create a Week 12 environment. Run these commands in a <strong>terminal</strong> (Anaconda Prompt on Windows):</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate geospatial</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge python-duckdb=1.5.6 pyarrow</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>DuckDB provides the database and spatial SQL; PyArrow supports Parquet/table exchange. The notebook also uses pandas, GeoPandas, and Matplotlib from your existing environment. If an import reports a missing package, install it in the same activated environment, for example <code>conda install -c conda-forge pandas geopandas matplotlib</code>.</p>
+<p>To make the existing environment available in Jupyter:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge ipykernel jupyterlab</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> ipykernel install <span class="at">--user</span> <span class="at">--name</span> geospatial <span class="at">--display-name</span> <span class="st">"Python (geospatial)"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">jupyter</span> lab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Select <strong>Python (geospatial)</strong> in the notebook’s kernel menu. After installing a package, restart the kernel and rerun the notebook. To check the selected interpreter, run <code>import sys; print(sys.executable)</code> in a code cell; its path should point to <code>geospatial</code>. Quarto is installed separately in Part B.</p>
 <div id="a1ff958b" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:01.728073Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:01.727696Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:09.421007Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:09.420417Z&quot;}" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> duckdb</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>DATA <span class="op">=</span> Path(<span class="st">"../week11/data/samples"</span>)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>OUT <span class="op">=</span> Path(<span class="st">"outputs"</span>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>OUT.mkdir(exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"DuckDB:"</span>, duckdb.__version__)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> duckdb</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>DATA <span class="op">=</span> Path(<span class="st">"data"</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>OUT <span class="op">=</span> Path(<span class="st">"outputs"</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>OUT.mkdir(exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"DuckDB:"</span>, duckdb.__version__)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>DuckDB: 1.5.6</code></pre>
 </div>
@@ -206,13 +214,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="create-and-connect-to-a-database" class="level2">
 <h2 class="anchored" data-anchor-id="create-and-connect-to-a-database">3. Create and connect to a database</h2>
 <p><code>connect()</code> creates the file if it does not exist, or opens it if it does. <code>:memory:</code> would create a temporary database instead. This file stays local; the website will use small exports, not a live connection to this Python session.</p>
-<p><code>INSTALL spatial</code> downloads the extension the first time and needs internet access. <code>LOAD spatial</code> activates it in each new connection. If installation fails, check the network and use the DuckDB version in <code>environment.yml</code>. <a href="https://duckdb.org/docs/1.5/core_extensions/spatial/overview">Extension documentation</a>.</p>
+<p><code>INSTALL spatial</code> downloads the extension the first time and needs internet access. <code>LOAD spatial</code> activates it in each new connection. If installation fails, check the network and run <code>conda install -c conda-forge python-duckdb=1.5.6</code> in your activated <code>geospatial</code> environment, then restart the kernel. <a href="https://duckdb.org/docs/1.5/core_extensions/spatial/overview">Extension documentation</a>.</p>
 <div id="620fb909" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:09.422396Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:09.422238Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:09.503793Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:09.503401Z&quot;}" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>database_path <span class="op">=</span> OUT <span class="op">/</span> <span class="st">"census_tutorial.duckdb"</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>con <span class="op">=</span> duckdb.<span class="ex">connect</span>(<span class="bu">str</span>(database_path))</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"INSTALL spatial"</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"LOAD spatial"</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"SELECT 2 + 3 AS first_query"</span>).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>database_path <span class="op">=</span> OUT <span class="op">/</span> <span class="st">"census_tutorial.duckdb"</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>con <span class="op">=</span> duckdb.<span class="ex">connect</span>(<span class="bu">str</span>(database_path))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"INSTALL spatial"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"LOAD spatial"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"SELECT 2 + 3 AS first_query"</span>).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div>
 
@@ -242,20 +250,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>First import Pennsylvania polygons, then keep only Census points they cover. A coarse coordinate filter reduces the first scan; the final <code>ST_Covers</code> test defines the selection precisely.</p>
 <p>The point source uses EPSG:3857, and the boundary GeoJSON uses longitude/latitude, EPSG:4326. Transform both to <strong>EPSG:26918 (UTM zone 18N, meters)</strong> for local spatial operations. <code>always_xy := true</code> makes longitude/X the first axis. Do not measure distances directly in longitude/latitude degrees. A geometry column does not relieve us of tracking its CRS. <a href="https://duckdb.org/docs/1.5/core_extensions/spatial/functions">Spatial functions</a>.</p>
 <div id="a36a4331" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:09.505129Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:09.505017Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:09.565158Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:09.564481Z&quot;}" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="st">    CREATE OR REPLACE TABLE districts (</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="st">        district_id VARCHAR PRIMARY KEY,</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="st">        geom GEOMETRY</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="st">    )</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="st">    INSERT INTO districts</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT STATEFP || CD114FP AS district_id,</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="st">           ST_Transform(geom, 'EPSG:4326', 'EPSG:26918', always_xy := true)</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM ST_Read(?)</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE STATEFP = '42'</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>, [<span class="bu">str</span>(DATA <span class="op">/</span> <span class="st">"districts_2015.geojson"</span>)])</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"SHOW TABLES"</span>).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="st">    CREATE OR REPLACE TABLE districts (</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="st">        district_id VARCHAR PRIMARY KEY,</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="st">        geom GEOMETRY</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="st">    )</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="st">    INSERT INTO districts</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT STATEFP || CD114FP AS district_id,</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="st">           ST_Transform(geom, 'EPSG:4326', 'EPSG:26918', always_xy := true)</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM ST_Read(?)</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE STATEFP = '42'</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>, [<span class="bu">str</span>(DATA <span class="op">/</span> <span class="st">"districts_2015.geojson"</span>)])</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"SHOW TABLES"</span>).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div>
 
@@ -279,27 +287,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div id="468248ab" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:09.566336Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:09.566243Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:09.752419Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:09.751766Z&quot;}" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="st">    CREATE OR REPLACE TABLE census_points (</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="st">        point_id INTEGER PRIMARY KEY,</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="st">        category VARCHAR,</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="st">        geom GEOMETRY</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="st">    )</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="st">    INSERT INTO census_points</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="st">    WITH candidates AS (</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="st">        SELECT easting AS x, northing AS y, race::VARCHAR AS category,</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="st">               ST_Transform(ST_Point(easting, northing), 'EPSG:3857', 'EPSG:26918', always_xy := true) AS geom</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="st">        FROM read_parquet(?)</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="st">        WHERE easting BETWEEN -9000000 AND -8200000</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="st">          AND northing BETWEEN 4750000 AND 5300000</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="st">    )</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT row_number() OVER (ORDER BY p.x, p.y, p.category), p.category, p.geom</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM candidates p</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE EXISTS (SELECT 1 FROM districts d WHERE ST_Covers(d.geom, p.geom))</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>, [<span class="bu">str</span>(DATA <span class="op">/</span> <span class="st">"census_sample.parquet"</span>)])</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"SELECT point_id, category, ST_AsText(geom) AS coordinates FROM census_points LIMIT 5"</span>).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="st">    CREATE OR REPLACE TABLE census_points (</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="st">        point_id INTEGER PRIMARY KEY,</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="st">        category VARCHAR,</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="st">        geom GEOMETRY</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="st">    )</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="st">    INSERT INTO census_points</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="st">    WITH candidates AS (</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="st">        SELECT easting AS x, northing AS y, race::VARCHAR AS category,</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="st">               ST_Transform(ST_Point(easting, northing), 'EPSG:3857', 'EPSG:26918', always_xy := true) AS geom</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="st">        FROM read_parquet(?)</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="st">        WHERE easting BETWEEN -9000000 AND -8200000</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="st">          AND northing BETWEEN 4750000 AND 5300000</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="st">    )</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT row_number() OVER (ORDER BY p.x, p.y, p.category), p.category, p.geom</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM candidates p</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE EXISTS (SELECT 1 FROM districts d WHERE ST_Covers(d.geom, p.geom))</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>, [<span class="bu">str</span>(DATA <span class="op">/</span> <span class="st">"census_sample.parquet"</span>)])</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"SELECT point_id, category, ST_AsText(geom) AS coordinates FROM census_points LIMIT 5"</span>).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div>
 
@@ -354,14 +362,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="inspect-the-schema-and-data-quality">Inspect the schema and data quality</h3>
 <p>Check counts, unique IDs, empty or invalid geometry, and categories before analysis. <code>df()</code> returns the small query result as a pandas DataFrame; it need not load the whole source table.</p>
 <div id="9cb16528" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:09.753786Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:09.753659Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:09.765060Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:09.764567Z&quot;}" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>display(con.execute(<span class="st">"DESCRIBE census_points"</span>).df())</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>display(con.execute(<span class="st">"""</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT count(*) AS sample_dots,</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="st">           count(DISTINCT point_id) AS unique_ids,</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="st">           count(*) FILTER (WHERE geom IS NULL OR ST_IsEmpty(geom)) AS missing_geometry</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM census_points</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>).df())</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"SELECT count(*) AS districts, bool_and(ST_IsValid(geom)) AS all_valid FROM districts"</span>).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>display(con.execute(<span class="st">"DESCRIBE census_points"</span>).df())</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>display(con.execute(<span class="st">"""</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT count(*) AS sample_dots,</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="st">           count(DISTINCT point_id) AS unique_ids,</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="st">           count(*) FILTER (WHERE geom IS NULL OR ST_IsEmpty(geom)) AS missing_geometry</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM census_points</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>).df())</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"SELECT count(*) AS districts, bool_and(ST_IsValid(geom)) AS all_valid FROM districts"</span>).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 
@@ -466,14 +474,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="select-filter-sort-and-summarize-with-sql">5. Select, filter, sort, and summarize with SQL</h2>
 <p><code>SELECT</code> chooses columns; <code>WHERE</code> filters rows; <code>GROUP BY</code> forms groups; <code>ORDER BY</code> sorts; <code>LIMIT</code> keeps a small result. <code>?</code> is a parameter placeholder: pass Python values separately instead of inserting user text into SQL strings.</p>
 <div id="d16fa779" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:09.766213Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:09.766130Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:09.770959Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:09.770532Z&quot;}" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>category <span class="op">=</span> <span class="st">"b"</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT point_id, category</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM census_points</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE category = ?</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="st">    ORDER BY point_id</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="st">    LIMIT 5</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>, [category]).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>category <span class="op">=</span> <span class="st">"b"</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT point_id, category</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM census_points</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE category = ?</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="st">    ORDER BY point_id</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="st">    LIMIT 5</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>, [category]).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <div>
 
@@ -519,15 +527,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div id="79b0fa66" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:09.772242Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:09.772156Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:09.777775Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:09.777291Z&quot;}" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="st">    CREATE OR REPLACE VIEW category_summary AS</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT category, count(*) AS sample_dots,</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="st">           round(100.0 * count(*) / (SELECT count(*) FROM census_points), 2) AS sample_percent</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM census_points</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY category</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>category_counts <span class="op">=</span> con.execute(<span class="st">"SELECT * FROM category_summary ORDER BY sample_dots DESC"</span>).df()</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>category_counts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="st">    CREATE OR REPLACE VIEW category_summary AS</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT category, count(*) AS sample_dots,</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="st">           round(100.0 * count(*) / (SELECT count(*) FROM census_points), 2) AS sample_percent</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM census_points</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY category</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>category_counts <span class="op">=</span> con.execute(<span class="st">"SELECT * FROM category_summary ORDER BY sample_dots DESC"</span>).df()</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>category_counts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div>
 
@@ -583,14 +591,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="visualize-the-query-result">Visualize the query result</h3>
 <p>Use a bar chart for counts. The source categories are White (<code>w</code>), Black (<code>b</code>), Asian (<code>a</code>), Hispanic (<code>h</code>), and Other (<code>o</code>). They are source-specific historical categories, not an exhaustive description of identity.</p>
 <div id="0b968428" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:09.779115Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:09.779047Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:10.111944Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:10.111471Z&quot;}" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> {<span class="st">"w"</span>: <span class="st">"White"</span>, <span class="st">"b"</span>: <span class="st">"Black"</span>, <span class="st">"a"</span>: <span class="st">"Asian"</span>, <span class="st">"h"</span>: <span class="st">"Hispanic"</span>, <span class="st">"o"</span>: <span class="st">"Other"</span>}</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>ax.bar(category_counts[<span class="st">"category"</span>].<span class="bu">map</span>(labels), category_counts[<span class="st">"sample_dots"</span>], color<span class="op">=</span><span class="st">"#176b87"</span>)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylabel<span class="op">=</span><span class="st">"Sample dots"</span>, title<span class="op">=</span><span class="st">"Pennsylvania teaching extract: category counts"</span>)</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>fig.savefig(OUT <span class="op">/</span> <span class="st">"category_counts.png"</span>, dpi<span class="op">=</span><span class="dv">160</span>)</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> {<span class="st">"w"</span>: <span class="st">"White"</span>, <span class="st">"b"</span>: <span class="st">"Black"</span>, <span class="st">"a"</span>: <span class="st">"Asian"</span>, <span class="st">"h"</span>: <span class="st">"Hispanic"</span>, <span class="st">"o"</span>: <span class="st">"Other"</span>}</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>ax.bar(category_counts[<span class="st">"category"</span>].<span class="bu">map</span>(labels), category_counts[<span class="st">"sample_dots"</span>], color<span class="op">=</span><span class="st">"#176b87"</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(ylabel<span class="op">=</span><span class="st">"Sample dots"</span>, title<span class="op">=</span><span class="st">"Pennsylvania teaching extract: category counts"</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>fig.savefig(OUT <span class="op">/</span> <span class="st">"category_counts.png"</span>, dpi<span class="op">=</span><span class="dv">160</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -605,15 +613,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="ask-a-spatial-question-which-district-contains-a-location">6. Ask a spatial question: which district contains a location?</h2>
 <p>A spatial predicate compares geometries. <code>ST_Covers(polygon, point)</code> includes a polygon boundary; <code>ST_Contains</code> excludes boundary-only points. Transform the test point from longitude/latitude into the same CRS as the districts. This example uses Philadelphia City Hall.</p>
 <div id="0294c4e0" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:10.113774Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:10.113628Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:10.122490Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:10.121985Z&quot;}" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>longitude, latitude <span class="op">=</span> <span class="op">-</span><span class="fl">75.1636</span>, <span class="fl">39.9526</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="st">    WITH location AS (</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="st">        SELECT ST_Transform(ST_Point(?, ?), 'EPSG:4326', 'EPSG:26918', always_xy := true) AS geom</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="st">    )</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT d.district_id</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM districts d, location p</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE ST_Covers(d.geom, p.geom)</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>, [longitude, latitude]).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>longitude, latitude <span class="op">=</span> <span class="op">-</span><span class="fl">75.1636</span>, <span class="fl">39.9526</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="st">    WITH location AS (</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="st">        SELECT ST_Transform(ST_Point(?, ?), 'EPSG:4326', 'EPSG:26918', always_xy := true) AS geom</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="st">    )</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT d.district_id</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM districts d, location p</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE ST_Covers(d.geom, p.geom)</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>, [longitude, latitude]).df()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <div>
 
@@ -640,18 +648,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="find-sample-dots-within-2-km">Find sample dots within 2 km</h3>
 <p><code>ST_DWithin()</code> uses the units of our projected CRS: meters. It counts points from the extract, not people actually living within the circle. Change <code>radius_m</code> and compare the result.</p>
 <div id="f79ee469" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:10.123606Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:10.123520Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:10.134738Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:10.134225Z&quot;}" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>radius_m <span class="op">=</span> <span class="dv">2000</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>nearby_counts <span class="op">=</span> con.execute(<span class="st">"""</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="st">    WITH location AS (</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="st">        SELECT ST_Transform(ST_Point(?, ?), 'EPSG:4326', 'EPSG:26918', always_xy := true) AS geom</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="st">    )</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT p.category, count(*) AS sample_dots</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM census_points p, location c</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE ST_DWithin(p.geom, c.geom, ?)</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY p.category</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="st">    ORDER BY sample_dots DESC</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>, [longitude, latitude, radius_m]).df()</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>nearby_counts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>radius_m <span class="op">=</span> <span class="dv">2000</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>nearby_counts <span class="op">=</span> con.execute(<span class="st">"""</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="st">    WITH location AS (</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="st">        SELECT ST_Transform(ST_Point(?, ?), 'EPSG:4326', 'EPSG:26918', always_xy := true) AS geom</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="st">    )</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT p.category, count(*) AS sample_dots</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM census_points p, location c</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE ST_DWithin(p.geom, c.geom, ?)</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY p.category</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="st">    ORDER BY sample_dots DESC</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>, [longitude, latitude, radius_m]).df()</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>nearby_counts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <div>
 
@@ -702,22 +710,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="spatial-join-summarize-dots-by-district">7. Spatial join: summarize dots by district</h2>
 <p>A spatial join matches rows by location instead of an ID. Points on a shared boundary could match more than one polygon. We assign those points once, to the smallest matching district ID, so our totals do not double count. This is a reproducible teaching rule, not a demographic allocation method.</p>
 <div id="a10f802b" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:10.136055Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:10.135970Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:10.359539Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:10.359146Z&quot;}" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="st">    CREATE OR REPLACE VIEW point_district AS</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT p.point_id, min(d.district_id) AS district_id</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM census_points p</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="st">    JOIN districts d ON ST_Covers(d.geom, p.geom)</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY p.point_id</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="st">    CREATE OR REPLACE VIEW district_summary AS</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT d.district_id, count(a.point_id) AS sample_dots</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM districts d</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="st">    LEFT JOIN point_district a ON d.district_id = a.district_id</span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY d.district_id</span></span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>district_counts <span class="op">=</span> con.execute(<span class="st">"SELECT * FROM district_summary ORDER BY district_id"</span>).df()</span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>district_counts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="st">    CREATE OR REPLACE VIEW point_district AS</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT p.point_id, min(d.district_id) AS district_id</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM census_points p</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="st">    JOIN districts d ON ST_Covers(d.geom, p.geom)</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY p.point_id</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="st">    CREATE OR REPLACE VIEW district_summary AS</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT d.district_id, count(a.point_id) AS sample_dots</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM districts d</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="st">    LEFT JOIN point_district a ON d.district_id = a.district_id</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY d.district_id</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>district_counts <span class="op">=</span> con.execute(<span class="st">"SELECT * FROM district_summary ORDER BY district_id"</span>).df()</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>district_counts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <div>
 
@@ -828,10 +836,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div id="aeacb2be" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:10.360973Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:10.360829Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:10.607519Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:10.606872Z&quot;}" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>point_count <span class="op">=</span> con.execute(<span class="st">"SELECT count(*) FROM census_points"</span>).fetchone()[<span class="dv">0</span>]</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>assigned_count <span class="op">=</span> con.execute(<span class="st">"SELECT count(*) FROM point_district"</span>).fetchone()[<span class="dv">0</span>]</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> point_count <span class="op">==</span> assigned_count <span class="op">==</span> <span class="bu">int</span>(district_counts[<span class="st">"sample_dots"</span>].<span class="bu">sum</span>())</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"All </span><span class="sc">{</span>point_count<span class="sc">:,}</span><span class="ss"> sample dots assigned once across </span><span class="sc">{</span><span class="bu">len</span>(district_counts)<span class="sc">}</span><span class="ss"> districts."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>point_count <span class="op">=</span> con.execute(<span class="st">"SELECT count(*) FROM census_points"</span>).fetchone()[<span class="dv">0</span>]</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>assigned_count <span class="op">=</span> con.execute(<span class="st">"SELECT count(*) FROM point_district"</span>).fetchone()[<span class="dv">0</span>]</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> point_count <span class="op">==</span> assigned_count <span class="op">==</span> <span class="bu">int</span>(district_counts[<span class="st">"sample_dots"</span>].<span class="bu">sum</span>())</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"All </span><span class="sc">{</span>point_count<span class="sc">:,}</span><span class="ss"> sample dots assigned once across </span><span class="sc">{</span><span class="bu">len</span>(district_counts)<span class="sc">}</span><span class="ss"> districts."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>All 63,552 sample dots assigned once across 18 districts.</code></pre>
 </div>
@@ -840,8 +848,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="what-about-spatial-indexes">What about spatial indexes?</h3>
 <p>An R-tree index can help some supported spatial filters on larger data. This small example does not need one, and not every query uses the index. Use <code>EXPLAIN</code> and measure performance before claiming a speedup. <a href="https://duckdb.org/docs/1.5/core_extensions/spatial/r-tree_indexes">DuckDB spatial indexes</a>.</p>
 <div id="4446d1c6" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:10.609374Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:10.609188Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:10.612970Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:10.612442Z&quot;}" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"CREATE INDEX IF NOT EXISTS district_geom_idx ON districts USING RTREE (geom)"</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Created an optional R-tree index on district geometry."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"CREATE INDEX IF NOT EXISTS district_geom_idx ON districts USING RTREE (geom)"</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Created an optional R-tree index on district geometry."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Created an optional R-tree index on district geometry.</code></pre>
 </div>
@@ -852,21 +860,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="map-the-analysis-result">8. Map the analysis result</h2>
 <p>Return geometry as WKB (well-known binary) to create a GeoDataFrame. Tell GeoPandas the actual CRS; assigning a CRS does not transform coordinates. The map colors are <strong>counts of sample dots</strong>, not density or current population.</p>
 <div id="948c9125" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:10.614316Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:10.614198Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:10.997150Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:10.996561Z&quot;}" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>map_table <span class="op">=</span> con.execute(<span class="st">"""</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT d.district_id, s.sample_dots, ST_AsWKB(d.geom) AS geometry_wkb</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM districts d JOIN district_summary s USING (district_id)</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="st">    ORDER BY district_id</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>).df()</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>geometry <span class="op">=</span> gpd.GeoSeries.from_wkb(map_table.pop(<span class="st">"geometry_wkb"</span>).<span class="bu">map</span>(<span class="bu">bytes</span>), crs<span class="op">=</span><span class="st">"EPSG:26918"</span>)</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>district_map <span class="op">=</span> gpd.GeoDataFrame(map_table, geometry<span class="op">=</span>geometry)</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>district_map.plot(column<span class="op">=</span><span class="st">"sample_dots"</span>, cmap<span class="op">=</span><span class="st">"YlGnBu"</span>, edgecolor<span class="op">=</span><span class="st">"white"</span>, linewidth<span class="op">=</span><span class="fl">0.6</span>,</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>                  legend<span class="op">=</span><span class="va">True</span>, legend_kwds<span class="op">=</span>{<span class="st">"label"</span>: <span class="st">"Sample dots"</span>}, ax<span class="op">=</span>ax)</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(title<span class="op">=</span><span class="st">"Historical Pennsylvania districts: Census teaching dot counts"</span>)</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>fig.savefig(OUT <span class="op">/</span> <span class="st">"district_sample_map.png"</span>, dpi<span class="op">=</span><span class="dv">160</span>)</span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>map_table <span class="op">=</span> con.execute(<span class="st">"""</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT d.district_id, s.sample_dots, ST_AsWKB(d.geom) AS geometry_wkb</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM districts d JOIN district_summary s USING (district_id)</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="st">    ORDER BY district_id</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>).df()</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>geometry <span class="op">=</span> gpd.GeoSeries.from_wkb(map_table.pop(<span class="st">"geometry_wkb"</span>).<span class="bu">map</span>(<span class="bu">bytes</span>), crs<span class="op">=</span><span class="st">"EPSG:26918"</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>district_map <span class="op">=</span> gpd.GeoDataFrame(map_table, geometry<span class="op">=</span>geometry)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>district_map.plot(column<span class="op">=</span><span class="st">"sample_dots"</span>, cmap<span class="op">=</span><span class="st">"YlGnBu"</span>, edgecolor<span class="op">=</span><span class="st">"white"</span>, linewidth<span class="op">=</span><span class="fl">0.6</span>,</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>                  legend<span class="op">=</span><span class="va">True</span>, legend_kwds<span class="op">=</span>{<span class="st">"label"</span>: <span class="st">"Sample dots"</span>}, ax<span class="op">=</span>ax)</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(title<span class="op">=</span><span class="st">"Historical Pennsylvania districts: Census teaching dot counts"</span>)</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>fig.tight_layout()</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>fig.savefig(OUT <span class="op">/</span> <span class="st">"district_sample_map.png"</span>, dpi<span class="op">=</span><span class="dv">160</span>)</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -880,11 +888,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="export-small-files-for-the-website">9. Export small files for the website</h2>
 <p>Static websites can show exported tables, charts, and GeoJSON without starting Python or opening the DuckDB database. CSV keeps IDs as text only if the reader preserves them. GeoJSON is exported in longitude/latitude for web mapping.</p>
 <div id="bb1e789e" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:10.998894Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:10.998778Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:16.845103Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:16.844692Z&quot;}" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>category_counts.to_csv(OUT <span class="op">/</span> <span class="st">"category_counts.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>category_counts.to_json(OUT <span class="op">/</span> <span class="st">"category_counts.json"</span>, orient<span class="op">=</span><span class="st">"records"</span>, indent<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>district_counts.to_csv(OUT <span class="op">/</span> <span class="st">"district_counts.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>district_map.to_crs(<span class="st">"EPSG:4326"</span>).to_file(OUT <span class="op">/</span> <span class="st">"district_sample.geojson"</span>, driver<span class="op">=</span><span class="st">"GeoJSON"</span>)</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Exports saved in outputs/."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>category_counts.to_csv(OUT <span class="op">/</span> <span class="st">"category_counts.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>category_counts.to_json(OUT <span class="op">/</span> <span class="st">"category_counts.json"</span>, orient<span class="op">=</span><span class="st">"records"</span>, indent<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>district_counts.to_csv(OUT <span class="op">/</span> <span class="st">"district_counts.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>district_map.to_crs(<span class="st">"EPSG:4326"</span>).to_file(OUT <span class="op">/</span> <span class="st">"district_sample.geojson"</span>, driver<span class="op">=</span><span class="st">"GeoJSON"</span>)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Exports saved in outputs/."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Exports saved in outputs/.</code></pre>
 </div>
@@ -894,12 +902,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="close-and-reopen-the-database">10. Close and reopen the database</h2>
 <p>Closing the connection does not delete the database file. Reopen in read-only mode to check persistence. Load Spatial again before working with geometries. Close connections before sharing the file; this is not a web server.</p>
 <div id="6c1b262e" class="cell" data-execution="{&quot;iopub.execute_input&quot;:&quot;2026-10-29T11:38:16.846455Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-10-29T11:38:16.846301Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-10-29T11:38:16.954334Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-10-29T11:38:16.953503Z&quot;}" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>con.close()</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> duckdb.<span class="ex">connect</span>(<span class="bu">str</span>(database_path), read_only<span class="op">=</span><span class="va">True</span>) <span class="im">as</span> saved:</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    saved.execute(<span class="st">"LOAD spatial"</span>)</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    restored_count <span class="op">=</span> saved.execute(<span class="st">"SELECT count(*) FROM census_points"</span>).fetchone()[<span class="dv">0</span>]</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> restored_count <span class="op">==</span> point_count</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Reopened database:"</span>, database_path, <span class="st">"| sample dots:"</span>, restored_count)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>con.close()</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> duckdb.<span class="ex">connect</span>(<span class="bu">str</span>(database_path), read_only<span class="op">=</span><span class="va">True</span>) <span class="im">as</span> saved:</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    saved.execute(<span class="st">"LOAD spatial"</span>)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    restored_count <span class="op">=</span> saved.execute(<span class="st">"SELECT count(*) FROM census_points"</span>).fetchone()[<span class="dv">0</span>]</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> restored_count <span class="op">==</span> point_count</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Reopened database:"</span>, database_path, <span class="st">"| sample dots:"</span>, restored_count)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Reopened database: outputs/census_tutorial.duckdb | sample dots: 63552</code></pre>
 </div>

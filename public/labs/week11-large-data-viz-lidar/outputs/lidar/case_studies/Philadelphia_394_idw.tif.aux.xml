@@ -1,0 +1,18 @@
+<PAMDataset>
+  <Metadata>
+    <MDI key="method">idw</MDI>
+    <MDI key="vertical_reference">NAVD88 height (ftUS) - US Geoid Model of 2018</MDI>
+  </Metadata>
+  <PAMRasterBand band="1">
+    <Description>idw</Description>
+    <UnitType>m</UnitType>
+    <Metadata>
+      <MDI key="STATISTICS_APPROXIMATE">YES</MDI>
+      <MDI key="STATISTICS_MAXIMUM">115.76300048828</MDI>
+      <MDI key="STATISTICS_MEAN">21.332871109737</MDI>
+      <MDI key="STATISTICS_MINIMUM">-1.3582625389099</MDI>
+      <MDI key="STATISTICS_STDDEV">14.011674447114</MDI>
+      <MDI key="STATISTICS_VALID_PERCENT">99.57</MDI>
+    </Metadata>
+  </PAMRasterBand>
+</PAMDataset>

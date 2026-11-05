@@ -1,50 +1,59 @@
 # Week 12: Databases and web hosting
 
-Two student-facing tutorials connect spatial analysis to publication:
+Three student-facing tutorials connect spatial analysis to publication:
 
 1. [Census analysis with DuckDB Spatial](lecture-12A.html) — [notebook](lecture-12A.ipynb).
 2. [Quarto, ChatGPT, localhost, and GitHub Pages](lecture-12B.html) — [notebook notes](lecture-12B.ipynb).
 
+3. [Full-stack Census GIS with a Python backend](lecture-12C.html) — [notebook](lecture-12C.ipynb) · [runnable project ZIP](downloads/census-full-stack.zip).
+
 Start at [the module homepage](index.html). [Download the tutorial folder](downloads/week12-tutorials.zip).
 
-## Reuse Week 11 data
+## Download data into week12/data
 
-**Do not download another Census dataset.** The database notebook uses the exact `census_sample.parquet` and `districts_2015.geojson` files from Week 11. It selects Pennsylvania inside DuckDB.
+Create a local **`week12`** folder and a **`data`** subfolder. Download both required files using these links and save them directly in **`week12/data/`**, keeping the filenames unchanged:
+
+- <a href="../week11-large-data-viz-lidar/data/samples/census_sample.parquet" download>Download census_sample.parquet</a>
+- <a href="../week11-large-data-viz-lidar/data/samples/districts_2015.geojson" download>Download districts_2015.geojson</a>
+
+If your browser saves files to Downloads, move them into `week12/data` before running the notebook. These are the same teaching datasets used in Week 11; Week 12 reads its own local copies.
 
 ```text
-course-work/
-├── week11/
-│   └── data/samples/
-│       ├── census_sample.parquet
-│       └── districts_2015.geojson
-└── week12/
-    ├── lecture-12A.ipynb
-    ├── lecture-12B.ipynb
-    └── environment.yml
+week12/
+├── data/
+│   ├── census_sample.parquet
+│   └── districts_2015.geojson
+├── lecture-12A.ipynb
+├── lecture-12B.ipynb
+└── lecture-12C.ipynb
 ```
 
-Open the notebook from `week12`. The one data-folder setting is:
-
-```python
-DATA = Path("../week11/data/samples")
-```
-
-If your Week 11 folder has another name, edit that path. For an instructor running from this course repository's lab folder, use `Path("../week11-large-data-viz-lidar/data/samples")`. There is no automatic path detection or data downloading in the notebook.
+Open Jupyter from `week12` and save the notebooks there. The notebook uses `DATA = Path("data")` to read these files. Generated analysis exports go into `week12/outputs`.
 
 The source is a systematically thinned synthetic 2010 Census point extract, with historical source categories and 2015 congressional polygons. All counts are **sample dots**, not population estimates, density, or current district demographics. See [Week 11 provenance](../week11-large-data-viz-lidar/data/samples/provenance.json).
 
 ## Environment
 
-From the local `week12` folder:
+Keep using the **`geospatial` environment** created earlier in the course. Install the additional packages into that environment; you do not need to create a Week 12 environment. Run these commands in a **terminal** (Anaconda Prompt on Windows):
 
 ```bash
-conda env create -f environment.yml
-conda activate census-web
-python -m ipykernel install --user --name census-web --display-name "Python (census-web)"
+conda activate geospatial
+conda install -c conda-forge python-duckdb=1.5.6 pyarrow
+```
+
+DuckDB provides the database and spatial SQL; PyArrow supports Parquet/table exchange. The notebook also uses pandas, GeoPandas, and Matplotlib from your existing environment. If an import reports a missing package, install it in the same activated environment, for example `conda install -c conda-forge pandas geopandas matplotlib`.
+
+To make the existing environment available in Jupyter:
+
+```bash
+conda install -c conda-forge ipykernel jupyterlab
+python -m ipykernel install --user --name geospatial --display-name "Python (geospatial)"
 jupyter lab
 ```
 
-Use **Python (census-web)**. The first `INSTALL spatial` needs internet access to download DuckDB's extension. `LOAD spatial` is required in each new connection. Existing environments can be updated with `conda env update -n census-web -f environment.yml`.
+Select **Python (geospatial)** in the notebook's kernel menu. After installing a package, restart the kernel and rerun the notebook. To check the selected interpreter, run `import sys; print(sys.executable)` in a code cell; its path should point to `geospatial`. Quarto is installed separately in Part B.
+
+The first `INSTALL spatial` needs internet access to download DuckDB's extension. `LOAD spatial` is required in each new connection.
 
 Install the [Quarto CLI](https://quarto.org/docs/get-started/) separately for Section 2. Git is needed for the publishing exercise. No OpenAI API key is required: students use ChatGPT through its interface and save the returned code locally.
 
@@ -105,3 +114,9 @@ quarto render public/labs/week12-database-web-hosting/lecture-12B.ipynb --to htm
 ```
 
 The module configuration renders saved notebook outputs. It does not rerun the database import or publish externally.
+
+## Section 3: Full-stack Census GIS
+
+Lecture 12C adds a local Leaflet frontend, FastAPI/Uvicorn backend, and read-only DuckDB Spatial database. Activate `geospatial` and run `conda install -c conda-forge fastapi uvicorn httpx` to add the server and test tools. Extract [census-full-stack.zip](downloads/census-full-stack.zip), then follow its README to prepare the database from the downloaded files in `week12/data` and start the API. Save the extracted project inside `week12`; no hosting account is needed. The project includes integration tests and a category/radius query map.
+
+Render the notes with `quarto render public/labs/week12-database-web-hosting/lecture-12C.ipynb --to html --no-execute` from the course repository root. The optional HTTP client cell requires the app to be running. Quarto/GitHub Pages serve the lecture; the live Python app requires its own Python-capable server.

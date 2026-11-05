@@ -79,7 +79,8 @@ const schedule = [
   { w: 11, date: "11/5/26", topic: "Spatial databases and web hosting",
     lab: [
       {label: "11.1 Census analysis with DuckDB Spatial", href: `${base}labs/week12-database-web-hosting/lecture-12A.html`},
-      {label: "11.2 Quarto, ChatGPT, and GitHub Pages", href: `${base}labs/week12-database-web-hosting/lecture-12B.html`}
+      {label: "11.2 Quarto, ChatGPT, and GitHub Pages", href: `${base}labs/week12-database-web-hosting/lecture-12B.html`},
+      {label: "11.3 Full-stack Census GIS with Python", href: `${base}labs/week12-database-web-hosting/lecture-12C.html`}
     ]
   },
   { w: 12, date: "11/12/26", topic: "Machine Learning (I)", 

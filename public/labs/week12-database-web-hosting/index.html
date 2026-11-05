@@ -48,6 +48,7 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#create-and-query-a-spatial-database" id="toc-create-and-query-a-spatial-database" class="nav-link active" data-scroll-target="#create-and-query-a-spatial-database">1. Create and query a spatial database</a></li>
   <li><a href="#turn-the-analysis-into-a-website" id="toc-turn-the-analysis-into-a-website" class="nav-link" data-scroll-target="#turn-the-analysis-into-a-website">2. Turn the analysis into a website</a></li>
+  <li><a href="#build-a-full-stack-gis-with-python" id="toc-build-a-full-stack-gis-with-python" class="nav-link" data-scroll-target="#build-a-full-stack-gis-with-python">3. Build a full-stack GIS with Python</a></li>
   <li><a href="#start-here" id="toc-start-here" class="nav-link" data-scroll-target="#start-here">Start here</a></li>
   </ul>
 </nav>
@@ -88,18 +89,26 @@ ul.task-list li input[type="checkbox"] {
 <p>Render a notebook with Quarto, use ChatGPT prompts or a reusable skill to help create a website, preview through localhost, then publish the generated files with GitHub Pages.</p>
 <p><a href="lecture-12B.ipynb" download="">Download the publishing notes</a></p>
 </section>
+<section id="build-a-full-stack-gis-with-python" class="level2">
+<h2 class="anchored" data-anchor-id="build-a-full-stack-gis-with-python">3. Build a full-stack GIS with Python</h2>
+<p><a href="lecture-12C.html">Open the full-stack GIS demo</a></p>
+<p>Connect a Leaflet web map to FastAPI and DuckDB Spatial. Filter historical district counts and click a location to query Census sample dots within a radius.</p>
+<p><a href="lecture-12C.ipynb" download="">Download lecture 12C</a> · <a href="downloads/census-full-stack.zip">Download the complete runnable project</a></p>
+</section>
 <section id="start-here" class="level2">
 <h2 class="anchored" data-anchor-id="start-here">Start here</h2>
 <ul>
-<li><strong>Reuse your Week 11 data:</strong> <code>census_sample.parquet</code> and <code>districts_2015.geojson</code>. No new Census download is needed.</li>
-<li><a href="environment.yml">Environment file</a> — create the <code>census-web</code> environment.</li>
+<li><strong>Download both datasets into <code>week12/data</code>:</strong> <a href="../week11-large-data-viz-lidar/data/samples/census_sample.parquet">census_sample.parquet</a> and <a href="../week11-large-data-viz-lidar/data/samples/districts_2015.geojson">districts_2015.geojson</a>. Create the local folders first and move the files there if your browser saves them to Downloads.</li>
+<li>Save the notebooks in <code>week12</code>; extract the full-stack project into <code>week12/census-full-stack</code>.</li>
+<li><strong>Keep using <code>geospatial</code>:</strong> follow Part A to install DuckDB/PyArrow, and Part C to add FastAPI/Uvicorn/HTTPX in the same environment.</li>
+<li><a href="environment.yml">Dependency reference</a>.</li>
 <li><a href="downloads/week12-tutorials.zip">Download this tutorial folder</a>.</li>
 <li><a href="downloads/starter-website.zip">Standalone website starter</a>.</li>
 <li><a href="downloads/quarto-site.zip">Quarto website starter</a>.</li>
 <li><a href="downloads/census-story-site-skill.zip">Reusable skill example</a>.</li>
 <li><a href="README.md">Setup and folder instructions</a>.</li>
 </ul>
-<p>The Census dots are synthetic historical teaching data; their counts are not population estimates or current demographics. Both tutorials keep that distinction visible.</p>
+<p>The Census dots are synthetic historical teaching data; their counts are not population estimates or current demographics. All three tutorials keep that distinction visible.</p>
 </section>
 
 </main>

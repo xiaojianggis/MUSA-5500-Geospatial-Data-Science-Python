@@ -6,3 +6,7 @@ outputs/*.duckdb.wal
 examples/quarto-site/docs/
 
 /.quarto/
+
+# Local town explorer downloads and prepared databases
+data/tract-explorer/
+examples/census-full-stack/data/

@@ -1,4 +1,5 @@
 # Dependency reference for the existing course geospatial environment.
+# The tract explorer needs FastAPI, Uvicorn, HTTPX, and Shapely; SQLite is bundled with Python.
 # Follow the notebooks to install additional packages without creating a new environment.
 name: geospatial
 channels:

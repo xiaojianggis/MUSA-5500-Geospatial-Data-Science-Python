@@ -1,76 +1,108 @@
-# Census full-stack GIS demo — lecture 12C
+# Town Census tract explorer — lecture 12C
 
-Leaflet + browser JavaScript → FastAPI (Python) → DuckDB Spatial → JSON/GeoJSON.
-The same Python server serves both the frontend and API. Download the source files into `week12/data` before preparing the database. No JavaScript build step or API key is needed.
+Prepare real ACS data for towns in different states, then compare census tracts using a Leaflet choropleth. Python/FastAPI serves both frontend and API; SQLite stores prepared towns. This replaces the historical district and synthetic-dot radius demo.
 
-## Setup
+## Run locally
 
-Use your existing course `geospatial` environment. Add the server and test tools in a terminal:
+From the folder containing `lecture-12C.ipynb`:
 
 ```bash
 conda activate geospatial
-conda install -c conda-forge fastapi uvicorn httpx
-```
-
-If you skipped Part A, also run `conda install -c conda-forge python-duckdb=1.5.6 pyarrow`. Keep this environment activated for the commands below. For notebook cells select **Python (geospatial)** and restart the kernel after installation. The included `environment.yml` is a dependency reference; no new environment is needed.
-
-
-## Build the database
-
-Download `census-full-stack.zip` and extract the `census-full-stack` project folder **inside `week12`**. Download the two source files into **`week12/data`** from the course Week 12 Part A tutorial before continuing. The ZIP contains application code and a dependency reference, not the source datasets.
-
-```text
-week12/
-├── data/
-│   ├── census_sample.parquet
-│   └── districts_2015.geojson
-├── lecture-12C.ipynb
-└── census-full-stack/
-    ├── environment.yml
-    ├── prepare_data.py
-    ├── database.py
-    ├── app.py
-    ├── test_app.py
-    └── static/
-```
-
-Run shell commands below in a **terminal inside `week12/census-full-stack`**, rather than a notebook code cell. The notebook is a walkthrough; starting a long-running server in a cell would block Run All.
-
-Open a terminal inside `census-full-stack`:
-
-```bash
-python prepare_data.py --data ../data
+conda install -c conda-forge fastapi uvicorn httpx shapely
+cd examples/census-full-stack
 python -m uvicorn app:app --host 127.0.0.1 --port 8000
 ```
 
-The first build downloads the DuckDB Spatial extension. It selects Pennsylvania dots using the historical district polygons and writes `data/census.duckdb`. It does not alter the original files or the 12A database.
+For the standalone ZIP, extract `census-full-stack` beside the notebook and use `cd census-full-stack` instead. Keep the terminal running. Open **http://127.0.0.1:8000/**, not the HTML file directly. API docs: **http://127.0.0.1:8000/docs**. Stop with Ctrl+C. After code changes, restart Uvicorn and hard-refresh the browser.
 
-Open http://127.0.0.1:8000/ and http://127.0.0.1:8000/docs. Try the Philadelphia button, change radius/category, and click another Pennsylvania location. The map uses Leaflet from a CDN and OpenStreetMap tiles, so it needs internet access. The browser receives district polygons and small query summaries, not the entire point table.
+No map or Census API key is needed. Initial preparation downloads public data. Leaflet and OpenStreetMap tiles need internet access; already prepared estimates are stored locally.
 
-Stop the server with Ctrl+C. Keep one server worker for the classroom demo. Before rebuilding, stop the server and remove only this project's `data/census.duckdb`; the build refuses to overwrite an existing database. `CENSUS_DB` optionally sets a different database path in both preparation and API processes.
+## Prepare and explore towns
+
+1. Choose Pennsylvania and search **Harrisburg**.
+2. Select **Harrisburg city — Incorporated place (`28:4232800`)** and click **Prepare town data**.
+3. Wait for downloads and the tract choropleth. The purple dashed line outlines the town.
+4. Choose population, median household income, poverty rate, or median owner-occupied home value.
+5. Search **Pittsburgh**, select **Pittsburgh city — Incorporated place (`28:4261000`)**, and prepare it.
+6. Switch between prepared towns. Click a tract or its table row for details and an orange selected boundary.
+7. Choose another state and town. Search covers incorporated places, CDPs, and county subdivisions/townships. Check the geography type; names may repeat.
+
+The app starts with an empty prepared-town list in a fresh installation. No manual build is required before starting Uvicorn. Previously prepared towns reappear after restart. Repreparing replaces one town and reuses cached source responses.
+
+## Data and interpretation
+
+- **Estimates:** U.S. Census **2020–2024 ACS five-year**, delivered through the public [Census Reporter API](https://github.com/censusreporter/census-api/blob/master/API.md). The direct Census API may require a key; the mirror keeps this lesson key-free.
+- **Boundaries:** matching [Census TIGERweb ACS 2024](https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2024/MapServer), not current boundaries or the old district data.
+- **Measures:** B01003 total population; B19013 median household income; B17001 below-poverty count / poverty-status universe × 100; B25077 median owner-occupied home value. Dollars are 2024 dollars.
+- **Selection:** whole tracts with positive-area overlap with the town. Tracts are not clipped or apportioned to the town. Touching-only neighbors are excluded. Display geometry is slightly simplified after selection.
+- **Uncertainty:** available 90% margins of error accompany direct estimates. Poverty displays its numerator/denominator; the rate MOE is not calculated. Null/suppressed estimates are gray, distinct from true zero. Upper-coded medians show `+`.
+- **Comparisons:** class breaks stay fixed per variable across towns. Population is a count, not density. Whole-tract estimates include areas outside the town; do not call their sum a town total. Medians cannot be summed.
+
+## Files and storage
+
+In the repository layout:
+
+```text
+lecture folder/
+├── data/tract-explorer/
+│   ├── source-cache/                  # original public JSON responses
+│   └── towns/28-4232800/prepared.json  # joined estimates, boundary, provenance
+└── examples/census-full-stack/
+    ├── app.py
+    ├── database.py
+    ├── prepare_data.py
+    ├── test_app.py
+    ├── static/
+    └── data/tracts.sqlite              # database created on first server start
+```
+
+The standalone ZIP puts `census-full-stack` beside the shared data folder. Layout detection sets the same sibling source-data destination automatically. The old `census_sample.parquet`, `districts_2015.geojson`, and DuckDB files are unused and remain unchanged.
+
+`CENSUS_DB` overrides the SQLite path; `CENSUS_DATA_DIR` overrides the source-cache/package folder. Use the same settings for the API and CLI. Do not point the SQLite app at an old DuckDB file.
+
+## Optional command-line preparation
+
+Run in the app directory:
+
+```bash
+python prepare_data.py --state 42 --search Harrisburg
+python prepare_data.py --town 28:4232800
+python prepare_data.py --town 28:4261000
+```
+
+Search returns IDs; use those IDs rather than guessing. The former `--data` CLI has been replaced. Refresh the app after CLI preparation. To refresh remote responses for this fixed vintage, stop the server, remove only the sibling `data/tract-explorer/source-cache` folder, restart, and reprepare the town.
 
 ## API
 
-- `GET /api/health`: database availability and total sample dots.
-- `GET /api/districts?category=all`: 18 historical Pennsylvania districts with category counts.
-- `GET /api/nearby?lon=-75.1636&lat=39.9526&radius_m=2000&category=all`: radius-query summary.
+| Route | Purpose |
+| --- | --- |
+| `GET /api/health` | Status, vintage, prepared-town count |
+| `GET /api/config` | Variable descriptions and sources |
+| `GET /api/places?state=42&q=Harrisburg` | Search town IDs and geography types |
+| `POST /api/prepare` | Body `{"town_id":"28:4232800"}`; download and save one town |
+| `GET /api/towns` | List prepared towns |
+| `GET /api/tracts?town_id=28:4232800&variable=income` | Choropleth GeoJSON with all metrics, boundary, provenance |
 
-Category: `all`, `w`, `b`, `a`, `h`, or `o`. Radius: 100–20,000 meters. Search centers must lie in the historical Pennsylvania district coverage. Queries use bound parameters, and every request opens/closes a read-only database connection. Boundary points are assigned to the smallest matching district ID when building the district totals, as in 12A. A radius near the state border counts only points in the Pennsylvania selection.
+Variable keys: `population`, `income`, `poverty`, `home_value`. Invalid inputs return 422, unprepared towns 404, and failed upstream preparation 502. Failed downloads do not replace existing database data. SQL uses bound parameters. A single server worker is sufficient for this teaching app.
 
 ## Verify
-
-Run after preparation, from this project directory:
 
 ```bash
 python -m unittest -v
 ```
 
-Checks cover category totals against SQL, radius expansion, filtering, invalid requests, static files, and health. Browser checks: map loads; category changes the shading; the Philadelphia button returns a count; radius changes update the count; clicking outside Pennsylvania shows a useful message. Browser Network should show `/api/nearby` on each query.
+Six offline integration tests use isolated synthetic fixtures and a temporary database; no prepared town, network, or server is required. Checks cover overlap versus touching, whole geometries, joins, missing values, zeros, poverty denominators, top-coding, release consistency, failed-download preservation, repreparation, route validation, and static assets.
 
-## Hosting
+Browser checks: search → prepare → choropleth; switch all variables; prepare a second town; switch towns; inspect popups and table rows; restart and check persistence. In browser Network inspect `/api/tracts`; compare one feature to `prepared.json`.
 
-GitHub Pages can host the lecture HTML, but cannot run this Python API. For this demo, keep the frontend and API on the same Python host. On a Python-capable host install the environment, prepare the database from supplied source files, then use a host-provided start command equivalent to `python -m uvicorn app:app --host 0.0.0.0 --port $PORT`. Replace `$PORT` with your host's port setting. Preserve or rebuild the database on deployment, use HTTPS through the host, and check `/api/health`. `--reload` is for development only. Public multi-user write workloads are a later PostgreSQL/PostGIS topic; this example exposes read-only teaching queries. No deployment is created by running the lecture.
+## Troubleshooting
 
-## Data limits
+- **Old district/radius page:** stop the old server, start from the updated app directory, and hard-refresh.
+- **Map library unavailable:** allow `unpkg.com`; a missing Leaflet library is reported in the page.
+- **Streets blank but tracts visible:** check `tile.openstreetmap.org` requests and internet access.
+- **Preparation fails:** check public Census TIGERweb/Census Reporter connectivity and the Uvicorn terminal. Existing prepared towns remain usable.
+- **No matches:** verify state, spelling, and geography type.
+- **File is not a database:** unset a `CENSUS_DB` pointing at an old DuckDB file; default is `data/tracts.sqlite`.
+- **Port occupied:** stop the previous server or use `--port 8001` and that URL everywhere.
 
-These are systematically thinned synthetic 2010 Census teaching dots with 2015 district boundaries. Counts are **sample dots**, not population estimates, density, or current demographics. Source labels reproduce historical race/ethnicity categories. See the Week 11 `data/samples/provenance.json`. Web-map radius circles are illustrative; SQL measures in EPSG:26918 meters, then returns GeoJSON coordinates in EPSG:4326.
+Quarto/GitHub Pages publish lecture HTML, not this Python service. A deployed app needs a Python-capable host, persistent storage, HTTPS, and separate decisions about public preparation jobs and access. Running locally does not publish the app.

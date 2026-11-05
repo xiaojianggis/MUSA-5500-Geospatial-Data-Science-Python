@@ -1,19 +1,34 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Census query lab</title>
+<title>Town Census tract explorer</title>
+<link rel="icon" href="data:,">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="/static/styles.css">
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script defer src="/static/app.js"></script></head>
-<body><header><span>WEEK 12 · FULL STACK GIS</span><h1>Census query lab</h1><p>A click on the map becomes a Python request, a spatial SQL query, and a new result.</p></header>
-<main><aside><h2>Explore the teaching sample</h2>
-<p class="notice">Synthetic 2010 Census dots · 2015 districts. Counts are sample dots, not population estimates or current demographics.</p>
-<label for="category">Historical source category</label><select id="category"><option value="all">All categories</option><option value="w">White</option><option value="b">Black</option><option value="a">Asian</option><option value="h">Hispanic</option><option value="o">Other</option></select>
-<label for="radius">Search radius</label><select id="radius"><option value="1000">1 km</option><option value="2000" selected>2 km</option><option value="5000">5 km</option><option value="10000">10 km</option></select>
-<button id="philly" type="button">Try Philadelphia City Hall</button>
-<p id="status" role="status" aria-live="polite">Loading districts…</p>
-<h2 id="total">Choose a location</h2><p id="location"></p><ul id="counts"></ul>
-<p><a href="/docs">Explore the API docs</a> · <a id="request" href="/api/health" target="_blank" rel="noopener">View last response</a></p>
-<p class="hint">District shading shows category sample-dot counts. Click inside Pennsylvania to query a radius. Border searches count only points in the Pennsylvania extract.</p>
-</aside><section class="map-panel" aria-label="Interactive district map"><div id="map"></div><div class="legend"><strong>Sample dots per historical district</strong><div id="legend">Loading…</div><small>Counts, not density; color thresholds change with the selected category.</small></div></section></main>
-<footer>Browser → FastAPI (Python) → DuckDB Spatial → JSON → map. Leaflet and OpenStreetMap tiles require internet access.</footer></body></html>
+<body><header><span>WEEK 12C · FULL STACK GIS</span><h1>Town Census tract explorer</h1><p>Choose a town. Prepare real Census data. Explore differences between census tracts.</p></header>
+<main><aside>
+<h2>1. Find and prepare a town</h2>
+<form id="search-form"><label for="state">State</label><select id="state"></select>
+<label for="town-search">Town or municipality name</label><input id="town-search" value="Harrisburg" minlength="2" maxlength="80" required>
+<button type="submit" id="search">Find towns</button></form>
+<label for="place">Matching Census geographies</label><select id="place" disabled><option>Search for a town first</option></select>
+<p id="search-note" class="hint">Includes incorporated places, Census-designated places, and county subdivisions such as townships. Select the intended geography type.</p>
+<button id="prepare" type="button" disabled>Prepare town data</button>
+<p id="prepare-status" role="status" aria-live="polite">First preparation downloads boundaries and ACS estimates.</p>
+<h2>2. Explore prepared towns</h2>
+<label for="town">Prepared town</label><select id="town" disabled><option>No towns prepared yet</option></select>
+<label for="variable">Census variable</label><select id="variable" disabled></select>
+<p id="status" role="status" aria-live="polite">Start by preparing a town.</p>
+<p id="town-info" class="hint"></p>
+<p class="notice"><strong>2020–2024 ACS 5-year estimates.</strong> These are survey estimates for whole tracts, not synthetic sample dots. Tracts may extend outside town boundaries. Values are not town-only totals.</p>
+<p><a href="/docs">API documentation</a> · <a id="download" href="/api/towns" target="_blank" rel="noopener">View mapped GeoJSON</a></p>
+<p class="hint">Estimates: U.S. Census Bureau via <a href="https://censusreporter.org/">Census Reporter</a>. Boundaries: <a href="https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2024/MapServer">Census TIGERweb, 2024</a>. Prepared data are saved locally.</p>
+</aside><section class="map-panel" aria-label="Census tract choropleth map"><div id="map"></div>
+<div class="legend"><strong id="legend-title">Prepare a town to view tract data</strong><div id="legend"></div>
+<small>Purple outline: town boundary. Orange outline: selected tract. Click a tract for estimates and margins of error. Class breaks stay fixed when switching towns; population shows counts, not density.</small><p id="map-status" role="status"></p></div>
+</section>
+<section class="table-panel"><h2 id="table-title">Tract data</h2><p>Click a tract row to locate it on the map. Income and home value are medians; do not add them across tracts. Gray tracts have unavailable estimates.</p>
+<div class="table-scroll"><table><thead><tr><th scope="col">Census tract GEOID</th><th scope="col">Population</th><th scope="col">Median household income</th><th scope="col">Poverty rate</th><th scope="col">Median home value</th></tr></thead><tbody id="tract-table"></tbody></table></div></section>
+</main><footer>Free OpenStreetMap basemap · No map or Census API key required · Internet needed for downloads, Leaflet, and map tiles. Prepared town estimates remain available locally.</footer>
+</body></html>

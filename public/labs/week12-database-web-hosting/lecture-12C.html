@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Week 12C: A full-stack Census GIS with a Python backend</title>
+<title>Week 12C: A full-stack town Census tract explorer</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -80,17 +80,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Tutorial steps</h2>
    
   <ul>
-  <li><a href="#understand-the-three-layers" id="toc-understand-the-three-layers" class="nav-link active" data-scroll-target="#understand-the-three-layers">1. Understand the three layers</a></li>
-  <li><a href="#download-the-project-and-data-into-week12" id="toc-download-the-project-and-data-into-week12" class="nav-link" data-scroll-target="#download-the-project-and-data-into-week12">2. Download the project and data into week12</a></li>
-  <li><a href="#add-server-tools-to-your-existing-geospatial-environment" id="toc-add-server-tools-to-your-existing-geospatial-environment" class="nav-link" data-scroll-target="#add-server-tools-to-your-existing-geospatial-environment">3. Add server tools to your existing geospatial environment</a></li>
-  <li><a href="#prepare-a-separate-application-database" id="toc-prepare-a-separate-application-database" class="nav-link" data-scroll-target="#prepare-a-separate-application-database">4. Prepare a separate application database</a></li>
-  <li><a href="#start-python-and-open-the-application" id="toc-start-python-and-open-the-application" class="nav-link" data-scroll-target="#start-python-and-open-the-application">5. Start Python and open the application</a></li>
-  <li><a href="#inspect-the-api-contract" id="toc-inspect-the-api-contract" class="nav-link" data-scroll-target="#inspect-the-api-contract">6. Inspect the API contract</a></li>
-  <li><a href="#trace-the-python-backend" id="toc-trace-the-python-backend" class="nav-link" data-scroll-target="#trace-the-python-backend">7. Trace the Python backend</a></li>
-  <li><a href="#trace-the-frontend" id="toc-trace-the-frontend" class="nav-link" data-scroll-target="#trace-the-frontend">8. Trace the frontend</a></li>
-  <li><a href="#test-the-system" id="toc-test-the-system" class="nav-link" data-scroll-target="#test-the-system">9. Test the system</a></li>
-  <li><a href="#explain-hosting-static-files-versus-python" id="toc-explain-hosting-static-files-versus-python" class="nav-link" data-scroll-target="#explain-hosting-static-files-versus-python">10. Explain hosting: static files versus Python</a></li>
-  <li><a href="#exercises-and-troubleshooting" id="toc-exercises-and-troubleshooting" class="nav-link" data-scroll-target="#exercises-and-troubleshooting">Exercises and troubleshooting</a></li>
+  <li><a href="#understand-the-full-stack" id="toc-understand-the-full-stack" class="nav-link active" data-scroll-target="#understand-the-full-stack">1. Understand the full stack</a></li>
+  <li><a href="#use-the-project-beside-this-notebook" id="toc-use-the-project-beside-this-notebook" class="nav-link" data-scroll-target="#use-the-project-beside-this-notebook">2. Use the project beside this notebook</a></li>
+  <li><a href="#install-the-app-tools" id="toc-install-the-app-tools" class="nav-link" data-scroll-target="#install-the-app-tools">3. Install the app tools</a></li>
+  <li><a href="#start-the-application" id="toc-start-the-application" class="nav-link" data-scroll-target="#start-the-application">4. Start the application</a></li>
+  <li><a href="#prepare-census-data-for-different-towns" id="toc-prepare-census-data-for-different-towns" class="nav-link" data-scroll-target="#prepare-census-data-for-different-towns">5. Prepare Census data for different towns</a>
+  <ul class="collapse">
+  <li><a href="#first-example-harrisburg-pennsylvania" id="toc-first-example-harrisburg-pennsylvania" class="nav-link" data-scroll-target="#first-example-harrisburg-pennsylvania">First example: Harrisburg, Pennsylvania</a></li>
+  <li><a href="#second-example-pittsburgh-pennsylvania" id="toc-second-example-pittsburgh-pennsylvania" class="nav-link" data-scroll-target="#second-example-pittsburgh-pennsylvania">Second example: Pittsburgh, Pennsylvania</a></li>
+  <li><a href="#your-own-town" id="toc-your-own-town" class="nav-link" data-scroll-target="#your-own-town">Your own town</a></li>
+  </ul></li>
+  <li><a href="#read-the-choropleth-and-tract-details" id="toc-read-the-choropleth-and-tract-details" class="nav-link" data-scroll-target="#read-the-choropleth-and-tract-details">6. Read the choropleth and tract details</a></li>
+  <li><a href="#optional-command-line-preparation" id="toc-optional-command-line-preparation" class="nav-link" data-scroll-target="#optional-command-line-preparation">7. Optional command-line preparation</a></li>
+  <li><a href="#inspect-the-api-contract" id="toc-inspect-the-api-contract" class="nav-link" data-scroll-target="#inspect-the-api-contract">8. Inspect the API contract</a></li>
+  <li><a href="#trace-the-python-preparation-and-backend" id="toc-trace-the-python-preparation-and-backend" class="nav-link" data-scroll-target="#trace-the-python-preparation-and-backend">9. Trace the Python preparation and backend</a></li>
+  <li><a href="#trace-the-frontend-and-test-the-system" id="toc-trace-the-frontend-and-test-the-system" class="nav-link" data-scroll-target="#trace-the-frontend-and-test-the-system">10. Trace the frontend and test the system</a></li>
+  <li><a href="#troubleshooting-and-hosting" id="toc-troubleshooting-and-hosting" class="nav-link" data-scroll-target="#troubleshooting-and-hosting">11. Troubleshooting and hosting</a></li>
+  <li><a href="#exercises-and-sources" id="toc-exercises-and-sources" class="nav-link" data-scroll-target="#exercises-and-sources">Exercises and sources</a></li>
   </ul>
 </nav>
 </div>
@@ -100,7 +106,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Week 12C: A full-stack Census GIS with a Python backend</h1>
+<h1 class="title">Week 12C: A full-stack town Census tract explorer</h1>
 </div>
 
 
@@ -117,11 +123,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>Build a working application where a web-map click triggers a live spatial database query. Reuse the Census teaching data from Week 11 and the SQL concepts from 12A.</p>
-<p><a href="lecture-12C.ipynb">Download this notebook</a> · <a href="downloads/census-full-stack.zip">Download the complete runnable demo</a> · <a href="lecture-12B.html">Previous: static publishing</a> · <a href="examples/census-full-stack/README.md">Project README</a></p>
-<p><strong>Deliverable:</strong> a local web map that filters historical district counts and reports sample dots within a chosen radius. These synthetic 2010 teaching dots and 2015 boundaries do not describe current demographics or population totals.</p>
-<section id="understand-the-three-layers" class="level2">
-<h2 class="anchored" data-anchor-id="understand-the-three-layers">1. Understand the three layers</h2>
+<p>Build a local web application that prepares <strong>real Census ACS data for different towns</strong> and maps Census variables at the <strong>census tract level</strong>. Choose a state and town, prepare its data, then switch towns and variables in an interactive choropleth.</p>
+<p><a href="lecture-12C.ipynb">Download this notebook</a> · <a href="downloads/census-full-stack.zip">Download the complete runnable app</a> · <a href="examples/census-full-stack/README.md">App README</a> · <a href="lecture-12B.html">Previous: publishing</a></p>
+<p><strong>Deliverable:</strong> compare tract-level population, median household income, poverty rate, and median home value in Harrisburg, Pittsburgh, and a town of your choice. This version replaces the historical district/synthetic-dot radius demo. The older dot and district files remain available for Part A; Part C downloads its own tract data. ## Quick start: run the town tract explorer</p>
+<p>Open a terminal in the folder containing this notebook, then run:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate geospatial</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge fastapi uvicorn httpx shapely</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> examples/census-full-stack</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> uvicorn app:app <span class="at">--host</span> 127.0.0.1 <span class="at">--port</span> 8000</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>For the standalone ZIP, use <code>cd census-full-stack</code> instead. Leave the terminal running and open <strong><a href="http://127.0.0.1:8000/">http://127.0.0.1:8000/</a></strong>.</p>
+<ol type="1">
+<li>Select <strong>Pennsylvania</strong>, search <strong>Harrisburg</strong>, and choose <strong>Harrisburg city — Incorporated place</strong>.</li>
+<li>Click <strong>Prepare town data</strong> and wait for the map.</li>
+<li>Select a Census variable; click a tract to inspect its estimates and margin of error.</li>
+<li>Search and prepare <strong>Pittsburgh city — Incorporated place</strong>, then compare the two towns using <strong>Prepared town</strong>.</li>
+</ol>
+<p>The checked 2024 boundary selection produces <strong>14 overlapping tracts for Harrisburg</strong> and <strong>128 for Pittsburgh</strong>. Local installations that already have these towns prepared can select them immediately. A fresh download starts with no prepared towns.</p>
+<p><strong>Expected map:</strong> OpenStreetMap streets, colored census tracts, a purple dashed town boundary, and a numeric legend. Selecting a tract adds an orange boundary and a details popup. The table below the map shows all four Census measures. Whole-tract estimates may include areas outside the purple town boundary.</p>
+<p>If you were running an older version, stop it with <strong>Ctrl+C</strong>, start the updated server, and hard-refresh the browser. This lecture HTML explains the app; the interactive app runs at the localhost URL above.</p>
+<section id="understand-the-full-stack" class="level2">
+<h2 class="anchored" data-anchor-id="understand-the-full-stack">1. Understand the full stack</h2>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -139,85 +160,118 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>Frontend</td>
 <td>HTML, CSS, JavaScript, Leaflet</td>
-<td>Display the map, collect category/radius/location, fetch and display results</td>
+<td>Find a town, request preparation, choose a variable, show tract polygons and a table</td>
 </tr>
 <tr class="even">
 <td>Backend</td>
-<td>Python, FastAPI, Uvicorn</td>
-<td>Validate requests, run parameterized SQL, return JSON/GeoJSON</td>
+<td>Python, FastAPI, Uvicorn, Shapely</td>
+<td>Download public data, select overlapping tracts, join estimates by GEOID, return GeoJSON</td>
 </tr>
 <tr class="odd">
-<td>Database</td>
-<td>Persistent DuckDB + Spatial</td>
-<td>Store selected Census dots and historical polygons; compute counts and distances</td>
+<td>Local database</td>
+<td>SQLite, included with Python</td>
+<td>Save prepared towns and tract estimates between restarts</td>
+</tr>
+<tr class="even">
+<td>Public sources</td>
+<td>Census TIGERweb and Census Reporter</td>
+<td>Matching 2024 boundaries and 2020–2024 ACS five-year estimates</td>
 </tr>
 </tbody>
 </table>
-<pre class="mermaid"><code>sequenceDiagram
-    participant B as Browser / Leaflet
-    participant P as Python / FastAPI
-    participant D as DuckDB Spatial
-    B-&gt;&gt;P: GET /api/nearby?lon=...&amp;lat=...&amp;radius_m=2000
-    P-&gt;&gt;P: Validate coordinates, radius, category
-    P-&gt;&gt;D: Parameterized spatial SQL
-    D--&gt;&gt;P: Small grouped count table
-    P--&gt;&gt;B: JSON response
-    B-&gt;&gt;B: Update result panel and search circle</code></pre>
-<p>In 12B the browser loaded already exported files. Here the Python process computes an answer for each request. The frontend and API share one origin (<code>http://127.0.0.1:8000</code>), so no separate frontend server or CORS setup is needed. The point table stays on the server.</p>
+<p>The same Python process serves the web page and API at <strong>http://127.0.0.1:8000/</strong>. No frontend build step or separate CORS configuration is needed.</p>
+<p>Part A teaches DuckDB Spatial queries on historical sample dots. This app uses Shapely for one-time boundary selection and SQLite for prepared-town storage. SQLite needs no Spatial extension download. You can inspect the SQL in <code>database.py</code>; no old Part A database is overwritten.</p>
+<pre class="text"><code>Browser: choose state + town → POST /api/prepare
+Python: town boundary → overlapping tract boundaries → ACS tables → join by tract GEOID
+SQLite: save town and tract estimates
+Browser: GET /api/tracts?town_id=...&amp;variable=income → Leaflet choropleth + tract table</code></pre>
 </section>
-<section id="download-the-project-and-data-into-week12" class="level2">
-<h2 class="anchored" data-anchor-id="download-the-project-and-data-into-week12">2. Download the project and data into week12</h2>
-<p>Download <a href="downloads/census-full-stack.zip">census-full-stack.zip</a> and extract the <code>census-full-stack</code> project folder <strong>inside <code>week12</code></strong>. Download the two source files into <strong><code>week12/data</code></strong> using the links in Part A before continuing. The ZIP contains application code and a dependency reference, not the source datasets.</p>
-<pre class="text"><code>week12/
-├── data/
-│   ├── census_sample.parquet
-│   └── districts_2015.geojson
+<section id="use-the-project-beside-this-notebook" class="level2">
+<h2 class="anchored" data-anchor-id="use-the-project-beside-this-notebook">2. Use the project beside this notebook</h2>
+<p>In this course repository the app is under <code>examples/census-full-stack</code>. The existing <code>data</code> folder beside this notebook will hold the new downloads:</p>
+<pre class="text"><code>week12-database-web-hosting/
 ├── lecture-12C.ipynb
-└── census-full-stack/
-    ├── environment.yml
-    ├── prepare_data.py
-    ├── database.py
+├── data/
+│   ├── census_sample.parquet        # Part A; not used by this app
+│   ├── districts_2015.geojson       # Part A; not used by this app
+│   └── tract-explorer/              # created by town preparation
+│       ├── source-cache/           # original public JSON responses
+│       └── towns/28-4232800/prepared.json
+└── examples/census-full-stack/
     ├── app.py
+    ├── database.py
+    ├── prepare_data.py
     ├── test_app.py
-    └── static/</code></pre>
-<p>Run shell commands below in a <strong>terminal inside <code>week12/census-full-stack</code></strong>, rather than a notebook code cell. The notebook is a walkthrough; starting a long-running server in a cell would block Run All.</p>
+    ├── static/
+    └── data/tracts.sqlite           # prepared database; created automatically</code></pre>
+<p>Open this notebook with its lecture folder as the working directory. The following cell checks the app location without downloading anything.</p>
+<p><strong>Standalone ZIP:</strong> extract <code>census-full-stack</code> beside the notebook. In that layout, use <code>cd census-full-stack</code> instead of <code>cd examples/census-full-stack</code>. New source data still go into the sibling <code>data/tract-explorer</code> folder. Both layouts are detected automatically.</p>
+<div id="tract-path-check" class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>lecture_dir <span class="op">=</span> Path.cwd()</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>app_dir <span class="op">=</span> lecture_dir <span class="op">/</span> <span class="st">"examples"</span> <span class="op">/</span> <span class="st">"census-full-stack"</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> app_dir.is_dir():</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    app_dir <span class="op">=</span> lecture_dir <span class="op">/</span> <span class="st">"census-full-stack"</span>  <span class="co"># standalone ZIP layout</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> (app_dir <span class="op">/</span> <span class="st">"app.py"</span>).is_file(), <span class="st">"Open this notebook from its lecture folder."</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Application:"</span>, app_dir.resolve())</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Downloaded tract data:"</span>, (lecture_dir <span class="op">/</span> <span class="st">"data"</span> <span class="op">/</span> <span class="st">"tract-explorer"</span>).resolve())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
-<section id="add-server-tools-to-your-existing-geospatial-environment" class="level2">
-<h2 class="anchored" data-anchor-id="add-server-tools-to-your-existing-geospatial-environment">3. Add server tools to your existing geospatial environment</h2>
-<p>Keep using <strong><code>geospatial</code></strong>, the same environment as earlier in the course and Part A. In a terminal, install the new tools into it:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate geospatial</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge fastapi uvicorn httpx</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>FastAPI defines the routes and validation. Uvicorn runs the HTTP server. HTTPX is used by the optional notebook client and integration tests. If you skipped Part A, also run <code>conda install -c conda-forge python-duckdb=1.5.6 pyarrow</code>. Keep this environment activated for every command below.</p>
-<p>Select <strong>Python (geospatial)</strong> for notebook cells. Restart the kernel after installation. If this kernel is missing, follow Part A’s kernel registration steps. The included <code>environment.yml</code> is a dependency reference; no new environment is needed.</p>
-<p>DuckDB and its Spatial extension perform the queries. Leaflet runs in the browser and requires no Python package installation. No OpenAI API key or additional Census API request is involved.</p>
+<section id="install-the-app-tools" class="level2">
+<h2 class="anchored" data-anchor-id="install-the-app-tools">3. Install the app tools</h2>
+<p>Keep using the course <strong><code>geospatial</code></strong> environment. In a terminal:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate geospatial</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge fastapi uvicorn httpx shapely</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>FastAPI defines routes and validates requests. Uvicorn runs the server. HTTPX downloads public JSON and supports the test client. Shapely selects tracts overlapping a town. SQLite comes with Python. The included <code>environment.yml</code> remains a dependency reference for the broader course environment.</p>
+<p>For notebook cells, select <strong>Python (geospatial)</strong> or your existing kernel backed by that environment; restart it after installing packages.</p>
+<p><strong>No API key is needed.</strong> Estimates are from the public Census Reporter mirror of Census ACS, with boundaries directly from Census TIGERweb. Direct <code>api.census.gov</code> requests may require a Census API key; this app uses the mirror so classroom preparation works without one. The map uses free OpenStreetMap tiles and Leaflet. Initial preparation, the map library, and basemap tiles require internet access.</p>
 </section>
-<section id="prepare-a-separate-application-database" class="level2">
-<h2 class="anchored" data-anchor-id="prepare-a-separate-application-database">4. Prepare a separate application database</h2>
-<p>From inside the extracted project directory:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> prepare_data.py <span class="at">--data</span> ../data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The first preparation installs DuckDB Spatial and needs internet access. It creates <strong><code>data/census.duckdb</code></strong>, separate from 12A’s database, using:</p>
-<ol type="1">
-<li><code>ST_Read</code> to select 2015 Pennsylvania district polygons.</li>
-<li><code>read_parquet</code> plus <code>ST_Covers</code> to select the Census dots inside those polygons.</li>
-<li><code>ST_Transform</code> to store both geometries in <strong>EPSG:26918</strong>, with meter units.</li>
-<li>A <code>point_district</code> table assigning every selected dot once; boundary ties use the smallest matching district ID, as in 12A.</li>
-</ol>
-<p>The checked teaching files produce <strong>63,552 sample dots across 18 historical districts</strong>. Your result should match when using the same inputs. The script refuses to overwrite an existing demo database. Stop the server before removing this demo database and rebuilding it. Source files stay unchanged.</p>
-</section>
-<section id="start-python-and-open-the-application" class="level2">
-<h2 class="anchored" data-anchor-id="start-python-and-open-the-application">5. Start Python and open the application</h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> uvicorn app:app <span class="at">--host</span> 127.0.0.1 <span class="at">--port</span> 8000</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Keep this terminal running. Open:</p>
+<section id="start-the-application" class="level2">
+<h2 class="anchored" data-anchor-id="start-the-application">4. Start the application</h2>
+<p>In <strong>Terminal 1</strong>, start from the folder containing this notebook:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate geospatial</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> examples/census-full-stack</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> uvicorn app:app <span class="at">--host</span> 127.0.0.1 <span class="at">--port</span> 8000</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>For a standalone ZIP, replace the <code>cd</code> line with <code>cd census-full-stack</code>. Keep the terminal running.</p>
+<p>Open:</p>
 <ul>
-<li><a href="http://127.0.0.1:8000/">The web map</a>.</li>
-<li><a href="http://127.0.0.1:8000/docs">Interactive FastAPI documentation</a>.</li>
-<li><a href="http://127.0.0.1:8000/api/health">Health check</a>.</li>
+<li><a href="http://127.0.0.1:8000/">Town Census tract explorer</a></li>
+<li><a href="http://127.0.0.1:8000/docs">Interactive API documentation</a></li>
+<li><a href="http://127.0.0.1:8000/api/health">Health check</a></li>
 </ul>
-<p>Press <strong>Ctrl+C</strong> to stop the server. Localhost is your computer; a classmate cannot open your localhost URL. Do not use <code>python -m http.server</code> for this project: that serves files but does not execute FastAPI routes. Leaflet’s CDN files and OpenStreetMap basemap tiles need internet access.</p>
-<p><strong>Try the app:</strong> click <strong>Try Philadelphia City Hall</strong>, change the radius from 2 km to 5 km, select a category, and click another location inside Pennsylvania. The district shading responds to the category selector, while the count panel responds to the location, radius, and category. Click outside Pennsylvania to see the validation message.</p>
+<p>The database is created automatically. <strong>You do not need to run the old <code>prepare_data.py --data ../../data</code> command.</strong> Preparation now happens town by town in the browser.</p>
+<p>In <strong>Terminal 2</strong>, verify the server:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> http://127.0.0.1:8000/api/health</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Expect <code>status: "ok"</code>, <code>year: 2024</code>, and a <code>prepared_towns</code> count, initially zero in a fresh installation. Existing prepared towns appear automatically after restarting the server.</p>
+<p>Run the server in a terminal, not a notebook cell: the long-running process would block Run All. Use the Uvicorn URL; opening the HTML file, Live Server, or <code>python -m http.server</code> does not run the API. Press <strong>Ctrl+C</strong> to stop Uvicorn. After app edits, restart Uvicorn and hard-refresh the browser (Mac: Cmd+Shift+R; Windows/Linux: Ctrl+Shift+R).</p>
 </section>
-<section id="inspect-the-api-contract" class="level2">
-<h2 class="anchored" data-anchor-id="inspect-the-api-contract">6. Inspect the API contract</h2>
+<section id="prepare-census-data-for-different-towns" class="level2">
+<h2 class="anchored" data-anchor-id="prepare-census-data-for-different-towns">5. Prepare Census data for different towns</h2>
+<section id="first-example-harrisburg-pennsylvania" class="level3">
+<h3 class="anchored" data-anchor-id="first-example-harrisburg-pennsylvania">First example: Harrisburg, Pennsylvania</h3>
+<ol type="1">
+<li>Select <strong>Pennsylvania</strong> and enter <strong>Harrisburg</strong>.</li>
+<li>Click <strong>Find towns</strong>.</li>
+<li>Choose <strong>Harrisburg city — Incorporated place (<code>28:4232800</code>)</strong>. A county-subdivision version may also appear; check the geography type.</li>
+<li>Click <strong>Prepare town data</strong>. The first download can take a few minutes.</li>
+<li>The app saves the data, selects the town, and displays the tract choropleth and town boundary.</li>
+</ol>
+</section>
+<section id="second-example-pittsburgh-pennsylvania" class="level3">
+<h3 class="anchored" data-anchor-id="second-example-pittsburgh-pennsylvania">Second example: Pittsburgh, Pennsylvania</h3>
+<p>Search <strong>Pittsburgh</strong>, select <strong>Pittsburgh city — Incorporated place (<code>28:4261000</code>)</strong>, and prepare it. Both towns now appear in <strong>Prepared town</strong>. Switching between already prepared towns uses the local database.</p>
+</section>
+<section id="your-own-town" class="level3">
+<h3 class="anchored" data-anchor-id="your-own-town">Your own town</h3>
+<p>Choose a state and search for a municipality. The search includes incorporated places, Census-designated places, and county subdivisions such as townships. Names can repeat; use the state, geography type, and Census identifier to select the intended area. The tool uses 2024 Census geography, so newly created or renamed municipalities may differ from today’s names.</p>
+<p>The backend fetches the selected town’s boundary, finds overlapping tracts, downloads four ACS tables, and joins them by the <strong>11-digit tract GEOID</strong>. Repreparing replaces that town atomically and reuses cached public responses; other prepared towns remain saved. The source vintage is fixed at 2024 for reproducible teaching.</p>
+<p>Prepared source responses and <code>prepared.json</code> packages are saved in <code>data/tract-explorer</code> beside the notebook; the database is <code>examples/census-full-stack/data/tracts.sqlite</code>. The old source files are not inputs to this tract explorer.</p>
+</section>
+</section>
+<section id="read-the-choropleth-and-tract-details" class="level2">
+<h2 class="anchored" data-anchor-id="read-the-choropleth-and-tract-details">6. Read the choropleth and tract details</h2>
+<p>Choose <strong>Median household income</strong>, <strong>Total population</strong>, <strong>Poverty rate</strong>, or <strong>Median owner-occupied home value</strong>. The map and table update for the selected town.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -226,109 +280,142 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </colgroup>
 <thead>
 <tr class="header">
-<th>Request</th>
-<th>Response</th>
-<th>Frontend use</th>
+<th>Variable</th>
+<th>ACS table / estimate</th>
+<th>Interpretation</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>/api/health</code></td>
-<td>Status and total sample dots</td>
-<td>Check preparation/server readiness</td>
+<td>Total population</td>
+<td>B01003, total</td>
+<td>Estimated residents of the whole tract; count, not density</td>
 </tr>
 <tr class="even">
-<td><code>/api/districts?category=all</code></td>
-<td>GeoJSON polygons with <code>district_id</code> and <code>sample_dots</code></td>
-<td>Draw district shading and tooltips</td>
+<td>Median household income</td>
+<td>B19013, median</td>
+<td>2024 inflation-adjusted dollars; not additive across tracts</td>
 </tr>
 <tr class="odd">
-<td><code>/api/nearby?lon=-75.1636&amp;lat=39.9526&amp;radius_m=2000&amp;category=all</code></td>
-<td>Total and category counts around a location</td>
-<td>Update the count panel</td>
+<td>Poverty rate</td>
+<td>B17001, below poverty / poverty-status universe × 100</td>
+<td>Percent of people for whom poverty status is determined</td>
+</tr>
+<tr class="even">
+<td>Median owner-occupied home value</td>
+<td>B25077, median</td>
+<td>2024 dollars for owner-occupied units; not all housing</td>
 </tr>
 </tbody>
 </table>
-<p>Open the browser’s developer tools → <strong>Network</strong>, click the map, and inspect the <code>/api/nearby</code> URL and JSON response. In <code>/docs</code>, expand <code>GET /api/nearby</code>, choose <strong>Try it out</strong>, enter the City Hall values above, and execute it. The valid category values are <code>all</code>, <code>w</code>, <code>b</code>, <code>a</code>, <code>h</code>, and <code>o</code>; the allowed radius is 100–20,000 m. Invalid parameter types/ranges return HTTP 422; a location outside the selected district coverage returns HTTP 400.</p>
-<p>Optional Python client: keep the server running in its terminal and run the following cell with the <code>geospatial</code> notebook kernel. It makes a real HTTP request; it does not open the database directly.</p>
-<div id="30aea267" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> requests.get(</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"http://127.0.0.1:8000/api/nearby"</span>,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    params<span class="op">=</span>{<span class="st">"lon"</span>: <span class="op">-</span><span class="fl">75.1636</span>, <span class="st">"lat"</span>: <span class="fl">39.9526</span>, <span class="st">"radius_m"</span>: <span class="dv">2000</span>, <span class="st">"category"</span>: <span class="st">"all"</span>},</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    timeout<span class="op">=</span><span class="dv">30</span>,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>response.raise_for_status()</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> response.json()</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Sample dots within 2 km:"</span>, result[<span class="st">"sample_dots"</span>])</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>result[<span class="st">"categories"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Sample dots within 2 km: 532</code></pre>
-</div>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>[{'category': 'w', 'label': 'White', 'sample_dots': 341}, {'category': 'b', 'label': 'Black', 'sample_dots': 94}, {'category': 'a', 'label': 'Asian', 'sample_dots': 57}, {'category': 'h', 'label': 'Hispanic', 'sample_dots': 32}, {'category': 'o', 'label': 'Other', 'sample_dots': 8}]</code></pre>
-</div>
+<ul>
+<li><strong>Purple dashed outline:</strong> the selected town’s boundary, with a white halo for visibility.</li>
+<li><strong>Tract fills:</strong> the selected variable, using fixed class breaks for comparisons across towns.</li>
+<li><strong>Orange outline:</strong> the tract you selected. Click a tract or its GEOID in the table to inspect it.</li>
+<li><strong>Gray fill:</strong> missing or unavailable estimates; zero is a real value and remains distinct from missing.</li>
+</ul>
+<p>Tract popups show all four measures and available <strong>90% margins of error (MOEs)</strong> for direct estimates. Poverty displays its numerator and denominator; this demo does not calculate a rate MOE. Large MOEs mean estimates are uncertain. <code>+</code> identifies top-coded medians (income $250,000+; home value $2,000,000+).</p>
+<p><strong>Geography matters:</strong> Census tracts and town boundaries do not necessarily nest. We select whole tracts with positive-area overlap; touching neighbors are excluded. The map retains complete tract boundaries and complete tract estimates, including areas outside the town. It does not allocate a fraction of a tract’s population to the town. Do not add displayed tract values and call them a town total. Dollar medians are not sums or averages of household records.</p>
+<p>All estimates describe the <strong>2020–2024 ACS five-year period</strong>. They are survey estimates, not current counts, a single-year census, or the old synthetic 2010 dots. Geometry is simplified slightly for display; selection uses the downloaded boundaries before simplification.</p>
+</section>
+<section id="optional-command-line-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="optional-command-line-preparation">7. Optional command-line preparation</h2>
+<p>The browser is the simplest workflow. For a reproducible terminal workflow, run these commands from the app directory in Terminal 2:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate geospatial</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> prepare_data.py <span class="at">--state</span> 42 <span class="at">--search</span> Harrisburg</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> prepare_data.py <span class="at">--town</span> 28:4232800</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> prepare_data.py <span class="at">--town</span> 28:4261000</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Search returns town IDs and geography types. Use those IDs rather than guessing FIPS codes. Reload the app to see towns prepared through the CLI. The server and preparation script use the same default database and source cache.</p>
+<p>Optional overrides: <code>CENSUS_DB</code> changes the SQLite path, and <code>CENSUS_DATA_DIR</code> changes the source-cache/package folder. If overriding them, set the same values in both terminals. Do not point <code>CENSUS_DB</code> at the old DuckDB database; SQLite uses a different file format.</p>
+</section>
+<section id="inspect-the-api-contract" class="level2">
+<h2 class="anchored" data-anchor-id="inspect-the-api-contract">8. Inspect the API contract</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Request</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>GET /api/health</code></td>
+<td>Server status, vintage, number of prepared towns</td>
+</tr>
+<tr class="even">
+<td><code>GET /api/config</code></td>
+<td>Variables and source descriptions</td>
+</tr>
+<tr class="odd">
+<td><code>GET /api/places?state=42&amp;q=Harrisburg</code></td>
+<td>Matching towns and IDs</td>
+</tr>
+<tr class="even">
+<td><code>POST /api/prepare</code> with <code>{"town_id":"28:4232800"}</code></td>
+<td>Download, join, and save the selected town</td>
+</tr>
+<tr class="odd">
+<td><code>GET /api/towns</code></td>
+<td>Locally prepared towns and tract counts</td>
+</tr>
+<tr class="even">
+<td><code>GET /api/tracts?town_id=28:4232800&amp;variable=income</code></td>
+<td>Whole-tract GeoJSON, chosen values, all metrics, town boundary, and provenance</td>
+</tr>
+</tbody>
+</table>
+<p>Use browser developer tools → <strong>Network</strong>. Observe the search, preparation POST, and choropleth GET. In <code>/docs</code>, try the tract endpoint after preparing a town. Supported variable keys are <code>population</code>, <code>income</code>, <code>poverty</code>, and <code>home_value</code>.</p>
+<p>The next cell is an <strong>optional live HTTP client</strong>. Start Uvicorn and prepare Harrisburg first. This request talks to the Python server; it does not open the database directly.</p>
+<div id="tract-http-client" class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> httpx</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> httpx.get(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"http://127.0.0.1:8000/api/tracts"</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    params<span class="op">=</span>{<span class="st">"town_id"</span>: <span class="st">"28:4232800"</span>, <span class="st">"variable"</span>: <span class="st">"income"</span>},</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    timeout<span class="op">=</span><span class="dv">30</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>response.raise_for_status()</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>tracts <span class="op">=</span> response.json()</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tracts[<span class="st">"town_name"</span>], <span class="st">"—"</span>, <span class="bu">len</span>(tracts[<span class="st">"features"</span>]), <span class="st">"overlapping tracts"</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>[</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"geoid"</span>: f[<span class="st">"properties"</span>][<span class="st">"geoid"</span>], <span class="st">"income"</span>: f[<span class="st">"properties"</span>][<span class="st">"value"</span>]}</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> f <span class="kw">in</span> tracts[<span class="st">"features"</span>][:<span class="dv">5</span>]</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="trace-the-python-backend" class="level2">
-<h2 class="anchored" data-anchor-id="trace-the-python-backend">7. Trace the Python backend</h2>
-<p>Open <a href="examples/census-full-stack/app.py">app.py</a>. <code>@app.get('/api/nearby')</code> registers a URL handler. FastAPI checks typed query parameters before calling it. Each request opens its own <strong>read-only connection</strong> and closes it after the query. The <code>lifespan</code> startup check detects a missing database before the app accepts requests.</p>
-<p>The core query is:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> location <span class="kw">AS</span> (</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> ST_Transform(ST_Point(?, ?), <span class="st">'EPSG:4326'</span>, <span class="st">'EPSG:26918'</span>,</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                        always_xy <span class="op">:=</span> <span class="kw">true</span>) <span class="kw">AS</span> geom</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> p.<span class="kw">category</span>, <span class="fu">count</span>(<span class="op">*</span>)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> census_points p, location q</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> ST_DWithin(p.geom, q.geom, ?)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">AND</span> (? <span class="op">=</span> <span class="st">'all'</span> <span class="kw">OR</span> p.<span class="kw">category</span> <span class="op">=</span> ?)</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> p.<span class="kw">category</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> p.<span class="kw">category</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Python passes <code>[lon, lat, radius_m, category, category]</code> separately from the SQL text. The browser supplies allowed parameter values, never SQL. Distances use projected meter coordinates, not degrees. The server returns only grouped counts; district geometry is transformed back to EPSG:4326 for GeoJSON.</p>
-<p>A radius near the Pennsylvania border counts only dots in the Pennsylvania extract. The web-map circle is illustrative: the analytical distance comes from the projected SQL query, not a screen measurement.</p>
+<section id="trace-the-python-preparation-and-backend" class="level2">
+<h2 class="anchored" data-anchor-id="trace-the-python-preparation-and-backend">9. Trace the Python preparation and backend</h2>
+<p>Open <a href="examples/census-full-stack/prepare_data.py">prepare_data.py</a>. It uses the matching <strong>ACS 2024 TIGERweb service</strong> for both town and tract boundaries. Layers distinguish incorporated places, CDPs, county subdivisions, and tracts. Queries are paginated, and public responses are cached.</p>
+<p>Shapely first finds candidate tracts in the town’s bounding box, then retains those whose intersection with the town has positive area. Whole-tract geometries and estimates are preserved. Census Reporter requests explicitly use <code>acs2024_5yr</code>; the script checks the returned release and requires every selected tract to be present before replacing the saved town.</p>
+<p>Open <a href="examples/census-full-stack/database.py">database.py</a>. The <code>towns</code> table stores the boundary and provenance; the <code>tracts</code> table stores one row per town and tract, including geometry and metrics. A transaction replaces one town’s data without removing others.</p>
+<p>Open <a href="examples/census-full-stack/app.py">app.py</a>. FastAPI validates query parameters and returns JSON/GeoJSON. Reads use bound SQL parameters:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> tracts <span class="kw">WHERE</span> town_id <span class="op">=</span> ? <span class="kw">ORDER</span> <span class="kw">BY</span> geoid</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The browser passes a town ID, never SQL. Download errors leave previous database results available. Census sentinel codes become null rather than false zeros; a zero poverty denominator produces no rate. Town IDs encode a fixed, allowed TIGERweb layer and Census identifier, not an arbitrary remote URL.</p>
 </section>
-<section id="trace-the-frontend" class="level2">
-<h2 class="anchored" data-anchor-id="trace-the-frontend">8. Trace the frontend</h2>
-<p>Open <a href="examples/census-full-stack/static/app.js">static/app.js</a>. Its <code>queryLocation()</code> function builds the request using <code>URLSearchParams</code>, calls <code>fetch()</code>, checks the response, and updates the page. A request counter discards older responses if several queries overlap. Errors are shown in a live status region.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> params <span class="op">=</span> <span class="kw">new</span> <span class="fu">URLSearchParams</span>({</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">lon</span><span class="op">:</span> latlng<span class="op">.</span><span class="at">lng</span><span class="op">,</span> <span class="dt">lat</span><span class="op">:</span> latlng<span class="op">.</span><span class="at">lat</span><span class="op">,</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">radius_m</span><span class="op">:</span> radius<span class="op">.</span><span class="at">value</span><span class="op">,</span> <span class="dt">category</span><span class="op">:</span> category<span class="op">.</span><span class="at">value</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> response <span class="op">=</span> <span class="cf">await</span> <span class="fu">fetch</span>(<span class="vs">`/api/nearby?</span><span class="sc">${</span>params<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> data <span class="op">=</span> <span class="cf">await</span> response<span class="op">.</span><span class="fu">json</span>()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Notice the ordering: Leaflet exposes <code>lat</code>/<code>lng</code>, while the API names X as <code>lon</code> and Y as <code>lat</code>. The frontend draws historical polygons with <code>L.geoJSON()</code> and displays a shared legend for district counts in the selected category. The scale is recomputed when that category changes; compare numbers rather than interpreting colors across different filters. These are counts, not area-normalized density.</p>
-</section>
-<section id="test-the-system" class="level2">
-<h2 class="anchored" data-anchor-id="test-the-system">9. Test the system</h2>
-<p>With the environment activated, run from the project directory after preparing the database:</p>
+<section id="trace-the-frontend-and-test-the-system" class="level2">
+<h2 class="anchored" data-anchor-id="trace-the-frontend-and-test-the-system">10. Trace the frontend and test the system</h2>
+<p>Open <a href="examples/census-full-stack/static/app.js">static/app.js</a>. Search uses <code>fetch()</code> to obtain town matches; <strong>Prepare town data</strong> sends JSON in a POST. <code>loadTown()</code> fetches tract GeoJSON and draws fills with <code>L.geoJSON()</code>. A separate map pane draws the purple town boundary above the choropleth. Fixed color breaks allow comparison between towns; switching variables changes the legend and units.</p>
+<p>Every tract has a tooltip, popup, and table row. Selecting a row zooms to that tract and highlights its boundary. A request counter discards outdated map responses during fast selections. The map reports unavailable libraries, tiles, API failures, and missing estimates.</p>
+<p>From the app directory, run:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> unittest <span class="at">-v</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The included tests compare API district totals against direct SQL for all categories, check radius expansion and category filtering, reject invalid inputs, and verify frontend files and health. They use FastAPI’s in-process test client; the Uvicorn server need not be running.</p>
-<p>Then check the real browser flow: map loads; the City Hall button returns a result; category/radius changes update the response; an outside-state click gives a clear message; the last-response link shows the actual JSON. Use Network to distinguish a failed API request from a missing basemap tile.</p>
-</section>
-<section id="explain-hosting-static-files-versus-python" class="level2">
-<h2 class="anchored" data-anchor-id="explain-hosting-static-files-versus-python">10. Explain hosting: static files versus Python</h2>
-<p>Quarto can publish this lecture as static HTML, but it does not keep the API running. GitHub Pages can serve a map frontend and exported JSON, but cannot run this Python backend.</p>
-<p>For an application deployment, use a <strong>Python-capable host</strong> and keep this demo’s frontend/API on that same host:</p>
+<p>The tests use <strong>synthetic fixtures clearly isolated from the map data</strong>, a temporary SQLite database, and mocked downloads. They require no prepared town, internet access, or running Uvicorn. They cover overlap versus touching, GEOID joins, missing values versus zeros, poverty denominators, top-coding, release mismatch, incomplete-download protection, repreparation, validation, and frontend routes.</p>
+<p>Then test the real browser workflow:</p>
 <ol type="1">
-<li>Install the additional packages in <code>geospatial</code> and supply the two existing source files during preparation.</li>
-<li>Build the database once; retain it on persistent storage or rebuild it during deployment.</li>
-<li>Configure a start command equivalent to <code>python -m uvicorn app:app --host 0.0.0.0 --port $PORT</code>, using the host’s supplied port.</li>
-<li>Enable the host’s HTTPS endpoint and check <code>/api/health</code>, <code>/</code>, and <code>/docs</code>.</li>
+<li>Start with no prepared towns (fresh standalone install) and verify instructions appear.</li>
+<li>Search and prepare Harrisburg; confirm tract fills and the purple town boundary appear.</li>
+<li>Switch all four variables; check units, missing values, legend, and popup details.</li>
+<li>Prepare Pittsburgh and switch between towns; the viewport fits the chosen town’s tracts.</li>
+<li>Click a tract and a table row; verify the orange selected-tract boundary.</li>
+<li>Restart the server; verify prepared towns remain available.</li>
+<li>Inspect <code>/api/tracts</code> and compare one popup against the saved <code>prepared.json</code>.</li>
 </ol>
-<p>This lecture runs locally and does not create a hosting account or publish the app. Use one server worker for the teaching demo. Many concurrent writers and shared editing would be a separate PostgreSQL/PostGIS design exercise; this app exposes read-only analytical queries.</p>
-<p>To render this notebook with saved outputs:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render lecture-12C.ipynb <span class="at">--to</span> html <span class="at">--no-execute</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The runnable server stays a separate project; rendering cannot turn localhost links into a public API.</p>
 </section>
-<section id="exercises-and-troubleshooting" class="level2">
-<h2 class="anchored" data-anchor-id="exercises-and-troubleshooting">Exercises and troubleshooting</h2>
-<ol type="1">
-<li>Explain the request path for a map click, naming the frontend, backend, and database responsibilities.</li>
-<li>Add a 3 km choice to the radius menu without changing the server’s validation limits.</li>
-<li>Query two locations with the same radius/category; explain what you can and cannot infer from the sample counts.</li>
-<li>Add a backend summary endpoint and inspect it in <code>/docs</code> before connecting a new frontend control.</li>
-</ol>
+<section id="troubleshooting-and-hosting" class="level2">
+<h2 class="anchored" data-anchor-id="troubleshooting-and-hosting">11. Troubleshooting and hosting</h2>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -342,41 +429,65 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td>Missing <code>fastapi</code>, <code>uvicorn</code>, or <code>httpx</code></td>
-<td>Activate <code>geospatial</code> and run <code>conda install -c conda-forge fastapi uvicorn httpx</code></td>
+<td>Import error for FastAPI, HTTPX, or Shapely</td>
+<td>Activate <code>geospatial</code> and install the section 3 packages</td>
 </tr>
 <tr class="even">
-<td>Database missing at startup</td>
-<td>Run <code>prepare_data.py --data ...</code> first, in the project directory</td>
+<td>No prepared towns</td>
+<td>Find a town and click <strong>Prepare town data</strong>; database creation alone downloads no town</td>
 </tr>
 <tr class="odd">
-<td>Cannot find Parquet/GeoJSON</td>
-<td>Point <code>--data</code> at the local <code>week12/data</code> folder containing both downloaded files</td>
+<td>No town matches</td>
+<td>Confirm state and spelling; choose the intended incorporated-place, CDP, or township geography</td>
 </tr>
 <tr class="even">
-<td>Spatial installation fails</td>
-<td>Check internet access and the DuckDB version from the environment file</td>
+<td>Preparation fails</td>
+<td>Check internet access to <code>tigerweb.geo.census.gov</code> and <code>api.censusreporter.org</code>; read the server terminal</td>
 </tr>
 <tr class="odd">
-<td>Port 8000 is in use</td>
-<td>Stop the previous server or choose <code>--port 8001</code> and use that URL everywhere</td>
+<td>Blank map / map library failed</td>
+<td>Allow <code>unpkg.com</code>; hard-refresh the page after script updates</td>
 </tr>
 <tr class="even">
-<td>HTML opens but API fails</td>
-<td>Use Uvicorn’s URL rather than <code>file://</code> or a plain static server</td>
+<td>Tracts appear but streets do not</td>
+<td>Check <code>tile.openstreetmap.org</code> requests; streets require internet access</td>
 </tr>
 <tr class="odd">
-<td>Map is blank but API works</td>
-<td>Check CDN/OSM requests and internet access in browser Network</td>
+<td>Gray tract</td>
+<td>Estimate unavailable or suppressed; inspect its popup and raw response rather than assuming zero</td>
 </tr>
 <tr class="even">
-<td>Rebuild refused</td>
-<td>Stop the API and remove only the demo’s <code>data/census.duckdb</code> before rebuilding</td>
+<td>Old district/radius controls still appear</td>
+<td>Stop the old server, start Uvicorn from this updated app directory, and hard-refresh</td>
+</tr>
+<tr class="odd">
+<td>Port 8000 is occupied</td>
+<td>Stop the previous server or choose <code>--port 8001</code>; use that URL for the browser and notebook client</td>
+</tr>
+<tr class="even">
+<td>File is not a database</td>
+<td>Remove a custom <code>CENSUS_DB</code> override pointing at an old DuckDB file; use the default <code>data/tracts.sqlite</code></td>
 </tr>
 </tbody>
 </table>
-<p><strong>Data provenance:</strong> <a href="../week11-large-data-viz-lidar/data/samples/provenance.json">Week 11 sample preparation</a>. Historical source categories are limited representations of identity; sample counts are not population estimates, density, or current demographics.</p>
-<p><strong>References:</strong> <a href="https://fastapi.tiangolo.com/tutorial/static-files/">FastAPI static files</a> · <a href="https://fastapi.tiangolo.com/tutorial/testing/">FastAPI testing</a> · <a href="https://duckdb.org/docs/stable/core_extensions/spatial/functions.html">DuckDB spatial functions</a>.</p>
+<p>Stop Uvicorn before manually removing database files. Source-cache responses are fixed-vintage downloads. To refresh from the sources, stop the server, remove only <code>data/tract-explorer/source-cache</code> beside the notebook, restart, and reprepare the desired town. Repreparation retains other towns.</p>
+<p>Quarto and GitHub Pages can publish this lecture but cannot run FastAPI. For deployment use a Python-capable host, persistent storage for the SQLite database and downloaded packages, a single Uvicorn worker for this teaching demo, and the host’s HTTPS endpoint. Local preparation does not publish anything. Public multi-user deployment needs separate decisions about authentication, preparation jobs, and resource limits.</p>
+<p>Render the updated notes from the lecture folder:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render lecture-12C.ipynb <span class="at">--to</span> html <span class="at">--no-execute</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Keep the live server separate from notebook rendering. The optional HTTP cell requires it to be running.</p>
+</section>
+<section id="exercises-and-sources" class="level2">
+<h2 class="anchored" data-anchor-id="exercises-and-sources">Exercises and sources</h2>
+<ol type="1">
+<li>Compare median income in two towns using the same legend. Explain why a dark tract is not necessarily a dense tract.</li>
+<li>Locate a tract crossing the town outline. Explain why its estimate cannot be treated as a town-only estimate.</li>
+<li>Recalculate one tract’s poverty rate from its displayed numerator and denominator.</li>
+<li>Compare a direct estimate and its MOE; describe how uncertainty changes your interpretation.</li>
+<li>Prepare a third town and explain which Census geography you selected and why.</li>
+</ol>
+<p><strong>Primary dataset and boundary documentation:</strong> <a href="https://api.census.gov/data/2024/acs/acs5/geography.html">2024 ACS five-year geography</a>, <a href="https://api.census.gov/data/2024/acs/acs5/variables/B19013_001E.json">median income variable</a>, <a href="https://api.census.gov/data/2024/acs/acs5/variables/B17001_002E.json">poverty numerator</a>, <a href="https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2024/MapServer">Census TIGERweb ACS 2024 service</a>.</p>
+<p><strong>Estimate delivery:</strong> <a href="https://github.com/censusreporter/census-api/blob/master/API.md">Census Reporter API documentation</a>. Census Reporter redistributes Census ACS estimates; the local prepared package records the requested and returned release and both source URLs.</p>
+<p><strong>Map attribution:</strong> <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>. Keep attribution visible when sharing map screenshots.</p>
 </section>
 
 </main>

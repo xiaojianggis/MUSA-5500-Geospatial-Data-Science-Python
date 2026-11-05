@@ -92,7 +92,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="build-a-full-stack-gis-with-python" class="level2">
 <h2 class="anchored" data-anchor-id="build-a-full-stack-gis-with-python">3. Build a full-stack GIS with Python</h2>
 <p><a href="lecture-12C.html">Open the full-stack GIS demo</a></p>
-<p>Connect a Leaflet web map to FastAPI and DuckDB Spatial. Filter historical district counts and click a location to query Census sample dots within a radius.</p>
+<p>Choose a town and prepare real ACS five-year estimates and Census tract boundaries. Use a Leaflet choropleth to compare population, income, poverty, and home value at the tract level, with a Python/FastAPI backend and persistent local SQLite storage.</p>
 <p><a href="lecture-12C.ipynb" download="">Download lecture 12C</a> · <a href="downloads/census-full-stack.zip">Download the complete runnable project</a></p>
 </section>
 <section id="start-here" class="level2">
@@ -100,7 +100,7 @@ ul.task-list li input[type="checkbox"] {
 <ul>
 <li><strong>Download both datasets into <code>week12/data</code>:</strong> <a href="../week11-large-data-viz-lidar/data/samples/census_sample.parquet">census_sample.parquet</a> and <a href="../week11-large-data-viz-lidar/data/samples/districts_2015.geojson">districts_2015.geojson</a>. Create the local folders first and move the files there if your browser saves them to Downloads.</li>
 <li>Save the notebooks in <code>week12</code>; extract the full-stack project into <code>week12/census-full-stack</code>.</li>
-<li><strong>Keep using <code>geospatial</code>:</strong> follow Part A to install DuckDB/PyArrow, and Part C to add FastAPI/Uvicorn/HTTPX in the same environment.</li>
+<li><strong>Keep using <code>geospatial</code>:</strong> follow Part A to install DuckDB/PyArrow, and Part C to add FastAPI/Uvicorn/HTTPX/Shapely in the same environment.</li>
 <li><a href="environment.yml">Dependency reference</a>.</li>
 <li><a href="downloads/week12-tutorials.zip">Download this tutorial folder</a>.</li>
 <li><a href="downloads/starter-website.zip">Standalone website starter</a>.</li>
@@ -108,7 +108,7 @@ ul.task-list li input[type="checkbox"] {
 <li><a href="downloads/census-story-site-skill.zip">Reusable skill example</a>.</li>
 <li><a href="README.md">Setup and folder instructions</a>.</li>
 </ul>
-<p>The Census dots are synthetic historical teaching data; their counts are not population estimates or current demographics. All three tutorials keep that distinction visible.</p>
+<p>The Census dots are synthetic historical teaching data; their counts are not population estimates or current demographics. Parts A and B use those sample dots; Part C downloads real ACS estimates for town-level tract exploration.</p>
 </section>
 
 </main>

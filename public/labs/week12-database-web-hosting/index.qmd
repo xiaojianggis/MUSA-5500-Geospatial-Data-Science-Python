@@ -16,7 +16,7 @@ Connect Python to a persistent database, import the Week 11 Census points and di
 
 [Open the publishing tutorial](lecture-12B.html)
 
-Render a notebook with Quarto, use ChatGPT prompts or a reusable skill to help create a website, preview through localhost, then publish the generated files with GitHub Pages.
+Beginner walkthrough: render your saved notebook with Quarto, use ChatGPT and vibe coding to build and test a simple website, learn the basic Git commands, then publish with GitHub Pages. Includes GitHub signup instructions and a diagram explaining local commits and online repositories.
 
 <a href="lecture-12B.ipynb" download>Download the publishing notes</a>
 

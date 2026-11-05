@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Week 12B: Git and GitHub basics</title>
+<title>Week 12B: Quarto, ChatGPT, vibe coding, and GitHub</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -80,13 +80,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Tutorial steps</h2>
    
   <ul>
-  <li><a href="#register-a-github-account-and-install-git" id="toc-register-a-github-account-and-install-git" class="nav-link active" data-scroll-target="#register-a-github-account-and-install-git">1. Register a GitHub account and install Git</a></li>
-  <li><a href="#how-do-git-and-github-fit-together" id="toc-how-do-git-and-github-fit-together" class="nav-link" data-scroll-target="#how-do-git-and-github-fit-together">2. How do Git and GitHub fit together?</a></li>
-  <li><a href="#start-a-local-repository-git-init-and-git-status" id="toc-start-a-local-repository-git-init-and-git-status" class="nav-link" data-scroll-target="#start-a-local-repository-git-init-and-git-status">3. Start a local repository: git init and git status</a></li>
-  <li><a href="#save-your-first-snapshot-git-add-and-git-commit" id="toc-save-your-first-snapshot-git-add-and-git-commit" class="nav-link" data-scroll-target="#save-your-first-snapshot-git-add-and-git-commit">4. Save your first snapshot: git add and git commit</a></li>
-  <li><a href="#connect-to-github-git-remote" id="toc-connect-to-github-git-remote" class="nav-link" data-scroll-target="#connect-to-github-git-remote">5. Connect to GitHub: git remote</a></li>
-  <li><a href="#upload-your-commits-git-push" id="toc-upload-your-commits-git-push" class="nav-link" data-scroll-target="#upload-your-commits-git-push">6. Upload your commits: git push</a></li>
-  <li><a href="#practice-making-an-update" id="toc-practice-making-an-update" class="nav-link" data-scroll-target="#practice-making-an-update">7. Practice making an update</a></li>
+  <li><a href="#turn-your-notebook-into-a-report-with-quarto" id="toc-turn-your-notebook-into-a-report-with-quarto" class="nav-link active" data-scroll-target="#turn-your-notebook-into-a-report-with-quarto">1. Turn your notebook into a report with Quarto</a></li>
+  <li><a href="#use-chatgpt-to-help-build-a-simple-website" id="toc-use-chatgpt-to-help-build-a-simple-website" class="nav-link" data-scroll-target="#use-chatgpt-to-help-build-a-simple-website">2. Use ChatGPT to help build a simple website</a></li>
+  <li><a href="#save-and-preview-the-website" id="toc-save-and-preview-the-website" class="nav-link" data-scroll-target="#save-and-preview-the-website">3. Save and preview the website</a></li>
+  <li><a href="#vibe-coding-describe-test-and-improve" id="toc-vibe-coding-describe-test-and-improve" class="nav-link" data-scroll-target="#vibe-coding-describe-test-and-improve">4. Vibe coding: describe, test, and improve</a></li>
+  <li><a href="#register-a-github-account-and-install-git" id="toc-register-a-github-account-and-install-git" class="nav-link" data-scroll-target="#register-a-github-account-and-install-git">5. Register a GitHub account and install Git</a></li>
+  <li><a href="#how-do-git-and-github-fit-together" id="toc-how-do-git-and-github-fit-together" class="nav-link" data-scroll-target="#how-do-git-and-github-fit-together">6. How do Git and GitHub fit together?</a></li>
+  <li><a href="#track-your-website-git-init-and-git-status" id="toc-track-your-website-git-init-and-git-status" class="nav-link" data-scroll-target="#track-your-website-git-init-and-git-status">7. Track your website: git init and git status</a></li>
+  <li><a href="#save-your-first-snapshot-git-add-and-git-commit" id="toc-save-your-first-snapshot-git-add-and-git-commit" class="nav-link" data-scroll-target="#save-your-first-snapshot-git-add-and-git-commit">8. Save your first snapshot: git add and git commit</a></li>
+  <li><a href="#connect-to-github-git-remote" id="toc-connect-to-github-git-remote" class="nav-link" data-scroll-target="#connect-to-github-git-remote">9. Connect to GitHub: git remote</a></li>
+  <li><a href="#upload-your-commits-git-push" id="toc-upload-your-commits-git-push" class="nav-link" data-scroll-target="#upload-your-commits-git-push">10. Upload your commits: git push</a></li>
+  <li><a href="#practice-making-an-update" id="toc-practice-making-an-update" class="nav-link" data-scroll-target="#practice-making-an-update">11. Practice making an update</a></li>
+  <li><a href="#publish-your-website-with-github-pages" id="toc-publish-your-website-with-github-pages" class="nav-link" data-scroll-target="#publish-your-website-with-github-pages">12. Publish your website with GitHub Pages</a></li>
+  <li><a href="#finish-and-check-your-work" id="toc-finish-and-check-your-work" class="nav-link" data-scroll-target="#finish-and-check-your-work">13. Finish and check your work</a></li>
   </ul>
 </nav>
 </div>
@@ -96,7 +102,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Week 12B: Git and GitHub basics</h1>
+<h1 class="title">Week 12B: Quarto, ChatGPT, vibe coding, and GitHub</h1>
 </div>
 
 
@@ -113,23 +119,161 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>Learn how to save a project’s history on your computer and upload it to GitHub.</p>
+<p>Turn your Week 12 analysis into a readable report, use ChatGPT to help create a simple website, and learn how to share files with GitHub.</p>
 <p><a href="lecture-12B.ipynb" download="">Download this notebook</a> · <a href="lecture-12A.html">Previous: DuckDB Spatial</a></p>
-<p><strong>Goal:</strong> create a small repository, upload a README, and make one update. Run all commands below in a <strong>terminal</strong>, one line at a time. No new Python package is needed; keep using your existing <code>geospatial</code> environment for Python work.</p>
+<p>We will work in small steps:</p>
+<ol type="1">
+<li><strong>Quarto:</strong> turn a saved notebook into an HTML report.</li>
+<li><strong>ChatGPT and vibe coding:</strong> describe a website, save the code, test it, and improve it.</li>
+<li><strong>Git and GitHub:</strong> save and upload the website you just made.</li>
+<li><strong>GitHub Pages:</strong> give your website a public URL.</li>
+</ol>
+<p><strong>Beginner walkthrough:</strong> each step tells you where to work, what to type, and what you should see. Work through the steps in order; you will use one website folder throughout.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Tool</th>
+<th>What you use it for</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Jupyter</td>
+<td>Run and save your Python analysis</td>
+</tr>
+<tr class="even">
+<td>Quarto</td>
+<td>Convert the saved notebook to a readable HTML report</td>
+</tr>
+<tr class="odd">
+<td>ChatGPT</td>
+<td>Help write and revise website code</td>
+</tr>
+<tr class="even">
+<td>Browser</td>
+<td>Test the report and website</td>
+</tr>
+<tr class="odd">
+<td>Git</td>
+<td>Save versions of your website on your computer</td>
+</tr>
+<tr class="even">
+<td>GitHub</td>
+<td>Store and share your saved project online</td>
+</tr>
+<tr class="odd">
+<td>GitHub Pages</td>
+<td>Publish the website for visitors</td>
+</tr>
+</tbody>
+</table>
+<p>Keep using your existing <strong><code>geospatial</code> environment</strong>. Download the source datasets into <strong><code>week12/data</code></strong> as described in Part A. Run shell commands in a terminal, not a Python notebook cell.</p>
+<section id="turn-your-notebook-into-a-report-with-quarto" class="level2">
+<h2 class="anchored" data-anchor-id="turn-your-notebook-into-a-report-with-quarto">1. Turn your notebook into a report with Quarto</h2>
+<p><strong>Where:</strong> your terminal, opened in <code>week12</code>.</p>
+<p><strong>Quarto</strong> is a publishing tool. It takes a notebook’s text, code, tables, and plots and puts them into an HTML page that people can read in a browser.</p>
+<p>First, finish Part A and <strong>save the notebook with its outputs</strong> as <code>week12/lecture-12A.ipynb</code>. Then install the <a href="https://quarto.org/docs/get-started/">Quarto command-line tool</a> for your operating system. Quarto is installed separately from Python.</p>
+<p>Open a new terminal inside your local <code>week12</code> folder:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate geospatial</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> <span class="at">--version</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render lecture-12A.ipynb <span class="at">--to</span> html</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>What you should see:</strong> a new file named <code>lecture-12A.html</code>. Open it in your browser. Keep the accompanying <strong><code>lecture-12A_files</code></strong> folder next to it; it contains files the page needs.</p>
+<p>This command uses the results already saved in your notebook. If you change the analysis, run the notebook again, save it, and repeat the render command.</p>
+<p><strong>Try it:</strong> add a Markdown sentence explaining one result in Part A. Save the notebook, render again, and find the sentence in the HTML report.</p>
+</section>
+<section id="use-chatgpt-to-help-build-a-simple-website" class="level2">
+<h2 class="anchored" data-anchor-id="use-chatgpt-to-help-build-a-simple-website">2. Use ChatGPT to help build a simple website</h2>
+<p>An HTML report shows your analysis. A small website can introduce the question and highlight one map or chart.</p>
+<p>Use the Part A exports from <code>week12/outputs</code>, especially:</p>
+<ul>
+<li><code>category_counts.json</code>: the actual counts to display.</li>
+<li><code>district_sample_map.png</code>: the map to show.</li>
+<li><code>district_counts.csv</code>: a table readers can download.</li>
+</ul>
+<p><strong>Where:</strong> the ChatGPT app or website.</p>
+<p>Open ChatGPT and attach these small files if your interface supports attachments. Otherwise paste the JSON and describe the other files. This exercise uses the ChatGPT interface; you do not need an API key or a new Python package.</p>
+<p>Copy and adapt this prompt:</p>
+<pre class="text"><code>Help me build a simple website for my Week 12 geospatial class project.
+The audience is classmates who have not seen my notebook.
+
+Use my category_counts.json, district_counts.csv, and
+district_sample_map.png files. Show a title, a short introduction,
+a bar chart using the supplied counts, the map with a caption,
+a link to download the CSV table, and a link to my notebook report
+called lecture-12A.html in the same folder as index.html.
+
+Explain that these are synthetic historical Census teaching dots
+and 2015 district boundaries. Counts are sample dots, not population
+estimates or current demographics. Do not invent values.
+
+Return three complete files: index.html, styles.css, and app.js.
+Use plain HTML, CSS, and JavaScript, with input files in assets/.
+Make the page easy to read on a phone. Explain how to save and preview it.</code></pre>
+<p>A clear prompt says <strong>what to make, who will read it, which files to use, and what the result must include</strong>. Read the returned code and instructions before using them.</p>
+</section>
+<section id="save-and-preview-the-website" class="level2">
+<h2 class="anchored" data-anchor-id="save-and-preview-the-website">3. Save and preview the website</h2>
+<p><strong>Where:</strong> your file manager and text editor.</p>
+<p>Create a <code>website</code> folder inside your local <code>week12</code> folder. Save ChatGPT’s code in files with these exact names. Copy your actual Part A exports into <code>assets</code>:</p>
+<pre class="text"><code>week12/
+├── data/                     # downloaded source datasets
+├── outputs/                  # results created in Part A
+├── lecture-12A.ipynb
+├── lecture-12A.html
+├── lecture-12A_files/
+└── website/
+    ├── index.html
+    ├── styles.css
+    ├── app.js
+    └── assets/
+        ├── category_counts.json
+        ├── district_counts.csv
+        └── district_sample_map.png</code></pre>
+<p>Also <strong>copy</strong> your rendered <code>lecture-12A.html</code> and its entire <code>lecture-12A_files</code> folder into <code>week12/website</code>. Keep the two names unchanged so the report’s images and formatting continue to work. The website’s report link should point to <code>lecture-12A.html</code>.</p>
+<p>Copy only the file contents, leaving out Markdown markers such as <code>```html</code>. ChatGPT code blocks must be saved as files on your computer.</p>
+<p>In a terminal inside <strong><code>week12/website</code></strong>, run:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate geospatial</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> http.server 8000 <span class="at">--bind</span> 127.0.0.1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Open <strong><a href="http://localhost:8000">http://localhost:8000</a></strong> in your browser. <strong>What you should see:</strong> your homepage, chart, and map. Click the CSV download link and the notebook report link to check them.</p>
+<p>This runs a small local file server, so the page can load its JSON data. <code>localhost</code> means your computer; this URL is not a public website link. Press <strong>Ctrl+C</strong> in the terminal when finished.</p>
+<p>For comparison, download the <a href="downloads/starter-website.zip">working website starter</a>. For a later project with several pages, the <a href="downloads/quarto-site.zip">Quarto website starter</a> includes a homepage and notebook report; see <a href="https://quarto.org/docs/websites/">Quarto’s website guide</a>.</p>
+</section>
+<section id="vibe-coding-describe-test-and-improve" class="level2">
+<h2 class="anchored" data-anchor-id="vibe-coding-describe-test-and-improve">4. Vibe coding: describe, test, and improve</h2>
+<p>Here, <strong>vibe coding</strong> means using everyday language to ask an AI tool for code, then testing the result and asking for specific changes. You still need to check that the website works and tells the truth about your data.</p>
+<pre class="text"><code>Describe your goal → Get code → Save and test → Describe one change
+                                      ▲                 │
+                                      └─────────────────┘</code></pre>
+<p>Check three things before asking for improvements:</p>
+<ol type="1">
+<li><strong>Data:</strong> do the chart values match your exported JSON?</li>
+<li><strong>Files:</strong> do the map and CSV download link work?</li>
+<li><strong>Explanation:</strong> are the title, captions, and sample-data limitations clear?</li>
+</ol>
+<p>Ask for one change at a time. For example:</p>
+<pre class="text"><code>The page opens, but the chart is empty. The browser's Network tab shows
+404 for category_counts.json. My file is in assets/category_counts.json.
+Please fix the file path and explain the change.</code></pre>
+<p>Or:</p>
+<pre class="text"><code>The page works. Please make the text larger and place the map below
+the chart on phones. Preserve the data values and captions.</code></pre>
+<p><strong>Try it:</strong> request one improvement, save the updated files, refresh the browser, and check that the data and map still work.</p>
+<p>Next, use Git to save this same website folder and upload it to GitHub. You do not need a second practice project.</p>
+</section>
 <section id="register-a-github-account-and-install-git" class="level2">
-<h2 class="anchored" data-anchor-id="register-a-github-account-and-install-git">1. Register a GitHub account and install Git</h2>
+<h2 class="anchored" data-anchor-id="register-a-github-account-and-install-git">5. Register a GitHub account and install Git</h2>
 <ol type="1">
 <li>Go to <strong><a href="https://github.com/signup">github.com/signup</a></strong> and register a free GitHub account. Verify your email address. If you already have an account, sign in.</li>
 <li>Write down your GitHub <strong>username</strong>; you will use it in your repository URL.</li>
 <li>Install <strong><a href="https://git-scm.com/downloads">Git</a></strong> for your operating system. On Windows, use Git Bash for this exercise. Reopen your terminal after installation.</li>
 <li>Check that Git is installed:</li>
 </ol>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> <span class="at">--version</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> <span class="at">--version</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Git records changes on your computer. GitHub is a website that stores a copy of your repository online, so you can share your work.</p>
 <p><a href="https://docs.github.com/en/account-and-profile/how-tos/account-management/creating-an-account-on-github">GitHub account setup guide</a>.</p>
 </section>
 <section id="how-do-git-and-github-fit-together" class="level2">
-<h2 class="anchored" data-anchor-id="how-do-git-and-github-fit-together">2. How do Git and GitHub fit together?</h2>
+<h2 class="anchored" data-anchor-id="how-do-git-and-github-fit-together">6. How do Git and GitHub fit together?</h2>
 <p>A <strong>repository</strong> is a project folder with a history of saved changes. A <strong>commit</strong> is a saved snapshot with a message describing the change.</p>
 <pre class="text"><code>YOUR COMPUTER                                      GITHUB (online)
 
@@ -146,68 +290,63 @@ README.md         Changes chosen   Saved commits     Copy you can share
   git remote add origin: connect it to a GitHub repository URL</code></pre>
 <p><code>git add</code> chooses changes for the next snapshot. <code>git commit</code> saves that snapshot locally. <code>git push</code> uploads your saved commits to GitHub. You can commit without being connected to the internet; pushing needs an internet connection.</p>
 </section>
-<section id="start-a-local-repository-git-init-and-git-status" class="level2">
-<h2 class="anchored" data-anchor-id="start-a-local-repository-git-init-and-git-status">3. Start a local repository: git init and git status</h2>
-<p>Inside your personal <strong><code>week12</code></strong> folder, create a new folder named <strong><code>github-practice</code></strong>. Open a terminal inside <code>week12/github-practice</code>. Use a personal folder outside the downloaded course Git repository.</p>
+<section id="track-your-website-git-init-and-git-status" class="level2">
+<h2 class="anchored" data-anchor-id="track-your-website-git-init-and-git-status">7. Track your website: git init and git status</h2>
+<p><strong>Where:</strong> a terminal opened inside <strong><code>week12/website</code></strong>, the folder containing <code>index.html</code>. Keep your personal <code>week12</code> folder outside the downloaded course Git repository.</p>
 <p>Create a text file named <strong><code>README.md</code></strong> in this folder using your text editor. Write:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># My Week 12 project</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>I am learning Git and GitHub for geospatial data science.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># My Week 12 project</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>I am learning Git and GitHub for geospatial data science.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Start tracking this folder:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> init <span class="at">-b</span> main</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> init <span class="at">-b</span> main</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><code>git init</code> creates a local repository. <code>-b main</code> names its first branch <code>main</code>. <code>git status</code> should list <code>README.md</code> as <strong>untracked</strong>: the file exists, but Git has not saved it yet.</p>
-<p>Keep downloaded datasets in <strong><code>week12/data</code></strong>, outside this practice repository:</p>
-<pre class="text"><code>week12/
-├── data/
-│   ├── census_sample.parquet
-│   └── districts_2015.geojson
-├── lecture-12B.ipynb
-└── github-practice/       ← run Git commands here
-    └── README.md</code></pre>
+<p>Keep downloaded source datasets in <strong><code>week12/data</code></strong>, outside the website repository. Only the small results used by your page belong in <code>website/assets</code>.</p>
+<p><strong>What you should see:</strong> <code>git status</code> lists your website files, the report, and README as untracked. Nothing has been uploaded yet.</p>
 </section>
 <section id="save-your-first-snapshot-git-add-and-git-commit" class="level2">
-<h2 class="anchored" data-anchor-id="save-your-first-snapshot-git-add-and-git-commit">4. Save your first snapshot: git add and git commit</h2>
-<p>Choose the file to include, then check its status:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add README.md</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The file should now appear under <strong>Changes to be committed</strong>. Save the snapshot with a short message:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">'Add my project introduction'</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<h2 class="anchored" data-anchor-id="save-your-first-snapshot-git-add-and-git-commit">8. Save your first snapshot: git add and git commit</h2>
+<p>Choose all files in this website folder, then check their status:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add .</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The files should now appear under <strong>Changes to be committed</strong>. Save the snapshot with a short message:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">'Add my website and notebook report'</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The dot in <code>git add .</code> means “include changes in this folder and its subfolders.” Run it from <code>week12/website</code>.</p>
 <p><code>-m</code> supplies the commit message. Use a message that describes what you changed. After the commit, Git should report a <strong>clean working tree</strong>.</p>
 <p><strong>First-time setup:</strong> if Git asks who you are, run these commands with your own name and email, then run the commit command again:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config user.name <span class="st">"Your Name"</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config user.email <span class="st">"you@example.com"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config user.name <span class="st">"Your Name"</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config user.email <span class="st">"you@example.com"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>These settings identify your commits; they do not sign you into GitHub.</p>
 </section>
 <section id="connect-to-github-git-remote" class="level2">
-<h2 class="anchored" data-anchor-id="connect-to-github-git-remote">5. Connect to GitHub: git remote</h2>
+<h2 class="anchored" data-anchor-id="connect-to-github-git-remote">9. Connect to GitHub: git remote</h2>
 <p>In your browser, sign in to GitHub and create a <strong>new repository</strong>:</p>
 <ol type="1">
 <li>Click <strong>+ → New repository</strong>.</li>
-<li>Name it <strong><code>week12-practice</code></strong> and choose <strong>Public</strong> for this class exercise.</li>
+<li>Name it <strong><code>week12-website</code></strong> and choose <strong>Public</strong> for this class exercise.</li>
 <li>Leave the README, .gitignore, and license options unchecked so the online repository starts empty.</li>
 <li>Click <strong>Create repository</strong> and copy its <strong>HTTPS</strong> URL.</li>
 </ol>
 <p>Back in the same terminal, replace <code>YOUR-USERNAME</code> with your GitHub username:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> remote add origin https://github.com/YOUR-USERNAME/week12-practice.git</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> remote add origin https://github.com/YOUR-USERNAME/week12-website.git</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>A <strong>remote</strong> is the address of an online repository. <code>origin</code> is the name we give this connection. This command connects your local repository to that address; it does not upload your files yet.</p>
 </section>
 <section id="upload-your-commits-git-push" class="level2">
-<h2 class="anchored" data-anchor-id="upload-your-commits-git-push">6. Upload your commits: git push</h2>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push <span class="at">-u</span> origin main</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<h2 class="anchored" data-anchor-id="upload-your-commits-git-push">10. Upload your commits: git push</h2>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push <span class="at">-u</span> origin main</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>This uploads your local <code>main</code> branch to GitHub. <code>-u</code> remembers the connection so future uploads can use just <code>git push</code>.</p>
 <p>Follow Git’s sign-in prompts. If HTTPS authentication asks for a password, GitHub requires a personal access token rather than your GitHub account password; follow <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github">GitHub’s authentication guide</a>.</p>
 <p>Refresh your repository page in the browser. You should see <strong>README.md</strong> and your commit message. Copy the repository URL to share your work.</p>
 <p>A GitHub repository page displays your files and history. Publishing an HTML website with GitHub Pages is a separate step; this exercise ends with uploading your project.</p>
 </section>
 <section id="practice-making-an-update" class="level2">
-<h2 class="anchored" data-anchor-id="practice-making-an-update">7. Practice making an update</h2>
-<p>Add one sentence to <code>README.md</code>, such as “My data are stored locally in week12/data.” Save the file, then run:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add README.md</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">'Describe my local data folder'</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<h2 class="anchored" data-anchor-id="practice-making-an-update">11. Practice making an update</h2>
+<p>Change one sentence on your homepage (<code>index.html</code>) or in <code>README.md</code>. Save the file, then run:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add .</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">'Improve my website introduction'</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Refresh GitHub to see your change. You only need <code>git init</code> and <code>git remote add origin</code> once for this project. Repeat <strong>status → add → commit → push</strong> whenever you want to save and upload another change.</p>
 <table class="caption-top table">
 <thead>
@@ -226,8 +365,8 @@ README.md         Changes chosen   Saved commits     Copy you can share
 <td>See what changed</td>
 </tr>
 <tr class="odd">
-<td><code>git add README.md</code></td>
-<td>Choose changes for the next commit</td>
+<td><code>git add .</code></td>
+<td>Choose the website changes for the next commit</td>
 </tr>
 <tr class="even">
 <td><code>git commit -m 'Describe the change'</code></td>
@@ -247,7 +386,102 @@ README.md         Changes chosen   Saved commits     Copy you can share
 </tr>
 </tbody>
 </table>
-<p><strong>Submit:</strong> your GitHub repository URL. Check that it contains your updated README and two commits.</p>
+</section>
+<section id="publish-your-website-with-github-pages" class="level2">
+<h2 class="anchored" data-anchor-id="publish-your-website-with-github-pages">12. Publish your website with GitHub Pages</h2>
+<p><strong>Where:</strong> your repository page on GitHub, in your browser.</p>
+<p>Your files are now on GitHub. Turn on GitHub Pages so visitors see the website:</p>
+<ol type="1">
+<li>Open your <strong><code>week12-website</code></strong> repository.</li>
+<li>Click <strong>Settings → Pages</strong>.</li>
+<li>Under <strong>Build and deployment</strong>, select <strong>Deploy from a branch</strong>.</li>
+<li>Select <strong>main</strong> and <strong>/(root)</strong>, then click <strong>Save</strong>. We use the root because <code>index.html</code> is at the top of your website repository.</li>
+<li>Wait for the deployment to finish. Open the website link shown on this settings page.</li>
+</ol>
+<p>Your two links serve different purposes:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Link</th>
+<th>What people see</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>https://github.com/YOUR-USERNAME/week12-website</code></td>
+<td>Project files and saved commits</td>
+</tr>
+<tr class="even">
+<td><code>https://YOUR-USERNAME.github.io/week12-website/</code></td>
+<td>The published website</td>
+</tr>
+</tbody>
+</table>
+<p><strong>What you should see:</strong> the same homepage you tested at localhost. Check the map, chart, CSV link, and report link again. Use relative links such as <code>assets/category_counts.json</code>, without a leading slash.</p>
+<p>GitHub Pages serves HTML, CSS, JavaScript, and saved outputs. It does not run your Python notebook or DuckDB queries. Keep the source datasets in your local <code>week12/data</code> folder.</p>
+<p><a href="https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site">GitHub Pages setup instructions</a>.</p>
+</section>
+<section id="finish-and-check-your-work" class="level2">
+<h2 class="anchored" data-anchor-id="finish-and-check-your-work">13. Finish and check your work</h2>
+<p><strong>Submit:</strong> your repository URL and published website URL. Your site should include an introduction, a chart with actual exported counts, a map with a caption, a CSV download, and a link to your rendered notebook report.</p>
+<p>To update your site later:</p>
+<ol type="1">
+<li>Edit and test the website locally.</li>
+<li>If you changed the analysis, rerun and save Part A, render it with Quarto, then copy the updated report, supporting folder, and exports into <code>website</code>.</li>
+<li>In a terminal inside <code>week12/website</code>, run:</li>
+</ol>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add .</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">'Update my website'</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Wait for GitHub Pages to finish deploying, then refresh the public link.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>If this happens</th>
+<th>Try this</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>quarto</code> is not found</td>
+<td>Install Quarto and reopen the terminal</td>
+</tr>
+<tr class="even">
+<td>The report shows old results</td>
+<td>Run and save Part A, then render and copy the report again</td>
+</tr>
+<tr class="odd">
+<td>The chart or map is missing</td>
+<td>Check filenames and the <code>assets/</code> paths; test using localhost</td>
+</tr>
+<tr class="even">
+<td>Git asks for a name or email</td>
+<td>Follow the first-time setup in Step 8, then retry the commit</td>
+</tr>
+<tr class="odd">
+<td><code>origin</code> already exists</td>
+<td>Skip <code>git remote add origin</code> if you already connected this repository</td>
+</tr>
+<tr class="even">
+<td>Push fails</td>
+<td>Check your repository URL and GitHub authentication; ask for help with the exact error</td>
+</tr>
+<tr class="odd">
+<td>Pages shows 404</td>
+<td>Check that <code>index.html</code> was uploaded and Pages uses <code>main</code> and <code>/(root)</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Explain in one sentence:</strong> what did Quarto do, what did ChatGPT help with, and what did GitHub Pages publish?</p>
 </section>
 
 </main>

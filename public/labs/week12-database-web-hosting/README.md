@@ -68,11 +68,11 @@ Rerunning the import cells rebuilds two teaching tables in `outputs/census_tutor
 The tutorial covers:
 
 - Rendering a saved notebook to HTML with Quarto.
-- A small Quarto website with navigation and a rendered notebook report.
+- A simple website linking to a rendered notebook report; an optional Quarto website starter.
 - A complete ChatGPT prompt for an HTML/CSS/JavaScript website using exported results.
-- A reusable example skill, with setup and a prompt-only fallback.
+- A beginner vibe coding loop: describe, save, test, and improve one change at a time.
 - Local HTTP preview and the difference between `file://`, localhost, and a public URL.
-- Git commits, a GitHub repository, and branch-based GitHub Pages publication from `main` + `/docs`.
+- Git commits, a GitHub repository, and branch-based GitHub Pages publication from `main` + `/(root)` for the simple website.
 - Updating the source, rerendering, and pushing the refreshed public files.
 
 The instructions do not create a repository or publish on the student's behalf. Static hosting serves exports and browser JavaScript; it does not run DuckDB or Python kernels.

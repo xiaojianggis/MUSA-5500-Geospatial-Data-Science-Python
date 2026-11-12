@@ -1,0 +1,43 @@
+---
+title: "Week 11: Databases and web hosting"
+---
+
+Use the Census data you already have to learn spatial SQL, then turn the analysis into a public-facing report and website.
+
+## 1. Create and query a spatial database
+
+[Open the DuckDB Spatial tutorial](lecture-11A.html)
+
+Connect Python to a persistent database, import the Week 11 Census points and district polygons, ask location and distance questions, join by geometry, and export maps and summaries.
+
+<a href="lecture-11A.ipynb" download>Download the database notebook</a>
+
+## 2. Turn the analysis into a website
+
+[Open the publishing tutorial](lecture-11B.html)
+
+Beginner walkthrough: render your saved notebook with Quarto, use ChatGPT and vibe coding to build and test a simple website, learn the basic Git commands, then publish with GitHub Pages. Includes GitHub signup instructions and a diagram explaining local commits and online repositories.
+
+<a href="lecture-11B.ipynb" download>Download the publishing notes</a>
+
+## 3. Build a full-stack GIS with Python
+
+[Open the full-stack GIS demo](lecture-11C.html)
+
+Select a state to load its county-name dropdown, then prepare the complete county Census tract dataset. Map population, income, poverty, and home value for individual tracts with FastAPI and SQLite. County names choose the area; every colored polygon and downloaded record remains a census tract.
+
+<a href="lecture-11C.ipynb" download>Download lecture 11C</a> · [Download the complete runnable project](downloads/census-full-stack.zip) · [Tract-only dataset](downloads/census-tract-data.zip)
+
+## Start here
+
+- **Download both datasets into `week11/data`:** [census_sample.parquet](../week10-large-data-viz-lidar/data/samples/census_sample.parquet) and [districts_2015.geojson](../week10-large-data-viz-lidar/data/samples/districts_2015.geojson). Create the local folders first and move the files there if your browser saves them to Downloads.
+- Save the notebooks in `week11`; extract the full-stack project into `week11/census-full-stack`.
+- **Keep using `geospatial`:** follow Part A to install DuckDB/PyArrow, and Part C to add FastAPI/Uvicorn/HTTPX/Shapely in the same environment.
+- [Dependency reference](environment.yml).
+- [Download this tutorial folder](downloads/week11-tutorials.zip).
+- [Standalone website starter](downloads/starter-website.zip).
+- [Quarto website starter](downloads/quarto-site.zip).
+- [Reusable skill example](downloads/census-story-site-skill.zip).
+- [Setup and folder instructions](README.md).
+
+The Census dots are synthetic historical teaching data; their counts are not population estimates or current demographics. Parts A and B use those sample dots; Part C downloads real ACS estimates for town-level tract exploration.

@@ -39,7 +39,7 @@ quarto --version
 From the repository root, render a notebook with:
 
 ```bash
-quarto render public/labs/week-9-web-scraping/lecture-9A.ipynb --to html
+quarto render public/labs/week-8-web-scraping/lecture-8A.ipynb --to html
 ```
 
 ### Preview while editing
@@ -47,7 +47,7 @@ quarto render public/labs/week-9-web-scraping/lecture-9A.ipynb --to html
 Open the notebook in JupyterLab (or VS Code), then in a second terminal run:
 
 ```bash
-quarto preview public/labs/week-9-web-scraping/lecture-9A.ipynb --to html
+quarto preview public/labs/week-8-web-scraping/lecture-8A.ipynb --to html
 ```
 
 Quarto opens a local preview URL and refreshes it after you save the notebook.
@@ -55,21 +55,21 @@ Use the saved cell outputs for a fast preview. If you also need Quarto to run
 every cell before rendering, add `--execute`:
 
 ```bash
-quarto preview public/labs/week-9-web-scraping/lecture-9A.ipynb --to html --execute
+quarto preview public/labs/week-8-web-scraping/lecture-8A.ipynb --to html --execute
 ```
 
 Replace the example path with the notebook you want to update. Quarto writes
 the HTML beside the notebook, so the example creates or replaces:
 
 ```text
-public/labs/week-9-web-scraping/lecture-9A.html
+public/labs/week-8-web-scraping/lecture-8A.html
 ```
 
 The command uses the notebook's saved cell outputs. To execute every cell
 before rendering, use:
 
 ```bash
-quarto render public/labs/week-9-web-scraping/lecture-9A.ipynb --to html --execute
+quarto render public/labs/week-8-web-scraping/lecture-8A.ipynb --to html --execute
 ```
 
 Use `--execute` only when the notebook's Python environment and required data

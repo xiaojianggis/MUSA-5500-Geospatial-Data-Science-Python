@@ -59,28 +59,28 @@ const schedule = [
   // },
   { w: 8, date: "10/15/26", topic: "Web Scraping", 
     lab: [
-      {label: "8.1 Web Scraping (I)", href: `${base}labs/week-9-web-scraping/lecture-9A.html` },
-      {label: "8.2 Web Scraping (II)", href: `${base}labs/week-9-web-scraping/lecture-9B.html` }
+      {label: "8.1 Web Scraping (I)", href: `${base}labs/week-8-web-scraping/lecture-8A.html` },
+      {label: "8.2 Web Scraping (II)", href: `${base}labs/week-8-web-scraping/lecture-8B.html` }
     ]
   },
   { w: 9, date: "10/22/26", topic: "Web Scraping (II)", 
     lab: [
-      {label: "9.1 Web APIs (I)", href: `${base}labs/week-10-web-api/lecture-10A.html` },
-      {label: "9.2 Web APIs (II)", href: `${base}labs/week-10-web-api/lecture-10B.html` }
+      {label: "9.1 Web APIs (I)", href: `${base}labs/week-9-web-api/lecture-9A.html` },
+      {label: "9.2 Web APIs (II)", href: `${base}labs/week-9-web-api/lecture-9B.html` }
     ]
   },
     { w: 10, date: "10/29/26", topic: "Analyzing and Visualizing Large Datasets", 
     lab: [
-      {label: "10.1 Visualization I: Dask and Datashader", href: `${base}labs/week11-large-data-viz-lidar/Visualizing%20Large%20Data-Lec1.html`},
-      {label: "10.2 Visualization II: Queries, movement, and animation", href: `${base}labs/week11-large-data-viz-lidar/Visualizing%20Large%20Data-Lec2.html`},
-      {label: "10.3 LiDAR data processing", href: `${base}labs/week11-large-data-viz-lidar/lecture-11B.html`}
+      {label: "10.1 Visualization I: Dask and Datashader", href: `${base}labs/week10-large-data-viz-lidar/Visualizing%20Large%20Data-Lec1.html`},
+      {label: "10.2 Visualization II: Queries, movement, and animation", href: `${base}labs/week10-large-data-viz-lidar/Visualizing%20Large%20Data-Lec2.html`},
+      {label: "10.3 LiDAR data processing", href: `${base}labs/week10-large-data-viz-lidar/lecture-10B.html`}
     ]
   },
   { w: 11, date: "11/5/26", topic: "Spatial databases and web hosting",
     lab: [
-      {label: "11.1 Census analysis with DuckDB Spatial", href: `${base}labs/week12-database-web-hosting/lecture-12A.html`},
-      {label: "11.2 Quarto, ChatGPT, and GitHub Pages", href: `${base}labs/week12-database-web-hosting/lecture-12B.html`},
-      {label: "11.3 Full-stack Census GIS with Python", href: `${base}labs/week12-database-web-hosting/lecture-12C.html`}
+      {label: "11.1 Census analysis with DuckDB Spatial", href: `${base}labs/week11-database-web-hosting/lecture-11A.html`},
+      {label: "11.2 Quarto, ChatGPT, and GitHub Pages", href: `${base}labs/week11-database-web-hosting/lecture-11B.html`},
+      {label: "11.3 Full-stack Census GIS with Python", href: `${base}labs/week11-database-web-hosting/lecture-11C.html`}
     ]
   },
   { w: 12, date: "11/12/26", topic: "Machine Learning (I)", 
